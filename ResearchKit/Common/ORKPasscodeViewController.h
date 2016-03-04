@@ -66,12 +66,21 @@ ORK_AVAILABLE_DECL
  */
 - (void)passcodeViewControllerDidCancel:(UIViewController *)viewController;
 
-/**
- Notifies the delegate that the user hit the forgot passcode button
- 
- @param viewController      The `ORKPasscodeStepViewController` object in which the passcode input is entered.
+/*
+ * @return YES and "Forgot Passcode" button will show with text from delegate method textForForgotPasscode and will call forgotPasscodeTapped when pressed.  NO and button will be hidden. Defaults to NO.
  */
-- (void)passcodeViewControllerForgotPasscode:(UIViewController *)viewController;
+- (BOOL) hasForgotPasscode;
+
+/*
+ * @return the text of the forgot passcode button
+ */
+- (NSString*) textForForgotPasscode;
+
+/*
+ * Called when forgot passcode button is tapped
+ * @param forgotPasscodeButton the button that was tapped
+ */
+- (void) forgotPasscodeTapped:(UIButton*) forgotPasscodeButton;
 
 @end
 
@@ -105,18 +114,6 @@ ORK_CLASS_AVAILABLE
  */
 + (id)passcodeAuthenticationViewControllerWithText:(nullable NSString *)text
                                           delegate:(id<ORKPasscodeDelegate>)delegate;
-
-/**
- @param forgotPasscodeText text to display for forgot passcode button
- 
- @param text        The message displayed to the user.
- @param delegate    The delegate for the passcode view controller.
- 
- @return A passcode authentication view controller.
- */
-+ (id)passcodeAuthenticationViewControllerWithForgotPasscodeText:(nullable NSString*)forgotPasscodeText
-                                                    andTitleText:(nullable NSString *)text
-                                                        delegate:(id<ORKPasscodeDelegate>)delegate;
 
 /**
  An editing passcode view controller allows a user to be authenticated using

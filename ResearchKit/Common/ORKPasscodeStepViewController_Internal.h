@@ -58,7 +58,6 @@ typedef NS_ENUM(NSUInteger, ORKPasscodeState) {
 
 @property (nonatomic) ORKPasscodeFlow passcodeFlow;
 @property (nonatomic, weak) id<ORKPasscodeDelegate> passcodeDelegate;
-@property (nonatomic, strong) NSString* forgotPasscodeText;
 
 @end
 

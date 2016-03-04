@@ -99,7 +99,7 @@ static CGFloat const kForgotPasscodeHeight              = 100.0f;
         _useTouchId = YES;
         
         // If this has text, we should add the forgot passcode button with this title
-        if (self.forgotPasscodeText != nil && _forgotPasscodeButton == nil)
+        if ([self hasForgotPasscode])
         {
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
             
@@ -108,13 +108,15 @@ static CGFloat const kForgotPasscodeHeight              = 100.0f;
             CGFloat width = self.view.bounds.size.width - 2*kForgotPasscodeHorizontalPadding;
             UIButton* forgotPasscodeButton = [[UIButton alloc] initWithFrame:CGRectMake(x, _originalForgotPasscodeY, width, kForgotPasscodeHeight)];
             
-            [forgotPasscodeButton setTitle:self.forgotPasscodeText forState:UIControlStateNormal];
+            NSString* buttonTitle = [self forgotPasscodeButtonText];
+            [forgotPasscodeButton setTitle:buttonTitle forState:UIControlStateNormal];
             [forgotPasscodeButton setTitleColor:forgotPasscodeButton.tintColor forState:UIControlStateNormal];
             
-            [forgotPasscodeButton addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(forgotPasscodeTapped)]];
+            [forgotPasscodeButton addTarget:self
+                                     action:@selector(forgotPasscodeTapped)
+                           forControlEvents:UIControlEventTouchUpInside];
             
-            [self.view addSubview:forgotPasscodeButton];
-            
+            [self.view addSubview:forgotPasscodeButton];            
             _forgotPasscodeButton = forgotPasscodeButton;
         }
         
@@ -674,20 +676,40 @@ static CGFloat const kForgotPasscodeHeight              = 100.0f;
 
 - (void)forgotPasscodeTapped
 {
-    if ([self.passcodeDelegate respondsToSelector:@selector(passcodeViewControllerForgotPasscode:)])
+    if ([self.passcodeDelegate respondsToSelector:@selector(forgotPasscodeTapped:)])
     {
-        [self.passcodeDelegate passcodeViewControllerForgotPasscode:self];
+        [self.passcodeDelegate forgotPasscodeTapped:_forgotPasscodeButton];
     }
+}
+
+- (BOOL) hasForgotPasscode
+{
+    if ([self.passcodeDelegate respondsToSelector:@selector(hasForgotPasscode)])
+    {
+        return [self.passcodeDelegate hasForgotPasscode];
+    }
+    return NO;
+}
+
+- (NSString*) forgotPasscodeButtonText
+{
+    if ([self.passcodeDelegate respondsToSelector:@selector(textForForgotPasscode)])
+    {
+        return [self.passcodeDelegate textForForgotPasscode];
+    }
+    return @"";
 }
 
 #pragma mark - Keyboard Notifications
 
-- (void)keyboardWillShow:(NSNotification *)notifcation
+- (void)keyboardWillShow:(NSNotification *)notification
 {
-    CGFloat keyboardHeight = [notifcation.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height;
+    CGFloat keyboardHeight = [notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height;
     
-    double animationDuration = [notifcation.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
+    double animationDuration = [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
     
+    // Note: currently the UI never gets to a state where the keyboard animates back down, but if that was added
+    // Note: we would have to reverse this animation when keyboard was dismissed
     [UIView animateWithDuration:animationDuration animations:^
     {
         [_forgotPasscodeButton setFrame:CGRectMake(_forgotPasscodeButton.frame.origin.x, _originalForgotPasscodeY - keyboardHeight, _forgotPasscodeButton.frame.size.width, _forgotPasscodeButton.frame.size.height)];
