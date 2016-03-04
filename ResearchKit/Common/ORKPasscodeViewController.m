@@ -79,7 +79,6 @@
                             delegate:(id<ORKPasscodeDelegate>)delegate
                         passcodeFlow:(ORKPasscodeFlow)passcodeFlow
                         passcodeType:(ORKPasscodeType)passcodeType {
-    
     ORKPasscodeStep *step = [[ORKPasscodeStep alloc] initWithIdentifier:PasscodeStepIdentifier];
     step.passcodeType = passcodeType;
     step.text = text;
