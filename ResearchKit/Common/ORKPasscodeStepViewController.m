@@ -39,9 +39,14 @@
 #import <AudioToolbox/AudioToolbox.h>
 #import <LocalAuthentication/LocalAuthentication.h>
 
+static CGFloat const kForgotPasscodeVerticalPadding     = 50.0f;
+static CGFloat const kForgotPasscodeHorizontalPadding   = 30.0f;
+static CGFloat const kForgotPasscodeHeight              = 100.0f;
 
 @implementation ORKPasscodeStepViewController {
     ORKPasscodeStepView *_passcodeStepView;
+    CGFloat _originalForgotPasscodeY;
+    UIButton* _forgotPasscodeButton;
     UITextField *_accessibilityPasscodeField;
     NSMutableString *_passcode;
     NSMutableString *_confirmPasscode;
@@ -92,6 +97,26 @@
         _isTouchIdAuthenticated = NO;
         _isPasscodeSaved = NO;
         _useTouchId = YES;
+        
+        // If this has text, we should add the forgot passcode button with this title
+        if (self.forgotPasscodeText != nil && _forgotPasscodeButton == nil)
+        {
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+            
+            CGFloat x = kForgotPasscodeHorizontalPadding;
+            _originalForgotPasscodeY = self.view.bounds.size.height - kForgotPasscodeVerticalPadding - kForgotPasscodeHeight;
+            CGFloat width = self.view.bounds.size.width - 2*kForgotPasscodeHorizontalPadding;
+            UIButton* forgotPasscodeButton = [[UIButton alloc] initWithFrame:CGRectMake(x, _originalForgotPasscodeY, width, kForgotPasscodeHeight)];
+            
+            [forgotPasscodeButton setTitle:self.forgotPasscodeText forState:UIControlStateNormal];
+            [forgotPasscodeButton setTitleColor:forgotPasscodeButton.tintColor forState:UIControlStateNormal];
+            
+            [forgotPasscodeButton addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(forgotPasscodeTapped)]];
+            
+            [self.view addSubview:forgotPasscodeButton];
+            
+            _forgotPasscodeButton = forgotPasscodeButton;
+        }
         
         // Set the starting passcode state and textfield based on flow.
         switch (_passcodeFlow) {
@@ -645,6 +670,28 @@
 
 - (BOOL)textFieldShouldEndEditing:(UITextField *)textField {
     return _shouldResignFirstResponder;
+}
+
+- (void)forgotPasscodeTapped
+{
+    if ([self.passcodeDelegate respondsToSelector:@selector(passcodeViewControllerForgotPasscode:)])
+    {
+        [self.passcodeDelegate passcodeViewControllerForgotPasscode:self];
+    }
+}
+
+#pragma mark - Keyboard Notifications
+
+- (void)keyboardWillShow:(NSNotification *)notifcation
+{
+    CGFloat keyboardHeight = [notifcation.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height;
+    
+    double animationDuration = [notifcation.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
+    
+    [UIView animateWithDuration:animationDuration animations:^
+    {
+        [_forgotPasscodeButton setFrame:CGRectMake(_forgotPasscodeButton.frame.origin.x, _originalForgotPasscodeY - keyboardHeight, _forgotPasscodeButton.frame.size.width, _forgotPasscodeButton.frame.size.height)];
+    }];
 }
 
 @end

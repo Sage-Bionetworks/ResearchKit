@@ -66,6 +66,17 @@
                                    passcodeType:0];
 }
 
++ (id)passcodeAuthenticationViewControllerWithForgotPasscodeText:(NSString*)forgotPasscodeText
+                                                    andTitleText:(NSString *)text
+                                                        delegate:(id<ORKPasscodeDelegate>)delegate
+{
+    return [self passcodeViewControllerWithText:text
+                                       delegate:delegate
+                                   passcodeFlow:ORKPasscodeFlowAuthenticate
+                                   passcodeType:0
+                             forgotPasscodeText:forgotPasscodeText];
+}
+
 + (id)passcodeEditingViewControllerWithText:(NSString *)text
                                    delegate:(id<ORKPasscodeDelegate>)delegate
                                passcodeType:(ORKPasscodeType)passcodeType {
@@ -78,7 +89,17 @@
 + (id)passcodeViewControllerWithText:(NSString *)text
                             delegate:(id<ORKPasscodeDelegate>)delegate
                         passcodeFlow:(ORKPasscodeFlow)passcodeFlow
-                        passcodeType:(ORKPasscodeType)passcodeType {
+                        passcodeType:(ORKPasscodeType)passcodeType
+{
+    return [self passcodeViewControllerWithText:text delegate:delegate passcodeFlow:passcodeFlow passcodeType:passcodeType forgotPasscodeText:nil];
+}
+
++ (id)passcodeViewControllerWithText:(NSString *)text
+                            delegate:(id<ORKPasscodeDelegate>)delegate
+                        passcodeFlow:(ORKPasscodeFlow)passcodeFlow
+                        passcodeType:(ORKPasscodeType)passcodeType
+                  forgotPasscodeText:(NSString*)forgotPasscodeText
+{
 
     ORKPasscodeStep *step = [[ORKPasscodeStep alloc] initWithIdentifier:PasscodeStepIdentifier];
     step.passcodeType = passcodeType;
@@ -88,6 +109,7 @@
     passcodeStepViewController.passcodeFlow = passcodeFlow;
     passcodeStepViewController.passcodeDelegate = delegate;
     passcodeStepViewController.step = step;
+    passcodeStepViewController.forgotPasscodeText = forgotPasscodeText;
     
     ORKPasscodeViewController *navigationController = [[ORKPasscodeViewController alloc] initWithRootViewController:passcodeStepViewController];
     return navigationController;
