@@ -102,6 +102,7 @@ static CGFloat const kForgotPasscodeHeight              = 100.0f;
         if ([self hasForgotPasscode])
         {
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
             
             CGFloat x = kForgotPasscodeHorizontalPadding;
             _originalForgotPasscodeY = self.view.bounds.size.height - kForgotPasscodeVerticalPadding - kForgotPasscodeHeight;
@@ -708,12 +709,20 @@ static CGFloat const kForgotPasscodeHeight              = 100.0f;
     
     double animationDuration = [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
     
-    // Note: currently the UI never gets to a state where the keyboard animates back down, but if that was added
-    // Note: we would have to reverse this animation when keyboard was dismissed
     [UIView animateWithDuration:animationDuration animations:^
     {
         [_forgotPasscodeButton setFrame:CGRectMake(_forgotPasscodeButton.frame.origin.x, _originalForgotPasscodeY - keyboardHeight, _forgotPasscodeButton.frame.size.width, _forgotPasscodeButton.frame.size.height)];
     }];
+}
+
+- (void)keyboardWillHide:(NSNotification *)notification
+{
+    double animationDuration = [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
+
+    [UIView animateWithDuration:animationDuration animations:^
+     {
+         [_forgotPasscodeButton setFrame:CGRectMake(_forgotPasscodeButton.frame.origin.x, _originalForgotPasscodeY, _forgotPasscodeButton.frame.size.width, _forgotPasscodeButton.frame.size.height)];
+     }];
 }
 
 @end
