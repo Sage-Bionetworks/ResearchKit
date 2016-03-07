@@ -72,6 +72,7 @@ ORK_AVAILABLE_DECL
 - (BOOL) hasForgotPasscode;
 
 /*
+ * Defaults to Localized "Forgot Password?" text
  * @return the text of the forgot passcode button
  */
 - (NSString*) textForForgotPasscode;
@@ -79,8 +80,10 @@ ORK_AVAILABLE_DECL
 /*
  * Called when forgot passcode button is tapped
  * @param forgotPasscodeButton the button that was tapped
+ * @param ORKPasscodeStepViewController
  */
-- (void) forgotPasscodeTapped:(UIButton*) forgotPasscodeButton;
+- (void) forgotPasscodeTapped:(UIButton*) forgotPasscodeButton
+             onViewController:(UIViewController*)viewController;
 
 @end
 

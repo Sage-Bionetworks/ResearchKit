@@ -676,9 +676,9 @@ static CGFloat const kForgotPasscodeHeight              = 100.0f;
 
 - (void)forgotPasscodeTapped
 {
-    if ([self.passcodeDelegate respondsToSelector:@selector(forgotPasscodeTapped:)])
+    if ([self.passcodeDelegate respondsToSelector:@selector(forgotPasscodeTapped:onViewController:)])
     {
-        [self.passcodeDelegate forgotPasscodeTapped:_forgotPasscodeButton];
+        [self.passcodeDelegate forgotPasscodeTapped:_forgotPasscodeButton onViewController:self];
     }
 }
 
@@ -697,7 +697,7 @@ static CGFloat const kForgotPasscodeHeight              = 100.0f;
     {
         return [self.passcodeDelegate textForForgotPasscode];
     }
-    return @"";
+    return NSLocalizedString(@"PASSCODE_FORGOT", @"Prompt for user forgetting their passcode");
 }
 
 #pragma mark - Keyboard Notifications
