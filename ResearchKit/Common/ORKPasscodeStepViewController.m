@@ -697,7 +697,7 @@ static CGFloat const kForgotPasscodeHeight              = 100.0f;
     {
         return [self.passcodeDelegate textForForgotPasscode];
     }
-    return NSLocalizedString(@"PASSCODE_FORGOT", @"Prompt for user forgetting their passcode");
+    return ORKLocalizedString(@"PASSCODE_FORGOT", @"Prompt for user forgetting their passcode");
 }
 
 #pragma mark - Keyboard Notifications
