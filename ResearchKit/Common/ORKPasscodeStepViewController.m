@@ -107,11 +107,12 @@ static CGFloat const kForgotPasscodeHeight              = 100.0f;
             CGFloat x = kForgotPasscodeHorizontalPadding;
             _originalForgotPasscodeY = self.view.bounds.size.height - kForgotPasscodeVerticalPadding - kForgotPasscodeHeight;
             CGFloat width = self.view.bounds.size.width - 2*kForgotPasscodeHorizontalPadding;
-            UIButton* forgotPasscodeButton = [[UIButton alloc] initWithFrame:CGRectMake(x, _originalForgotPasscodeY, width, kForgotPasscodeHeight)];
+            UIButton* forgotPasscodeButton = [UIButton buttonWithType:UIButtonTypeSystem];
+            forgotPasscodeButton.frame = CGRectMake(x, _originalForgotPasscodeY, width, kForgotPasscodeHeight);
             
             NSString* buttonTitle = [self forgotPasscodeButtonText];
             [forgotPasscodeButton setTitle:buttonTitle forState:UIControlStateNormal];
-            [forgotPasscodeButton setTitleColor:forgotPasscodeButton.tintColor forState:UIControlStateNormal];
+            [forgotPasscodeButton setTitleColor:[self forgotPasscodeButtonTintColor] forState:UIControlStateNormal];
             
             [forgotPasscodeButton addTarget:self
                                      action:@selector(forgotPasscodeTapped)
@@ -699,6 +700,15 @@ static CGFloat const kForgotPasscodeHeight              = 100.0f;
         return [self.passcodeDelegate textForForgotPasscode];
     }
     return ORKLocalizedString(@"PASSCODE_FORGOT", @"Prompt for user forgetting their passcode");
+}
+
+- (UIColor*) forgotPasscodeButtonTintColor
+{
+    if ([self.passcodeDelegate respondsToSelector:@selector(tintColorForForgotPasscode)])
+    {
+        return [self.passcodeDelegate tintColorForForgotPasscode];
+    }
+    return [UIButton new].tintColor;
 }
 
 #pragma mark - Keyboard Notifications

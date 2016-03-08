@@ -78,6 +78,12 @@ ORK_AVAILABLE_DECL
 - (NSString*) textForForgotPasscode;
 
 /*
+ * Defaults to Localized standard Apple blue tint color
+ * @return the tint color of the forgot passcode button
+ */
+- (UIColor*) tintColorForForgotPasscode;
+
+/*
  * Called when forgot passcode button is tapped
  * @param forgotPasscodeButton the button that was tapped
  * @param ORKPasscodeStepViewController
