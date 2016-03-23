@@ -1730,6 +1730,12 @@ const NSUInteger NumberOfPaddingSpacesForIndentationLevel = 4;
 }
 
 - (id)answer {
+    // ORKDateQuestionResult can be of type ORKQuestionTypeDate or ORKQuestionTypeDateAndTime
+    // If our type is ORKQuestionTypeDate, we will output only the Date and leave out the time
+    // per the server guide
+    if (self.questionType == ORKQuestionTypeDate) {
+        return [ORKResultDateFormatter() stringFromDate:self.dateAnswer];
+    }
     return self.dateAnswer;
 }
 
