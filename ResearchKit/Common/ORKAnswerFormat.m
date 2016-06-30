@@ -2016,6 +2016,7 @@ static NSArray *ork_processTextChoices(NSArray<ORKTextChoice *> *textChoices) {
     fmt->_keyboardType = _keyboardType;
     fmt->_multipleLines = _multipleLines;
     fmt->_secureTextEntry = _secureTextEntry;
+    fmt->_disallowBlankString = _disallowBlankString;
     
     return fmt;
 }
@@ -2035,6 +2036,7 @@ static NSArray *ork_processTextChoices(NSArray<ORKTextChoice *> *textChoices) {
         ORK_DECODE_ENUM(aDecoder, keyboardType);
         ORK_DECODE_BOOL(aDecoder, multipleLines);
         ORK_DECODE_BOOL(aDecoder, secureTextEntry);
+        ORK_DECODE_BOOL(aDecoder, disallowBlankString);
     }
     return self;
 }
@@ -2050,6 +2052,7 @@ static NSArray *ork_processTextChoices(NSArray<ORKTextChoice *> *textChoices) {
     ORK_ENCODE_ENUM(aCoder, keyboardType);
     ORK_ENCODE_BOOL(aCoder, multipleLines);
     ORK_ENCODE_BOOL(aCoder, secureTextEntry);
+    ORK_ENCODE_BOOL(aCoder, disallowBlankString);
 }
 
 + (BOOL)supportsSecureCoding {
@@ -2069,7 +2072,8 @@ static NSArray *ork_processTextChoices(NSArray<ORKTextChoice *> *textChoices) {
              self.spellCheckingType == castObject.spellCheckingType &&
              self.keyboardType == castObject.keyboardType &&
              self.multipleLines == castObject.multipleLines) &&
-             self.secureTextEntry == castObject.secureTextEntry);
+             self.secureTextEntry == castObject.secureTextEntry) &&
+             self.disallowBlankString == castObject.disallowBlankString;
 }
 
 @end
