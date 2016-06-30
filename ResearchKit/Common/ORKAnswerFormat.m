@@ -1943,6 +1943,7 @@ static NSArray *ork_processTextChoices(NSArray<ORKTextChoice *> *textChoices) {
     fmt->_keyboardType = _keyboardType;
     fmt->_multipleLines = _multipleLines;
     fmt->_secureTextEntry = _secureTextEntry;
+    fmt->_disallowBlankString = _disallowBlankString;
     return fmt;
 }
 
@@ -1958,6 +1959,12 @@ static NSArray *ork_processTextChoices(NSArray<ORKTextChoice *> *textChoices) {
     BOOL isValid = YES;
     if (text && text.length > 0) {
         isValid = ([self isTextLengthValidWithString:text] && [self isTextRegexValidWithString:text]);
+    }
+    // Disallow any string that is blank, like "     ".
+    if (self.disallowBlankString && text.length > 0) {
+        if([text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length == 0) {
+            isValid = NO;
+        }
     }
     return isValid;
 }
