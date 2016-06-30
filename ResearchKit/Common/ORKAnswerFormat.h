@@ -1270,6 +1270,13 @@ ORK_CLASS_AVAILABLE
 @property(nonatomic,getter=isSecureTextEntry) BOOL secureTextEntry;
 
 /**
+ Identifies whether the text object should be allowed to be blank strings, aka all whitespace, like "   ".
+ 
+ By default, the value of this property is NO.
+ */
+@property (nonatomic) BOOL disallowBlankString;
+
+/**
  Returns an answer format that can be used for confirming a text entry.
  
  This answer format produces an `ORKBooleanQuestionResult` object.

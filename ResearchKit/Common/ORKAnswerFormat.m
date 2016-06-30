@@ -1943,6 +1943,7 @@ static NSArray *ork_processTextChoices(NSArray<ORKTextChoice *> *textChoices) {
     fmt->_keyboardType = _keyboardType;
     fmt->_multipleLines = _multipleLines;
     fmt->_secureTextEntry = _secureTextEntry;
+    fmt->_disallowBlankString = _disallowBlankString;
     return fmt;
 }
 
@@ -1958,6 +1959,12 @@ static NSArray *ork_processTextChoices(NSArray<ORKTextChoice *> *textChoices) {
     BOOL isValid = YES;
     if (text && text.length > 0) {
         isValid = ([self isTextLengthValidWithString:text] && [self isTextRegexValidWithString:text]);
+    }
+    // Disallow any string that is blank, like "     ".
+    if (self.disallowBlankString && text.length > 0) {
+        if([text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length == 0) {
+            isValid = NO;
+        }
     }
     return isValid;
 }
@@ -2009,6 +2016,7 @@ static NSArray *ork_processTextChoices(NSArray<ORKTextChoice *> *textChoices) {
     fmt->_keyboardType = _keyboardType;
     fmt->_multipleLines = _multipleLines;
     fmt->_secureTextEntry = _secureTextEntry;
+    fmt->_disallowBlankString = _disallowBlankString;
     
     return fmt;
 }
@@ -2028,6 +2036,7 @@ static NSArray *ork_processTextChoices(NSArray<ORKTextChoice *> *textChoices) {
         ORK_DECODE_ENUM(aDecoder, keyboardType);
         ORK_DECODE_BOOL(aDecoder, multipleLines);
         ORK_DECODE_BOOL(aDecoder, secureTextEntry);
+        ORK_DECODE_BOOL(aDecoder, disallowBlankString);
     }
     return self;
 }
@@ -2043,6 +2052,7 @@ static NSArray *ork_processTextChoices(NSArray<ORKTextChoice *> *textChoices) {
     ORK_ENCODE_ENUM(aCoder, keyboardType);
     ORK_ENCODE_BOOL(aCoder, multipleLines);
     ORK_ENCODE_BOOL(aCoder, secureTextEntry);
+    ORK_ENCODE_BOOL(aCoder, disallowBlankString);
 }
 
 + (BOOL)supportsSecureCoding {
@@ -2062,7 +2072,22 @@ static NSArray *ork_processTextChoices(NSArray<ORKTextChoice *> *textChoices) {
              self.spellCheckingType == castObject.spellCheckingType &&
              self.keyboardType == castObject.keyboardType &&
              self.multipleLines == castObject.multipleLines) &&
-             self.secureTextEntry == castObject.secureTextEntry);
+             self.secureTextEntry == castObject.secureTextEntry) &&
+             self.disallowBlankString == castObject.disallowBlankString;
+}
+
+- (NSUInteger)hash {
+    return  [super hash]                        ^
+            [_validationRegex hash]             ^
+            [_invalidMessage hash]              ^
+            [@(_maximumLength) hash]            ^
+            [@(_autocapitalizationType) hash]   ^
+            [@(_autocorrectionType) hash]       ^
+            [@(_spellCheckingType) hash]        ^
+            [@(_keyboardType) hash]             ^
+            [@(_multipleLines) hash]            ^
+            [@(_secureTextEntry) hash]          ^
+            [@(_disallowBlankString) hash];
 }
 
 @end
