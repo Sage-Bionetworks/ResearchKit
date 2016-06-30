@@ -1513,6 +1513,20 @@ static NSArray *ork_processTextChoices(NSArray<ORKTextChoice *> *textChoices) {
     return ORKQuestionTypeScale;
 }
 
+- (NSUInteger)hash {
+    return  [super hash]                        ^
+            [_validationRegex hash]             ^
+            [_invalidMessage hash]              ^
+            [@(_maximumLength) hash]            ^
+            [@(_autocapitalizationType) hash]   ^
+            [@(_autocorrectionType) hash]       ^
+            [@(_spellCheckingType) hash]        ^
+            [@(_keyboardType) hash]             ^
+            [@(_multipleLines) hash]            ^
+            [@(_multipleLines) hash]            ^
+            [@(_disallowEmptyString) hash];
+}
+
 @end
 
 
