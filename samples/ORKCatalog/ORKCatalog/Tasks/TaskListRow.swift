@@ -99,6 +99,8 @@ enum TaskListRow: Int, CustomStringConvertible {
     case WalkBackAndForth
     case TremorTest
     
+    case MoodSurvey
+    
     class TaskListRowSection {
         var title: String
         var rows: [TaskListRow]
@@ -116,6 +118,7 @@ enum TaskListRow: Int, CustomStringConvertible {
                 [
                     .Form,
                     .Survey,
+                    .MoodSurvey,
                 ]),
             TaskListRowSection(title: "Survey Questions", rows:
                 [
@@ -273,6 +276,9 @@ enum TaskListRow: Int, CustomStringConvertible {
             
         case .TremorTest:
             return NSLocalizedString("Tremor Test", comment: "")
+            
+        case .MoodSurvey:
+            return NSLocalizedString("Mood Survey", comment: "")
         }
     }
     
@@ -425,6 +431,9 @@ enum TaskListRow: Int, CustomStringConvertible {
         case TwoFingerTappingIntervalTask
         case WalkBackAndForthTask
         case TremorTestTask
+
+        // Surveys
+        case MoodSurvey
     }
     
     // MARK: Properties
@@ -539,6 +548,9 @@ enum TaskListRow: Int, CustomStringConvertible {
             
         case .TremorTest:
             return tremorTestTask
+
+        case .MoodSurvey:
+            return moodSurveyTask
         }
     }
 
