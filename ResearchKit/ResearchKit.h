@@ -68,7 +68,9 @@
 
 #import "ORKStepViewController.h"
 #import "ORKActiveStepViewController.h"
+#import "ORKCompletionStepViewController.h"
 #import "ORKFormStepViewController.h"
+#import "ORKInstructionStepViewController.h"
 #import "ORKLoginStepViewController.h"
 #import "ORKPageStepViewController.h"
 #import "ORKPasscodeViewController.h"
