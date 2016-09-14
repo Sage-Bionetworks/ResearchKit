@@ -56,7 +56,6 @@
 #import "ORKSpatialSpanMemoryStep.h"
 #import "ORKStep_Private.h"
 #import "ORKTappingIntervalStep.h"
-#import "ORKTimedWalkStep.h"
 #import "ORKToneAudiometryStep.h"
 #import "ORKToneAudiometryPracticeStep.h"
 #import "ORKTowerOfHanoiStep.h"
@@ -66,6 +65,7 @@
 #import "ORKResultPredicate.h"
 
 #import "ORKHelpers_Internal.h"
+#import "ResearchKit_Private.h"
 #import "UIImage+ResearchKit.h"
 #import <limits.h>
 
