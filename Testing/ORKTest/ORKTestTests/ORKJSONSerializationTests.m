@@ -390,6 +390,7 @@ ORK_MAKE_TEST_INIT(ORKLocation, (^{
                                               @"ORKSignatureResult.signaturePath",
                                               @"ORKPageStep.steps",
                                               @"ORKNavigablePageStep.steps",
+                                              @"ORKMoodScaleQuestionResult.scaleAnswer",
                                               ];
     NSArray *allowedUnTouchedKeys = @[@"_class"];
     
