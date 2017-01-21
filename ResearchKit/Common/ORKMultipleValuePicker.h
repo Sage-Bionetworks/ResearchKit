@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2015, Apple Inc. All rights reserved.
+ Copyright (c) 2017, Sage Bionetworks. All rights reserved.
  
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
@@ -28,41 +28,12 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 @import UIKit;
-#import <ResearchKit/ORKRecorder.h>
-
+#import "ORKPicker.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-/**
- The `ORKAccelerometerRecorder` class represents a recorder that requests and collects raw accelerometer data from CoreMotion at a fixed frequency.
- 
- The accelerometer recorder continues to record when the application enters the
- background by using the background task support provided by UIApplication.
- */
-ORK_CLASS_AVAILABLE
-@interface ORKAccelerometerRecorder : ORKRecorder
-
-/**
- The frequency of accelerometer data collected from CoreMotion, in hertz (Hz).
- */
-@property (nonatomic, readonly) double frequency;
-
-/**
- Returns an initialized accelerometer recorder using the specified frequency.
- 
- @param identifier          The unique identifier of the recorder (assigned by the recorder configuration).
- @param frequency           The frequency of accelerometer data collected from CoreMotion, in hertz (Hz).
- @param step                The step that requested this recorder.
- @param outputDirectory     The directory in which the accelerometer data should be stored.
- 
- @return An initialized accelerometer recorder.
- */
-- (instancetype)initWithIdentifier:(NSString *)identifier
-                         frequency:(double)frequency
-                              step:(nullable ORKStep *)step
-                   outputDirectory:(nullable NSURL *)outputDirectory;
+@interface ORKMultipleValuePicker : NSObject <ORKPicker>
 
 @end
 

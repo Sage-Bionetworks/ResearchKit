@@ -872,8 +872,15 @@ encondingTable =
         },
         (@{
           PROPERTY(textChoices, ORKTextChoice, NSArray, NO, nil, nil),
-          
           })),
+   ENTRY(ORKMultipleValuePickerAnswerFormat,
+         ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
+             return [[ORKMultipleValuePickerAnswerFormat alloc] initWithValuePickers:GETPROP(dict, valuePickers) separator:GETPROP(dict, separator)];
+         },
+         (@{
+            PROPERTY(valuePickers, ORKValuePickerAnswerFormat, NSArray, NO, nil, nil),
+            PROPERTY(separator, NSString, NSObject, NO, nil, nil),
+            })),
   ENTRY(ORKImageChoiceAnswerFormat,
         ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
             return [[ORKImageChoiceAnswerFormat alloc] initWithImageChoices:GETPROP(dict, imageChoices)];
@@ -1283,6 +1290,12 @@ encondingTable =
          nil,
          (@{
             PROPERTY(choiceAnswers, NSObject, NSObject, NO, nil, nil)
+            })),
+   ENTRY(ORKMultipleComponentQuestionResult,
+         nil,
+         (@{
+            PROPERTY(componentsAnswer, NSObject, NSObject, NO, nil, nil),
+            PROPERTY(separator, NSString, NSObject, NO, nil, nil)
             })),
    ENTRY(ORKBooleanQuestionResult,
          nil,
