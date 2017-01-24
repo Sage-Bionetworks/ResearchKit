@@ -35,7 +35,6 @@
 @implementation ORKGoNoGoStimulusView {
     CAShapeLayer *_tickLayer;
     CAShapeLayer *_crossLayer;
-    UIColor* _backgroundColor;
 }
 
 static const CGFloat RoundGoNoGoViewDiameter = 122;
@@ -44,7 +43,7 @@ static const CGFloat RoundGoNoGoViewDiameter = 122;
     self = [super init];
     if (self) {
         self.layer.cornerRadius = RoundGoNoGoViewDiameter * 0.5;
-        _backgroundColor = color;
+        self.backgroundColor = color;
     }
     return self;
 }
@@ -62,14 +61,10 @@ static const CGFloat RoundGoNoGoViewDiameter = 122;
     [_crossLayer removeFromSuperlayer];
     _tickLayer = nil;
     _crossLayer = nil;
-    self.layer.backgroundColor = _backgroundColor.CGColor;
+    self.layer.backgroundColor = self.backgroundColor.CGColor;
 }
 
-- (UIColor*)color {
-    return _backgroundColor;
-}
-
-- (void)setColor:(UIColor *)color {
+- (void)setBackgroundColor:(UIColor *)color {
     _backgroundColor = color;
     [self reset];
 }
