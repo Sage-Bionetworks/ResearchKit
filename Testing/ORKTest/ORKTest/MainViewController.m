@@ -697,6 +697,7 @@ static const CGFloat HeaderSideLayoutMargin = 16.0;
      */
 
     id<ORKTask> task = [self makeTaskWithIdentifier:identifier];
+    NSParameterAssert(task);
     
     if (_savedViewControllers[identifier]) {
         NSData *data = _savedViewControllers[identifier];
@@ -4229,7 +4230,7 @@ stepViewControllerWillAppear:(ORKStepViewController *)stepViewController {
     if (results) {
         NSSet *uniqueResults = [NSSet setWithArray:results];
         BOOL allResultsUnique = (results.count == uniqueResults.count);
-        NSAssert(allResultsUnique, @"The returns results have duplicates of the same object.");
+        NSAssert(allResultsUnique, @"The returned results have duplicates of the same object.");
     }
     
     if (_currentDocument) {

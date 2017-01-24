@@ -32,6 +32,7 @@
 
 #import "ORKESerialization.h"
 
+@import ResearchKit;
 @import ResearchKit.Private;
 
 @import MapKit;
@@ -1398,6 +1399,7 @@ encondingTable =
          nil,
          (@{
             PROPERTY(enabledAssistiveTechnology, NSString, NSObject, YES, nil, nil),
+            PROPERTY(isPreviousResult, NSNumber, NSObject, YES, nil, nil),
             })),
    ENTRY(ORKPageResult,
          nil,
