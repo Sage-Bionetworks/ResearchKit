@@ -4735,29 +4735,6 @@ stepViewControllerWillAppear:(ORKStepViewController *)stepViewController {
     return [[ORKOrderedTask alloc] initWithIdentifier:CompletionStepTaskIdentifier steps:steps];
 }
 
-#pragma mark - Icon Image
-
-- (IBAction)iconImageButtonTapped:(id)sender {
-    [self beginTaskWithIdentifier:IconImageTaskIdentifier];
-}
-
-- (ORKOrderedTask *)makeIconImageTask {
-    
-    ORKInstructionStep *step1 = [[ORKInstructionStep alloc] initWithIdentifier:@"step1"];
-    step1.title = @"Title";
-    step1.text = @"This is an example of a step with an icon image.";
-
-    NSDictionary *infoPlist = [[NSBundle mainBundle] infoDictionary];
-    NSString *icon = [[infoPlist valueForKeyPath:@"CFBundleIcons.CFBundlePrimaryIcon.CFBundleIconFiles"] lastObject];
-    step1.iconImage = [UIImage imageNamed:icon];
-    
-    ORKInstructionStep *step2 = [[ORKInstructionStep alloc] initWithIdentifier:@"step2"];
-    step2.text = @"This is an example of a step with an icon image and no title.";
-    step2.iconImage = [UIImage imageNamed:icon];
-    
-    return [[ORKOrderedTask alloc] initWithIdentifier:IconImageTaskIdentifier steps:@[step1, step2]];
-}
-
 #pragma mark - Footnote
 
 - (IBAction)footnoteButtonTapped:(id)sender {
