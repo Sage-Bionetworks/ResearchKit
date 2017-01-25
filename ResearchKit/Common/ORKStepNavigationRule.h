@@ -328,7 +328,6 @@ ORK_CLASS_AVAILABLE
  
  Step modifiers can be used within an `ORKNavigableOrderedTask` object. You assign step modifiers 
  to be triggered after a task step is shown. Each step can have one step modifier at most.
-
  */
 ORK_CLASS_AVAILABLE
 @interface ORKStepModifier: NSObject <NSCopying, NSSecureCoding>
@@ -346,13 +345,13 @@ ORK_CLASS_AVAILABLE
 
 @end
 
+
 /**
  The `ORKKeyValueStepModifier` class is an class for an object that can be used to modify a step
  if a given navigation rule is matched.
  
  Step modifiers can be used within an `ORKNavigableOrderedTask` object. You assign step modifiers
  to be triggered after a task step is shown. Each step can have one step modifier at most.
- 
  */
 ORK_CLASS_AVAILABLE
 @interface ORKKeyValueStepModifier: ORKStepModifier
@@ -373,7 +372,9 @@ ORK_CLASS_AVAILABLE
 
 /**
  A key-value mapping to apply to the modified step if the result predicate matches.
- The keys in this are assumed to map using KVO.
+ The keys in this are assumed to map using key-value coding.
+ 
+ See https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/KeyValueCoding/
  */
 @property (nonatomic, strong, readonly) NSDictionary<NSString *, NSObject *> *keyValueMap;
 
