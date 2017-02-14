@@ -286,6 +286,7 @@ typedef NS_ENUM(NSUInteger, ORKMoodSurveyFrequency) {
     ORKMoodSurveyFrequencyWeekly,
 } ORK_ENUM_AVAILABLE;
 
+
 /**
  Type of mood survey question.
  
@@ -299,5 +300,40 @@ typedef NS_ENUM(NSUInteger, ORKMoodQuestionType) {
     ORKMoodQuestionTypeSleep,
     ORKMoodQuestionTypeExcercise
 } ORK_ENUM_AVAILABLE;
+
+
+/**
+ Keys into a `sendMessage:` dictionary for interactive communication between the 
+ watch and the phone.
+ */
+typedef NSString * ORKWorkoutMessageKey NS_STRING_ENUM;
+
+// State changed (sent by watch)
+ORK_EXTERN ORKWorkoutMessageKey const ORKWorkoutMessageKeyChangedState;
+// Command (sent by phone)
+ORK_EXTERN ORKWorkoutMessageKey const ORKWorkoutMessageKeyCommand;
+// Timestamp included with message packet
+ORK_EXTERN ORKWorkoutMessageKey const ORKWorkoutMessageKeyTimestamp;
+
+
+/**
+ String enum for the watch's workout session state. 
+ */
+typedef NSString * ORKWorkoutState NS_STRING_ENUM;
+
+ORK_EXTERN ORKWorkoutState const ORKWorkoutStateNotStarted;
+ORK_EXTERN ORKWorkoutState const ORKWorkoutStateRunning;
+ORK_EXTERN ORKWorkoutState const ORKWorkoutStateEnded;
+ORK_EXTERN ORKWorkoutState const ORKWorkoutStatePaused;
+
+
+/**
+ String enum for commands to change the watch's session state.
+ */
+typedef NSString * ORKWorkoutCommand NS_STRING_ENUM;
+
+ORK_EXTERN ORKWorkoutCommand const ORKWorkoutCommandStop;
+ORK_EXTERN ORKWorkoutCommand const ORKWorkoutCommandPause;
+ORK_EXTERN ORKWorkoutCommand const ORKWorkoutCommandResume;
 
 NS_ASSUME_NONNULL_END

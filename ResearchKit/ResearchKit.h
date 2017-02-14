@@ -31,10 +31,14 @@
 
 #import <ResearchKit/ORKTypes.h>
 
+// Only include the types and defines for other OS types.
+#if TARGET_OS_IOS
+
 #import <ResearchKit/ORKStep.h>
 #import <ResearchKit/ORKActiveStep.h>
 #import <ResearchKit/ORKConsentReviewStep.h>
 #import <ResearchKit/ORKConsentSharingStep.h>
+#import <ResearchKit/ORKFitnessStep.h>
 #import <ResearchKit/ORKFormStep.h>
 #import <ResearchKit/ORKImageCaptureStep.h>
 #import <ResearchKit/ORKInstructionStep.h>
@@ -72,6 +76,7 @@
 #import <ResearchKit/ORKStepViewController.h>
 #import <ResearchKit/ORKActiveStepViewController.h>
 #import <ResearchKit/ORKCompletionStepViewController.h>
+#import <ResearchKit/ORKFitnessStepViewController.h>
 #import <ResearchKit/ORKFormStepViewController.h>
 #import <ResearchKit/ORKInstructionStepViewController.h>
 #import <ResearchKit/ORKLoginStepViewController.h>
@@ -99,4 +104,6 @@
 
 #import <ResearchKit/ORKDataCollectionManager.h>
 #import <ResearchKit/ORKCollector.h>
+
+#endif
 
