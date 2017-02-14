@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2015, Apple Inc. All rights reserved.
+ Copyright (c) 2017, Sage Bionetworks. All rights reserved.
  
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
@@ -28,46 +28,15 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+@import Foundation;
+#import <ResearchKit/ORKDefines.h>
+#import <ResearchKit/ORKInstructionStep.h>
 
-#import "CLLocation+ORKJSONDictionary.h"
+NS_ASSUME_NONNULL_BEGIN
 
-#import "ORKHelpers_Internal.h"
-
-
-@implementation CLLocation (ORKJSONDictionary)
-
-- (NSDictionary *)ork_JSONDictionary {
-    CLLocationCoordinate2D coord = self.coordinate;
-    CLLocationDistance altitude = self.altitude;
-    CLLocationAccuracy horizAccuracy = self.horizontalAccuracy;
-    CLLocationAccuracy vertAccuracy = self.verticalAccuracy;
-    CLLocationDirection course = self.course;
-    CLLocationSpeed speed = self.speed;
-    NSDate *timestamp = self.timestamp;
-    CLFloor *floor = self.floor;
-    
-    NSMutableDictionary *dictionary = [@{@"timestamp": ORKStringFromDateISO8601(timestamp)} mutableCopy];
-    
-    if (horizAccuracy >= 0) {
-        dictionary[@"coordinate"] = @{ @"latitude": [NSDecimalNumber numberWithDouble:coord.latitude],
-                                       @"longitude": [NSDecimalNumber numberWithDouble:coord.longitude]};
-        dictionary[@"horizontalAccuracy"] = [NSDecimalNumber numberWithDouble:horizAccuracy];
-    }
-    if (vertAccuracy >= 0) {
-        dictionary[@"altitude"] = [NSDecimalNumber numberWithDouble:altitude];
-        dictionary[@"verticalAccuracy"] = [NSDecimalNumber numberWithDouble:vertAccuracy];
-    }
-    if (course >= 0) {
-        dictionary[@"course"] = [NSDecimalNumber numberWithDouble:course];
-    }
-    if (speed >= 0) {
-        dictionary[@"speed"] = [NSDecimalNumber numberWithDouble:speed];
-    }
-    if (floor) {
-        dictionary[@"floor"] = @(floor.level);
-    }
-
-    return dictionary;
-}
+ORK_CLASS_AVAILABLE
+@interface ORKHeartRateCameraInstructionStep : ORKInstructionStep
 
 @end
+
+NS_ASSUME_NONNULL_END

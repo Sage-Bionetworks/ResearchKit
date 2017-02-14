@@ -116,6 +116,9 @@
     if ([self.pageTask respondsToSelector:@selector(validateParameters)]) {
         [self.pageTask validateParameters];
     }
+    for (ORKStep *step in self.pageTask.steps) {
+        [step validateParameters];
+    }
 }
 
 - (ORKStep *)stepAfterStepWithIdentifier:(NSString *)identifier withResult:(ORKTaskResult *)result {

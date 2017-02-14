@@ -34,14 +34,16 @@
 #import "ORKDataLogger.h"
 
 #import "ORKRecorder_Internal.h"
+#import "ORKHelpers_Internal.h"
 
-#import "CLLocation+ORKJSONDictionary.h"
+#import "CLLocation+JSONCodingObject.h"
 
 #import <CoreLocation/CoreLocation.h>
 
 
 @interface ORKLocationRecorder () <CLLocationManagerDelegate> {
     ORKDataLogger *_logger;
+    CLLocation *_lastLocation;
     NSError *_recordingError;
     BOOL _started;
 }
@@ -131,13 +133,16 @@
 - (void)locationManager:(CLLocationManager *)manager
      didUpdateLocations:(NSArray *)locations {
     BOOL success = YES;
+    BOOL relativeDistanceOnly = ((ORKLocationRecorderConfiguration *)self.configuration).relativeDistanceOnly;
     NSParameterAssert(locations.count >= 0);
     NSError *error = nil;
     if (locations) {
         NSMutableArray *dictionaries = [NSMutableArray arrayWithCapacity:locations.count];
         [locations enumerateObjectsUsingBlock:^(CLLocation *obj, NSUInteger idx, BOOL *stop) {
-            NSDictionary *d = [obj ork_JSONDictionary];
+            NSDictionary *d = [obj ork_jsonCodingObjectWithRelativeDistanceOnly:relativeDistanceOnly
+                                                                       previous:_lastLocation];
             [dictionaries addObject:d];
+            _lastLocation = [obj copy];
         }];
         
         success = [_logger appendObjects:dictionaries error:&error];
@@ -184,17 +189,29 @@
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
+    ORK_DECODE_BOOL(aDecoder, relativeDistanceOnly);
     return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    [super encodeWithCoder:aCoder];
+    ORK_ENCODE_BOOL(aCoder, relativeDistanceOnly);
 }
 
 + (BOOL)supportsSecureCoding {
     return YES;
 }
 
+- (NSUInteger)hash {
+    return super.hash ^ self.relativeDistanceOnly;
+}
+
 - (BOOL)isEqual:(id)object {
     BOOL isParentSame = [super isEqual:object];
     
-    return isParentSame;
+    __typeof(self) castObject = object;
+    return isParentSame &&
+        (self.relativeDistanceOnly == castObject.relativeDistanceOnly);
 }
 
 - (ORKPermissionMask)requestedPermissionMask {

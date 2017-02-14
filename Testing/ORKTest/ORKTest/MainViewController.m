@@ -71,11 +71,13 @@ DefineStringKey(PredicateTestsTaskIdentifier);
 DefineStringKey(ActiveStepTaskIdentifier);
 DefineStringKey(AudioTaskIdentifier);
 DefineStringKey(AuxillaryImageTaskIdentifier);
+DefineStringKey(CardioTaskIdentifier);
 DefineStringKey(FitnessTaskIdentifier);
 DefineStringKey(FootnoteTaskIdentifier);
 DefineStringKey(GaitTaskIdentifier);
 DefineStringKey(GoNoGoTaskIdentifier);
 DefineStringKey(IconImageTaskIdentifier);
+DefineStringKey(HeartRateStepTaskIdentifier);
 DefineStringKey(HolePegTestTaskIdentifier);
 DefineStringKey(MemoryTaskIdentifier);
 DefineStringKey(PSATTaskIdentifier);
@@ -364,9 +366,11 @@ static const CGFloat HeaderSideLayoutMargin = 16.0;
                        @[ // Active Tasks
                            @"Active Step Task",
                            @"Audio Task",
+                           @"Cardio Task",
                            @"Fitness Task",
                            @"GAIT Task",
                            @"Go No Go Task",
+                           @"Heart Rate Step Task",
                            @"Hole Peg Test Task",
                            @"Memory Game Task",
                            @"PSAT Task",
@@ -528,6 +532,20 @@ static const CGFloat HeaderSideLayoutMargin = 16.0;
         return [self makeOptionalFormTask];
     } else if ([identifier isEqualToString:PredicateTestsTaskIdentifier]) {
         return [self makePredicateTestsTask];
+    } else if ([identifier isEqualToString:CardioTaskIdentifier]) {
+        if (ORK_IOS_10_WATCHOS_3_AVAILABLE) {
+            return [ORKOrderedTask cardioChallengeTaskWithIdentifier:CardioTaskIdentifier
+                                              intendedUseDescription:nil
+                                                        walkDuration:2*60
+                                                        restDuration:30
+                                                             options:ORKPredefinedTaskOptionNone];
+        } else {
+            return [ORKOrderedTask fitnessCheckTaskWithIdentifier:CardioTaskIdentifier
+                                           intendedUseDescription:nil
+                                                     walkDuration:360
+                                                     restDuration:180
+                                                          options:ORKPredefinedTaskOptionNone];
+        }
     } else if ([identifier isEqualToString:FitnessTaskIdentifier]) {
         return [ORKOrderedTask fitnessCheckTaskWithIdentifier:FitnessTaskIdentifier
                                        intendedUseDescription:nil
@@ -2764,6 +2782,10 @@ static const CGFloat HeaderSideLayoutMargin = 16.0;
 
 #pragma mark - Active tasks
 
+- (void)cardioTaskButtonTapped:(id)sender {
+    [self beginTaskWithIdentifier:CardioTaskIdentifier];
+}
+
 - (void)fitnessTaskButtonTapped:(id)sender {
     [self beginTaskWithIdentifier:FitnessTaskIdentifier];
 }
@@ -2810,6 +2832,10 @@ static const CGFloat HeaderSideLayoutMargin = 16.0;
 
 - (void)psatTaskButtonTapped:(id)sender {
     [self beginTaskWithIdentifier:PSATTaskIdentifier];
+}
+
+- (void)heartRateStepTaskButtonTapped:(id)sender {
+    [self beginTaskWithIdentifier:HeartRateStepTaskIdentifier];
 }
 
 - (void)holePegTestTaskButtonTapped:(id)sender {
@@ -4040,7 +4066,7 @@ static const CGFloat HeaderSideLayoutMargin = 16.0;
     NSString *task_identifier = taskViewController.task.identifier;
 
     return ([step isKindOfClass:[ORKInstructionStep class]]
-            && NO == [@[AudioTaskIdentifier, FitnessTaskIdentifier, GaitTaskIdentifier, TwoFingerTapTaskIdentifier, NavigableOrderedTaskIdentifier, NavigableLoopTaskIdentifier] containsObject:task_identifier]);
+            && NO == [@[AudioTaskIdentifier, CardioTaskIdentifier, FitnessTaskIdentifier, GaitTaskIdentifier, TwoFingerTapTaskIdentifier, NavigableOrderedTaskIdentifier, NavigableLoopTaskIdentifier] containsObject:task_identifier]);
 }
 
 /*

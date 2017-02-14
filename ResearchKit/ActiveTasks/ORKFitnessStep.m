@@ -33,8 +33,61 @@
 
 #import "ORKFitnessStepViewController.h"
 
+#import "ORKCodingObjects.h"
+#import "ORKDefines.h"
+#import "ORKHelpers_Internal.h"
+#import "ORKOrderedTask_Private.h"
+#import "ORKRecorder.h"
+#import "ORKStep_Private.h"
 
 @implementation ORKFitnessStep
+
++ (NSArray *)recorderConfigurationsWithOptions:(ORKPredefinedRecorderOption)options
+                          relativeDistanceOnly:(BOOL)relativeDistanceOnly {
+    NSMutableArray *recorderConfigurations = [NSMutableArray arrayWithCapacity:5];
+    if (!(ORKPredefinedRecorderOptionExcludePedometer & options)) {
+        [recorderConfigurations addObject:[[ORKPedometerRecorderConfiguration alloc] initWithIdentifier:ORKPedometerRecorderIdentifier]];
+    }
+    if (!(ORKPredefinedRecorderOptionExcludeAccelerometer & options)) {
+        [recorderConfigurations addObject:[[ORKAccelerometerRecorderConfiguration alloc] initWithIdentifier:ORKAccelerometerRecorderIdentifier
+                                                                                                  frequency:100]];
+    }
+    if (!(ORKPredefinedRecorderOptionExcludeDeviceMotion & options)) {
+        [recorderConfigurations addObject:[[ORKDeviceMotionRecorderConfiguration alloc] initWithIdentifier:ORKDeviceMotionRecorderIdentifier
+                                                                                                 frequency:100]];
+    }
+    if (!(ORKPredefinedRecorderOptionExcludeLocation & options)) {
+        ORKLocationRecorderConfiguration *locationConfig = [[ORKLocationRecorderConfiguration alloc] initWithIdentifier:ORKLocationRecorderIdentifier];
+        locationConfig.relativeDistanceOnly = relativeDistanceOnly;
+        [recorderConfigurations addObject:locationConfig];
+    }
+    if (!(ORKPredefinedRecorderOptionExcludeHeartRate & options)) {
+        HKUnit *bpmUnit = [HKUnit bpmUnit];
+        HKQuantityType *heartRateType = [HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeartRate];
+        [recorderConfigurations addObject:[[ORKHealthQuantityTypeRecorderConfiguration alloc] initWithIdentifier:ORKHeartRateRecorderIdentifier
+                                                                                              healthQuantityType:heartRateType unit:bpmUnit]];
+    }
+    return recorderConfigurations;
+}
+
++ (instancetype)fitnessStepWithIdentifier:(NSString *)identifier walkDuration:(NSTimeInterval)walkDuration options:(ORKPredefinedRecorderOption)options relativeDistanceOnly:(BOOL)relativeDistanceOnly {
+    NSDateComponentsFormatter *formatter = [ORKOrderedTask textTimeFormatter];
+    ORKFitnessStep *fitnessStep = [[ORKFitnessStep alloc] initWithIdentifier:ORKFitnessWalkStepIdentifier];
+    fitnessStep.stepDuration = walkDuration;
+    fitnessStep.title = [NSString stringWithFormat:ORKLocalizedString(@"FITNESS_WALK_INSTRUCTION_FORMAT", nil), [formatter stringFromTimeInterval:walkDuration]];
+    fitnessStep.spokenInstruction = fitnessStep.title;
+    fitnessStep.recorderConfigurations = [self recorderConfigurationsWithOptions:options relativeDistanceOnly:relativeDistanceOnly];
+    fitnessStep.shouldContinueOnFinish = YES;
+    fitnessStep.optional = NO;
+    fitnessStep.shouldStartTimerAutomatically = YES;
+    fitnessStep.shouldTintImages = YES;
+    fitnessStep.image = [UIImage imageNamed:@"walkingman" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
+    fitnessStep.shouldVibrateOnStart = YES;
+    fitnessStep.shouldPlaySoundOnStart = YES;
+    fitnessStep.watchInstruction = ORKLocalizedString(@"FITNESS_WALK_INSTRUCTION_WATCH", nil);
+    fitnessStep.beginCommand = ORKWorkoutCommandStartMoving;
+    return fitnessStep;
+}
 
 + (Class)stepViewControllerClass {
     return [ORKFitnessStepViewController class];
@@ -48,8 +101,12 @@
     return self;
 }
 
-- (void)validateParameters {
+- (void)ork_superValidateParameters {
     [super validateParameters];
+}
+
+- (void)validateParameters {
+    [self ork_superValidateParameters];
     
     NSTimeInterval const ORKFitnessStepMinimumDuration = 5.0;
     

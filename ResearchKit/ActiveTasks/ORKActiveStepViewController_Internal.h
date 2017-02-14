@@ -30,7 +30,7 @@
 
 
 #import "ORKActiveStepViewController.h"
-
+#import "ORKWorkoutMessage.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -48,9 +48,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, readonly, nullable) ORKActiveStepView *activeStepView;
 
+@property (nonatomic, readonly) NSTimeInterval stepDuration;
 @property (nonatomic, readonly) NSTimeInterval timeRemaining;
 @property (nonatomic, readonly) BOOL timerActive;
 @property (nonatomic, assign) NSTimeInterval timerUpdateInterval;
+
 
 @property (nonatomic, assign, getter=isStarted) BOOL started;
 
@@ -60,6 +62,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)applicationDidBecomeActive:(NSNotification *)notification;
 
 - (void)stopRecorders;
+- (void)removeRecorder:(ORKRecorder *)recorder;
+
+- (void)workoutStateChanged:(ORKWorkoutState)workoutState;
+- (void)addHeathRecorderQuantitySamples:(NSArray<HKQuantitySample *> *)samples quantityTypeIdentifier:(NSString *)quantityTypeIdentifier;
 
 @end
 

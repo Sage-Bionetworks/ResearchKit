@@ -30,7 +30,7 @@
 
 
 #import "ORKStepViewController.h"
-
+#import "ORKWorkoutMessage.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -83,6 +83,9 @@ NS_ASSUME_NONNULL_BEGIN
 // internal method for updating the right bar button item.
 - (void)updateNavRightBarButtonItem;
 - (void)updateNavLeftBarButtonItem;
+
+- (void)didReceiveWatchMessage:(ORKWorkoutMessage *)message;
+- (void)didReceiveWatchError:(NSError *)error;
 
 @end
 

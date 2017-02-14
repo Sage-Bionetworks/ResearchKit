@@ -30,10 +30,14 @@
 
 
 @import Foundation;
+@import HealthKit;
 #import <ResearchKit/ORKDefines.h>
 
 
 NS_ASSUME_NONNULL_BEGIN
+
+@interface ORKTypes : NSObject
+@end
 
 /**
  An enumeration of values that identify the different types of questions that the ResearchKit
@@ -298,42 +302,50 @@ typedef NS_ENUM(NSUInteger, ORKMoodQuestionType) {
     ORKMoodQuestionTypeOverall,
     ORKMoodQuestionTypePain,
     ORKMoodQuestionTypeSleep,
-    ORKMoodQuestionTypeExcercise
+    ORKMoodQuestionTypeExcercise,
+    ORKMoodQuestionTypeBreathing,
+    ORKMoodQuestionTypeTired,
 } ORK_ENUM_AVAILABLE;
 
 
 /**
- Keys into a `sendMessage:` dictionary for interactive communication between the 
- watch and the phone.
+ Options for excluding different recorders
  */
-typedef NSString * ORKWorkoutMessageKey NS_STRING_ENUM;
-
-// State changed (sent by watch)
-ORK_EXTERN ORKWorkoutMessageKey const ORKWorkoutMessageKeyChangedState;
-// Command (sent by phone)
-ORK_EXTERN ORKWorkoutMessageKey const ORKWorkoutMessageKeyCommand;
-// Timestamp included with message packet
-ORK_EXTERN ORKWorkoutMessageKey const ORKWorkoutMessageKeyTimestamp;
+typedef NS_OPTIONS(NSUInteger, ORKPredefinedRecorderOption) {
+    /// Default behavior.
+    ORKPredefinedRecorderOptionNone = 0,
+    
+    /// Exclude accelerometer data collection.
+    ORKPredefinedRecorderOptionExcludeAccelerometer = (1 << 2),
+    
+    /// Exclude device motion data collection.
+    ORKPredefinedRecorderOptionExcludeDeviceMotion = (1 << 3),
+    
+    /// Exclude pedometer data collection.
+    ORKPredefinedRecorderOptionExcludePedometer = (1 << 4),
+    
+    /// Exclude location data collection.
+    ORKPredefinedRecorderOptionExcludeLocation = (1 << 5),
+    
+    /// Exclude heart rate data collection.
+    ORKPredefinedRecorderOptionExcludeHeartRate = (1 << 6),
+    
+    /// Exclude audio data collection.
+    ORKPredefinedRecorderOptionExcludeAudio = (1 << 7)
+    
+} ORK_ENUM_AVAILABLE;
 
 
 /**
- String enum for the watch's workout session state. 
+ Extension to HKUnit
  */
-typedef NSString * ORKWorkoutState NS_STRING_ENUM;
-
-ORK_EXTERN ORKWorkoutState const ORKWorkoutStateNotStarted;
-ORK_EXTERN ORKWorkoutState const ORKWorkoutStateRunning;
-ORK_EXTERN ORKWorkoutState const ORKWorkoutStateEnded;
-ORK_EXTERN ORKWorkoutState const ORKWorkoutStatePaused;
-
+@interface HKUnit (ORKUnitExtension)
 
 /**
- String enum for commands to change the watch's session state.
+ Beats per minute (heart rate)
  */
-typedef NSString * ORKWorkoutCommand NS_STRING_ENUM;
++ (HKUnit *)bpmUnit;
 
-ORK_EXTERN ORKWorkoutCommand const ORKWorkoutCommandStop;
-ORK_EXTERN ORKWorkoutCommand const ORKWorkoutCommandPause;
-ORK_EXTERN ORKWorkoutCommand const ORKWorkoutCommandResume;
+@end
 
 NS_ASSUME_NONNULL_END

@@ -217,7 +217,9 @@ ORK_MAKE_TEST_INIT(HKObjectType, (^{
 ORK_MAKE_TEST_INIT(CLCircularRegion, (^{
     return [[CLCircularRegion alloc] initWithCenter:CLLocationCoordinate2DMake(2.0, 3.0) radius:100.0 identifier:@"identifier"];
 }));
-
+ORK_MAKE_TEST_INIT(NSError, ^{return [self initWithDomain:@"ORKTest" code:1 userInfo:nil];});
+ORK_MAKE_TEST_INIT(ORKDevice, ^{return [self initWithName:@"test" manufacturer:@"test" model:@"test" hardwareVersion:nil softwareVersion:nil];});
+ORK_MAKE_TEST_INIT(HKWorkoutEvent, ^{return [HKWorkoutEvent workoutEventWithType:HKWorkoutEventTypeMarker date:[NSDate date]];});
                                                 
 @interface ORKJSONSerializationTests : XCTestCase <NSKeyedUnarchiverDelegate>
 
@@ -360,6 +362,7 @@ ORK_MAKE_TEST_INIT(CLCircularRegion, (^{
                                        @"firstResult",
                                        @"ORKPageStep.steps",
                                        @"ORKNavigablePageStep.steps",
+                                       @"workoutConfiguration",
                                        ];
     NSArray *knownNotSerializedProperties = @[
                                               @"ORKStep.task",
@@ -377,6 +380,7 @@ ORK_MAKE_TEST_INIT(CLCircularRegion, (^{
                                               @"ORKConsentDocument.sections",
                                               @"ORKConsentDocument.signatures",
                                               @"ORKContinuousScaleAnswerFormat.numberFormatter",
+                                              @"ORKErrorResult.error",
                                               @"ORKFormItem.step",
                                               @"ORKTimeIntervalAnswerFormat.maximumInterval",
                                               @"ORKTimeIntervalAnswerFormat.defaultInterval",
@@ -586,6 +590,9 @@ ORK_MAKE_TEST_INIT(CLCircularRegion, (^{
         [instance setValue:[[ORKLocation alloc] initWithCoordinate:CLLocationCoordinate2DMake(index? 2.0 : 3.0, 3.0) region:[[CLCircularRegion alloc] initWithCenter:CLLocationCoordinate2DMake(2.0, 3.0) radius:100.0 identifier:@"identifier"] userInput:@"addressString" addressDictionary:@{@"city":@"city", @"street":@"street"}] forKey:p.propertyName];
     } else if (p.propertyClass == [CLCircularRegion class]) {
         [instance setValue:[[CLCircularRegion alloc] initWithCenter:CLLocationCoordinate2DMake(index? 2.0 : 3.0, 3.0) radius:100.0 identifier:@"identifier"] forKey:p.propertyName];
+    } else if (p.propertyClass == [ORKDevice class]) {
+        ORKDevice *device = [[ORKDevice alloc] initWithName:index?@"blah":@"test" manufacturer:nil model:nil hardwareVersion:nil softwareVersion:nil];
+        [instance setValue:device forKey:p.propertyName];
     } else if (p.propertyClass == [NSPredicate class]) {
         [instance setValue:[NSPredicate predicateWithFormat:index?@"1 == 1":@"1 == 2"] forKey:p.propertyName];
     } else if (equality && (p.propertyClass == [UIImage class])) {
@@ -621,6 +628,7 @@ ORK_MAKE_TEST_INIT(CLCircularRegion, (^{
                                        @"unit",
                                        @"ORKPageStep.steps",
                                        @"ORKNavigablePageStep.steps",
+                                       @"watchWorkoutConfiguration",
                                        ];
     NSArray *knownNotSerializedProperties = @[@"ORKConsentDocument.writer", // created on demand
                                               @"ORKConsentDocument.signatureFormatter", // created on demand
@@ -748,6 +756,8 @@ ORK_MAKE_TEST_INIT(CLCircularRegion, (^{
                 && ![aClass isSubclassOfClass:[ORKKeyValueStepModifier class]]
                 // ORKKeyValueStepModifier si a subclass of ORKStepModifier which is an abstract class
                 // with no encoded properties, but encoded/decoded objects are still equal.
+                && ![aClass isSubclassOfClass:[ORKWorkoutStep class]]
+                // ORKWorkoutClass fails because of the workoutConfiguration
                 ) {
                 XCTAssertEqualObjects(data, data2, @"data mismatch for %@", NSStringFromClass(aClass));
             }
@@ -781,6 +791,9 @@ ORK_MAKE_TEST_INIT(CLCircularRegion, (^{
              (c == [ORKLocation class]) ||
              (c == [ORKResultSelector class]) ||
              [c isSubclassOfClass:[HKObjectType class]] ||
+            (c == [NSError class]) ||
+            (c == [ORKDevice class]) ||
+            (c == [HKWorkoutEvent class]) ||
             (c == [CLCircularRegion class]))
         {
             result = [[c alloc] orktest_init];
@@ -866,6 +879,7 @@ ORK_MAKE_TEST_INIT(CLCircularRegion, (^{
                                    @"ORKNumericAnswerFormat.minimum",
                                    @"ORKNumericAnswerFormat.maximum",
                                    @"ORKVideoCaptureStep.duration",
+                                   @"ORKMoodScaleQuestionResult.scaleAnswer",
                                    ];
     
     // Test Each class

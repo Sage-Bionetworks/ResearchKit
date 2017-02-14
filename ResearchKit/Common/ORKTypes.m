@@ -30,15 +30,13 @@
 
 #import <ResearchKit/ORKTypes.h>
 
-ORKWorkoutMessageKey const ORKWorkoutMessageKeyChangedState = @"chagedState";
-ORKWorkoutMessageKey const ORKWorkoutMessageKeyCommand = @"command";
-ORKWorkoutMessageKey const ORKWorkoutMessageKeyTimestamp = @"timestamp";
+@implementation ORKTypes 
+@end
 
-ORKWorkoutState const ORKWorkoutStateNotStarted = @"notStarted";
-ORKWorkoutState const ORKWorkoutStateRunning = @"running";
-ORKWorkoutState const ORKWorkoutStateEnded = @"ended";
-ORKWorkoutState const ORKWorkoutStatePaused = @"paused";
+@implementation  HKUnit (ORKUnitExtension)
 
-ORKWorkoutCommand const ORKWorkoutCommandStop = @"stop";
-ORKWorkoutCommand const ORKWorkoutCommandPause = @"pause";
-ORKWorkoutCommand const ORKWorkoutCommandResume = @"resume";
++ (HKUnit *)bpmUnit {
+    return [[HKUnit countUnit] unitDividedByUnit:[HKUnit minuteUnit]];
+}
+
+@end

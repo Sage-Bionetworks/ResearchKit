@@ -174,4 +174,8 @@
     return nil;
 }
 
+- (NSSet<HKObjectType *> *)requestedHealthKitTypesForWriting {
+    return nil;
+}
+
 @end

@@ -164,15 +164,21 @@
                        ];
     ORKPageStep *pageStep = [[ORKPageStep alloc] initWithIdentifier:@"pageStep" steps:steps];
     
+    ORKResult *markerResult1 = [[ORKResult alloc] initWithIdentifier:@"step.step1"];
+    markerResult1.startDate = [NSDate dateWithTimeIntervalSinceNow:-4.0];
+    markerResult1.endDate = [markerResult1.startDate dateByAddingTimeInterval:1];
+    
+    ORKResult *markerResult2 = [[ORKResult alloc] initWithIdentifier:@"step.step2"];
+    markerResult2.startDate = [markerResult1.endDate dateByAddingTimeInterval:0.01];
+    markerResult2.endDate = [markerResult2.startDate dateByAddingTimeInterval:1];
+    
     ORKChoiceQuestionResult *step1Result1 = [[ORKChoiceQuestionResult alloc] initWithIdentifier:@"step1.result1"];
     step1Result1.choiceAnswers = @[@(1)];
     ORKChoiceQuestionResult *step1Result2 = [[ORKChoiceQuestionResult alloc] initWithIdentifier:@"step1.result2"];
     step1Result2.choiceAnswers = @[@(2)];
-    ORKChoiceQuestionResult *step2Result1 = [[ORKChoiceQuestionResult alloc] initWithIdentifier:@"step2.result1"];
-    step2Result1.choiceAnswers = @[@(3)];
     
     ORKStepResult *inputResult = [[ORKStepResult alloc] initWithStepIdentifier:@"pageStep"
-                                                                      results:@[step1Result1, step1Result2, step2Result1]];
+                                                                      results:@[markerResult1, step1Result1, step1Result2, markerResult2]];
     
     // Test that the page result creates ORKStepResults for each result that matches the prefix test
     ORKPageResult *pageResult = [[ORKPageResult alloc] initWithPageStep:pageStep stepResult:inputResult];
@@ -180,11 +186,17 @@
     
     ORKStepResult *stepResult1 = [pageResult stepResultForStepIdentifier:@"step1"];
     XCTAssertNotNil(stepResult1);
+    XCTAssertEqualObjects(stepResult1.identifier, @"step1");
+    XCTAssertEqualObjects(stepResult1.startDate, markerResult1.startDate);
+    XCTAssertEqualObjects(stepResult1.endDate, markerResult1.endDate);
     XCTAssertEqual(stepResult1.results.count, 2);
     
     ORKStepResult *stepResult2 = [pageResult stepResultForStepIdentifier:@"step2"];
     XCTAssertNotNil(stepResult2);
-    XCTAssertEqual(stepResult2.results.count, 1);
+    XCTAssertEqualObjects(stepResult2.identifier, @"step2");
+    XCTAssertEqualObjects(stepResult2.startDate, stepResult2.startDate);
+    XCTAssertEqualObjects(stepResult2.endDate, stepResult2.endDate);
+    XCTAssertEqual(stepResult2.results.count, 0);
     
     ORKStepResult *stepResult3 = [pageResult stepResultForStepIdentifier:@"step3"];
     XCTAssertNil(stepResult3);

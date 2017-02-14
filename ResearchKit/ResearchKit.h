@@ -30,6 +30,9 @@
 
 
 #import <ResearchKit/ORKTypes.h>
+#import <ResearchKit/ORKCodingObjects.h>
+#import <ResearchKit/ORKWorkoutMessage.h>
+#import <ResearchKit/ORKWorkoutFormatter.h>
 
 // Only include the types and defines for other OS types.
 #if TARGET_OS_IOS
@@ -40,6 +43,7 @@
 #import <ResearchKit/ORKConsentSharingStep.h>
 #import <ResearchKit/ORKFitnessStep.h>
 #import <ResearchKit/ORKFormStep.h>
+#import <ResearchKit/ORKHeartRateCaptureStep.h>
 #import <ResearchKit/ORKImageCaptureStep.h>
 #import <ResearchKit/ORKInstructionStep.h>
 #import <ResearchKit/ORKLoginStep.h>
@@ -54,9 +58,10 @@
 #import <ResearchKit/ORKTouchAnywhereStep.h>
 #import <ResearchKit/ORKVerificationStep.h>
 #import <ResearchKit/ORKVideoCaptureStep.h>
+#import <ResearchKit/ORKVideoInstructionStep.h>
 #import <ResearchKit/ORKVisualConsentStep.h>
 #import <ResearchKit/ORKWaitStep.h>
-#import <ResearchKit/ORKVideoInstructionStep.h>
+#import <ResearchKit/ORKWorkoutStep.h>
 
 #import <ResearchKit/ORKTask.h>
 #import <ResearchKit/ORKOrderedTask.h>
@@ -78,6 +83,7 @@
 #import <ResearchKit/ORKCompletionStepViewController.h>
 #import <ResearchKit/ORKFitnessStepViewController.h>
 #import <ResearchKit/ORKFormStepViewController.h>
+#import <ResearchKit/ORKHeartRateCaptureStepViewController.h>
 #import <ResearchKit/ORKInstructionStepViewController.h>
 #import <ResearchKit/ORKLoginStepViewController.h>
 #import <ResearchKit/ORKPageStepViewController.h>
@@ -87,6 +93,7 @@
 #import <ResearchKit/ORKTouchAnywhereStepViewController.h>
 #import <ResearchKit/ORKVerificationStepViewController.h>
 #import <ResearchKit/ORKWaitStepViewController.h>
+#import <ResearchKit/ORKWorkoutStepViewController.h>
 
 #import <ResearchKit/ORKRecorder.h>
 

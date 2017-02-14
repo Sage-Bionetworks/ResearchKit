@@ -36,7 +36,7 @@
 #import "ORKRecorder_Internal.h"
 
 #import "ORKHelpers_Internal.h"
-#import "CMAccelerometerData+ORKJSONDictionary.h"
+#import "CMAccelerometerData+JSONCodingObject.h"
 
 @import CoreMotion;
 
@@ -115,7 +115,7 @@
     [self.motionManager startAccelerometerUpdatesToQueue:[[NSOperationQueue alloc] init] withHandler:^(CMAccelerometerData *data, NSError *error) {
          BOOL success = NO;
          if (data) {
-             success = [_logger append:[data ork_JSONDictionary] error:&error];
+             success = [_logger append:[data ork_jsonCodingObject] error:&error];
          }
          if (!success) {
              dispatch_async(dispatch_get_main_queue(), ^{

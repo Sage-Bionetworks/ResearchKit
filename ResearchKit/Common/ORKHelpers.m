@@ -31,12 +31,15 @@
 
 #import "ORKHelpers_Internal.h"
 
-#import "ORKStep.h"
-
-#import "ORKSkin.h"
 #import "ORKTypes.h"
 
+#if TARGET_OS_IOS
+
+#import "ORKSkin.h"
+
 #import <CoreText/CoreText.h>
+
+#endif
 
 
 NSURL *ORKCreateRandomBaseURL() {
@@ -47,10 +50,12 @@ NSBundle *ORKAssetsBundle(void) {
     static NSBundle *bundle;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        bundle = [NSBundle bundleForClass:[ORKStep class]];
+        bundle = [NSBundle bundleForClass:[ORKTypes class]];
     });
     return bundle;
 }
+
+#if TARGET_OS_IOS
 
 ORK_INLINE CGFloat ORKCGFloor(CGFloat value) {
     if (sizeof(value) == sizeof(float)) {
@@ -75,10 +80,13 @@ ORK_INLINE CGFloat ORKAdjustToScale(CGFloat (adjustFunction)(CGFloat), CGFloat v
         return adjustFunction(value * scale) / scale;
     }
 }
+#endif
 
+#if TARGET_OS_IOS
 CGFloat ORKFloorToViewScale(CGFloat value, UIView *view) {
     return ORKAdjustToScale(ORKCGFloor, value, view.contentScaleFactor);
 }
+#endif
 
 id findInArrayByKey(NSArray * array, NSString *key, id value) {
     NSPredicate *pred = [NSPredicate predicateWithFormat:@"%K == %@", key, value];
@@ -89,26 +97,23 @@ id findInArrayByKey(NSArray * array, NSString *key, id value) {
     return nil;
 }
 
-NSString *ORKStringFromDateISO8601(NSDate *date) {
+NSDateFormatter *ORKISO8601DateFormatter() {
     static NSDateFormatter *formatter = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         formatter = [[NSDateFormatter alloc] init];
-        [formatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ssZ"];
+        [formatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZ"];
         [formatter setLocale:[NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"]];
     });
-    return [formatter stringFromDate:date];
+    return formatter;
+}
+
+NSString *ORKStringFromDateISO8601(NSDate *date) {
+    return [ORKISO8601DateFormatter() stringFromDate:date];
 }
 
 NSDate *ORKDateFromStringISO8601(NSString *string) {
-    static NSDateFormatter *formatter = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        formatter = [[NSDateFormatter alloc] init];
-        [formatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ssZ"];
-        [formatter setLocale:[NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"]];
-    });
-    return [formatter dateFromString:string];
+    return [ORKISO8601DateFormatter() dateFromString:string];
 }
 
 NSString *ORKSignatureStringFromDate(NSDate *date) {
@@ -133,6 +138,7 @@ UIColor *ORKRGB(uint32_t x) {
     return ORKRGBA(x, 1.0f);
 }
 
+#if TARGET_OS_IOS
 UIFontDescriptor *ORKFontDescriptorForLightStylisticAlternative(UIFontDescriptor *descriptor) {
     UIFontDescriptor *fontDescriptor = [descriptor
                       fontDescriptorByAddingAttributes:
@@ -142,13 +148,13 @@ UIFontDescriptor *ORKFontDescriptorForLightStylisticAlternative(UIFontDescriptor
     return fontDescriptor;
 }
 
-
 UIFont *ORKTimeFontForSize(CGFloat size) {
     UIFontDescriptor *fontDescriptor = [ORKLightFontWithSize(size) fontDescriptor];
     fontDescriptor = ORKFontDescriptorForLightStylisticAlternative(fontDescriptor);
     UIFont *font = [UIFont fontWithDescriptor:fontDescriptor size:0];
     return font;
 }
+#endif
 
 NSString *ORKFileProtectionFromMode(ORKFileProtectionMode mode) {
     switch (mode) {
@@ -165,6 +171,7 @@ NSString *ORKFileProtectionFromMode(ORKFileProtectionMode mode) {
     return NSFileProtectionNone;
 }
 
+#if TARGET_OS_IOS
 CGFloat ORKExpectedLabelHeight(UILabel *label) {
     CGSize expectedLabelSize = [label.text boundingRectWithSize:CGSizeMake(label.frame.size.width, CGFLOAT_MAX)
                                                         options:NSStringDrawingUsesLineFragmentOrigin
@@ -178,6 +185,7 @@ void ORKAdjustHeightForLabel(UILabel *label) {
     rect.size.height = ORKExpectedLabelHeight(label);
     label.frame = rect;
 }
+#endif
 
 UIImage *ORKImageWithColor(UIColor *color) {
     CGRect rect = CGRectMake(0.0f, 0.0f, 1.0f, 1.0f);
@@ -193,11 +201,13 @@ UIImage *ORKImageWithColor(UIColor *color) {
     return image;
 }
 
+#if TARGET_OS_IOS
 void ORKEnableAutoLayoutForViews(NSArray *views) {
     [views enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         [(UIView *)obj setTranslatesAutoresizingMaskIntoConstraints:NO];
     }];
 }
+#endif
 
 NSDateFormatter *ORKResultDateTimeFormatter() {
     static NSDateFormatter *dateTimeformatter = nil;
@@ -248,7 +258,7 @@ NSBundle *ORKBundle() {
     static NSBundle *bundle;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        bundle = [NSBundle bundleForClass:[ORKStep class]];
+        bundle = [NSBundle bundleForClass:[ORKTypes class]];
     });
     return bundle;
 }
@@ -344,6 +354,7 @@ BOOL ORKCurrentLocalePresentsFamilyNameFirst() {
     return (language != nil) && [familyNameFirstLanguages containsObject:language];
 }
 
+#if TARGET_OS_IOS
 BOOL ORKWantsWideContentMargins(UIScreen *screen) {
     
     if (screen != [UIScreen mainScreen]) {
@@ -416,6 +427,7 @@ UIFont *ORKLightFontWithSize(CGFloat size) {
     }
     return font;
 }
+#endif
 
 NSURL *ORKURLFromBookmarkData(NSData *data) {
     if (data == nil) {
@@ -522,6 +534,7 @@ void ORKValidateArrayForObjectsOfClass(NSArray *array, Class expectedObjectClass
     }
 }
 
+#if TARGET_OS_IOS
 void ORKRemoveConstraintsForRemovedViews(NSMutableArray *constraints, NSArray *removedViews) {
     for (NSLayoutConstraint *constraint in [constraints copy]) {
         for (UIView *view in removedViews) {
@@ -541,6 +554,7 @@ void ORKAdjustPageViewControllerNavigationDirectionForRTL(UIPageViewControllerNa
         *direction = (*direction == UIPageViewControllerNavigationDirectionForward) ? UIPageViewControllerNavigationDirectionReverse : UIPageViewControllerNavigationDirectionForward;
     }
 }
+#endif
 
 NSString *ORKPaddingWithNumberOfSpaces(NSUInteger numberOfPaddingSpaces) {
     return [@"" stringByPaddingToLength:numberOfPaddingSpaces withString:@" " startingAtIndex:0];

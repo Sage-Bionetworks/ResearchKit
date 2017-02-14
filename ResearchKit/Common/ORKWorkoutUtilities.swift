@@ -31,6 +31,10 @@
 import Foundation
 import HealthKit
 
+/**
+ `ORKWorkoutUtilities` is a utility object for converting various enums and identifiers
+ that are used by an `HKWorkout`.
+ */
 @objc
 public final class ORKWorkoutUtilities: NSObject {
     
@@ -62,10 +66,39 @@ public final class ORKWorkoutUtilities: NSObject {
     }
     
     /**
+     Utility method for converting a workout location type to a `NSString` that can be used
+     by Objective-c classes.
+     
+     @param locationType        The `HKWorkoutSessionLocationType` to convert
+     @return                    The identifier for this event type
+     */
+    @available(iOS 10.0, *)
+    @available(watchOS 3.0, *)
+    @objc(identifierForWorkoutSessionLocationType:)
+    public class func identifier(for locationType:HKWorkoutSessionLocationType) -> String? {
+        return locationType.identifier
+    }
+    
+    /**
+     Utility method for converting an identifier to an `NSInteger` that maps to the
+     `HKWorkoutSessionLocationType`. Returns `HKWorkoutSessionLocationTypeUnknown` if undefined.
+     
+     @param identifier    The identifier to convert
+     @return              The `rawValue` for the `HKWorkoutSessionLocationType` enum
+     */
+    @available(iOS 10.0, *)
+    @available(watchOS 3.0, *)
+    @objc(workoutSessionLocationTypeForIdentifier:)
+    public class func workoutLocationType(for identifier:String) -> Int {
+        let type = HKWorkoutSessionLocationType(identifier: identifier)
+        return type.rawValue
+    }
+    
+    /**
      Utility method for converting a workout activity type to a `NSString` that can be used
      by Objective-c classes.
      
-     @param workoutEventType    The `HKWorkoutActivityType` to convert
+     @param workoutActivityType The `HKWorkoutActivityType` to convert
      @return                    The identifier for this event type
      */
     @objc(identifierForWorkoutActivityType:)
@@ -84,6 +117,87 @@ public final class ORKWorkoutUtilities: NSObject {
     public class func workoutActivityType(for identifier:String) -> UInt {
         let type = HKWorkoutActivityType(identifier: identifier)
         return type.rawValue
+    }
+    
+    /**
+     List of the distance types to be measured and their associated preferred unit.
+     */
+    open static let supportedDistanceTypeIdentifiers : [HKQuantityTypeIdentifier] = {
+        var types: [HKQuantityTypeIdentifier] = [.distanceWalkingRunning,
+                                                 .distanceCycling]
+        if #available(iOS 10.0, *), #available(watchOS 3.0, *){
+            types.append(.distanceSwimming)
+            types.append(.distanceWheelchair)
+        }
+        return types
+    }()
+    
+    /**
+     List of `HKQuantityTypeIdentifier` to include by default for a given configuration.
+     
+     @param  workoutConfiguration   The workout configuration
+     @return                        List of identifiers
+    */
+    @available(iOS 10.0, *)
+    @available(watchOS 3.0, *)
+    @objc(queryIdentifiersForWorkoutConfiguration:)
+    open class func queryIdentifiers(for workoutConfiguration: HKWorkoutConfiguration) -> [HKQuantityTypeIdentifier] {
+        
+        var queryIds: [HKQuantityTypeIdentifier] = [HKQuantityTypeIdentifier.activeEnergyBurned,
+                                                    HKQuantityTypeIdentifier.heartRate]
+        
+        switch workoutConfiguration.activityType {
+        case .crossTraining, .crossCountrySkiing, .golf, .hiking, .running, .walking:
+            queryIds.append(.distanceWalkingRunning)
+        case .cycling:
+            queryIds.append(.distanceCycling)
+        case .swimming:
+            queryIds.append(.distanceSwimming)
+        case .wheelchairWalkPace, .wheelchairRunPace:
+            queryIds.append(.distanceWheelchair)
+        default:
+            break
+        }
+        
+        return queryIds
+    }
+    
+    /**
+     Using the workout events to check for pause/resume, calculate the duration of the workout 
+     */
+    open class func computeDurationOfWorkout(withEvents workoutEvents: [HKWorkoutEvent]?, startDate: Date?, endDate: Date?) -> TimeInterval {
+        var duration = 0.0
+        
+        if var lastDate = startDate {
+            var paused = false
+            
+            if let events = workoutEvents {
+                for event in events {
+                    switch event.type {
+                    case .pause:
+                        duration += event.date.timeIntervalSince(lastDate)
+                        paused = true
+                        
+                    case .resume:
+                        lastDate = event.date
+                        paused = false
+                        
+                    default:
+                        continue
+                    }
+                }
+            }
+            
+            if !paused {
+                if let end = endDate {
+                    duration += end.timeIntervalSince(lastDate)
+                } else {
+                    duration += NSDate().timeIntervalSince(lastDate)
+                }
+            }
+        }
+        
+        return duration
     }
 }
 
@@ -143,6 +257,39 @@ public extension HKWorkoutEventType {
         }
         return ORKWorkoutEventTypeIdentifiers[idx - 1]
     }
+}
+
+@available(iOS 10.0, *)
+@available(watchOS 3.0, *)
+public extension HKWorkoutSessionLocationType {
+    
+    /**
+     Initializer that uses an `identifier` string
+     
+     @param identifier    The identifier to convert
+     @return              An `HKWorkoutSessionLocationType`. Default = `.unknown`
+     */
+    public init(identifier: String) {
+        guard let idx = ORKWorkoutSessionLocationTypeIdentifiers.index(of: identifier),
+            let type = HKWorkoutSessionLocationType(rawValue: Int(idx) + 1)
+            else {
+                self = .unknown
+                return
+        }
+        self = type
+    }
+    
+    /**
+     String identifier for this enum value.
+     */
+    public var identifier: String {
+        let idx = self.rawValue
+        guard idx >= 1 && idx <= ORKWorkoutSessionLocationTypeIdentifiers.count else {
+            return ORKWorkoutSessionLocationTypeIdentifiers[0]
+        }
+        return ORKWorkoutSessionLocationTypeIdentifiers[idx - 1]
+    }
+    
 }
 
 // MARK: Identifier map
@@ -225,4 +372,8 @@ fileprivate let ORKWorkoutEventTypeIdentifiers = ["pause",
                                                   "marker",
                                                   "motionPaused",
                                                   "motionResumed"]
+
+fileprivate let ORKWorkoutSessionLocationTypeIdentifiers = ["unknown",
+                                                            "indoor",
+                                                            "outdoor"]
 

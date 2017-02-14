@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2015, Apple Inc. All rights reserved.
+ Copyright (c) 2017, Sage Bionetworks. All rights reserved.
  
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
@@ -29,18 +29,32 @@
  */
 
 
-#import "CMAccelerometerData+ORKJSONDictionary.h"
+@import Foundation;
+#import <ResearchKit/ORKTypes.h>
 
 
-@implementation CMAccelerometerData (ORKJSONDictionary)
+NS_ASSUME_NONNULL_BEGIN
 
-- (NSDictionary *)ork_JSONDictionary {
-    NSDictionary *dictionary = @{@"timestamp": [NSDecimalNumber numberWithDouble:self.timestamp],
-                                 @"x": [NSDecimalNumber numberWithDouble:self.acceleration.x],
-                                 @"y": [NSDecimalNumber numberWithDouble:self.acceleration.y],
-                                 @"z": [NSDecimalNumber numberWithDouble:self.acceleration.z]
-                                 };
-    return dictionary;
-}
+
+@interface HKDevice (ORKJSONCodingObject)
+
+/**
+ Convert the quantity sample into a coded object that can be passed from the watch to the phone
+ using the `sendMessage:` method.
+ 
+ @return A dictionary with the properties of the device
+ */
+- (NSDictionary<NSString *, id> *)ork_jsonCodingObject;
+
+/**
+ Create an device from the coded object dictionary.
+ 
+ @param codingObject    The dictionary of property values
+ @return                A device object
+ */
++ (nullable instancetype)deviceWithCodingObject:(NSDictionary<NSString *, id> *)codingObject;
 
 @end
+
+
+NS_ASSUME_NONNULL_END

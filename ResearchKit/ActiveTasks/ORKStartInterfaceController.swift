@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2015, Apple Inc. All rights reserved.
+ Copyright (c) 2017, Sage Bionetworks. All rights reserved.
  
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
@@ -29,15 +29,17 @@
  */
 
 
-@import CoreLocation;
+import WatchKit
 
-
-NS_ASSUME_NONNULL_BEGIN
-
-@interface CLLocation (ORKJSONDictionary)
-
-- (NSDictionary *)ork_JSONDictionary;
-
-@end
-
-NS_ASSUME_NONNULL_END
+open class ORKStartInterfaceController: WKInterfaceController {
+    
+    public static let name = "StartInterfaceController"
+    
+    open var workoutControllerName = ORKCardioWorkoutInterfaceController.name
+    
+    @IBAction func didTapStartButton() {
+        
+        // Pass configuration to next interface controller
+        WKInterfaceController.reloadRootControllers(withNames: [workoutControllerName], contexts: nil)
+    }
+}

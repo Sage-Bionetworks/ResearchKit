@@ -32,6 +32,7 @@
 @import UIKit;
 #import <ResearchKit/ORKStepViewController.h>
 #import <ResearchKit/ORKRecorder.h>
+#import <ResearchKit/ORKTypes.h>
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -125,6 +126,11 @@ ORK_CLASS_AVAILABLE
  is not counted against the `duration` of the step.
  */
 @property (nonatomic, assign, readonly, getter=isStarted) BOOL started;
+
+/**
+ Watch connection established
+ */
+@property (nonatomic, assign, readonly, getter=isWatchConnected) BOOL watchConnected;
 
 /**
  Tells the view controller that the active step has finished.
