@@ -730,7 +730,7 @@
         [qResults addObject:result];
     }
     
-    parentResult.results = [self.addedResults arrayByAddingObjectsFromArray:qResults] ? : qResults;
+    parentResult.results = [parentResult.results arrayByAddingObjectsFromArray:qResults] ? : qResults;
     
     return parentResult;
 }
