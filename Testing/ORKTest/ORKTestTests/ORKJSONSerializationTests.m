@@ -854,7 +854,19 @@ ORK_MAKE_TEST_INIT(CLCircularRegion, (^{
                                        @"ORKStep.restorable",
                                        @"ORKStep.showsProgress",
                                        @"ORKStepResult.isPreviousResult",
+                                       @"ORKVideoCaptureStep.duration",
                                        ];
+    
+    NSArray *hashExclusionList = @[
+                                   @"ORKDateQuestionResult.calendar",
+                                   @"ORKDateQuestionResult.timeZone",
+                                   @"ORKToneAudiometryResult.outputVolume",
+                                   @"ORKConsentSection.contentURL",
+                                   @"ORKConsentSection.customAnimationURL",
+                                   @"ORKNumericAnswerFormat.minimum",
+                                   @"ORKNumericAnswerFormat.maximum",
+                                   @"ORKVideoCaptureStep.duration",
+                                   ];
     
     // Test Each class
     for (Class aClass in classesWithSecureCodingAndCopying) {
@@ -898,10 +910,18 @@ ORK_MAKE_TEST_INIT(CLCircularRegion, (^{
                     if ([self applySomeValueToClassProperty:p forObject:copiedInstance index:1 forEqualityCheck:YES])
                     {
                         if ([copiedInstance isEqual:instance]) {
-                            XCTAssertNotEqualObjects(copiedInstance, instance, @"%@", p.propertyName);
+                            XCTAssertNotEqualObjects(copiedInstance, instance, @"%@", dottedPropertyName);
                         }
+                        if (!p.isPrimitiveType &&
+                            ![hashExclusionList containsObject:p.propertyName] &&
+                            ![hashExclusionList containsObject:dottedPropertyName]) {
+                            // Only check the hash for non-primitive type properties because often the
+                            // hash into a table can be referenced using a subset of the properties used to test equality.
+                            XCTAssertNotEqual([instance hash], [copiedInstance hash], @"%@", dottedPropertyName);
+                        }
+                        
                         [self applySomeValueToClassProperty:p forObject:copiedInstance index:0 forEqualityCheck:YES];
-                        XCTAssertEqualObjects(copiedInstance, instance, @"%@", p.propertyName);
+                        XCTAssertEqualObjects(copiedInstance, instance, @"%@", dottedPropertyName);
                         
                         if (p.isPrimitiveType == NO) {
                             [copiedInstance setValue:nil forKey:p.propertyName];
