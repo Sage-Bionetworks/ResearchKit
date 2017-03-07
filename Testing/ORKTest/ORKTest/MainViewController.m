@@ -660,8 +660,7 @@ static const CGFloat HeaderSideLayoutMargin = 16.0;
         return [self makePageStepTask];
     } else if ([identifier isEqualToString:FootnoteTaskIdentifier]) {
         return [self makeFootnoteTask];
-    }
-    else if ([identifier isEqualToString:VideoInstructionStepTaskIdentifier]) {
+    } else if ([identifier isEqualToString:VideoInstructionStepTaskIdentifier]) {
         return [self makeVideoInstructionStepTask];
     }
     
