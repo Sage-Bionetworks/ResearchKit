@@ -181,6 +181,7 @@
  */
 ORK_MAKE_TEST_INIT(ORKStepNavigationRule, ^{return [super init];});
 ORK_MAKE_TEST_INIT(ORKSkipStepNavigationRule, ^{return [super init];});
+ORK_MAKE_TEST_INIT(ORKStepModifier, ^{return [super init];});
 ORK_MAKE_TEST_INIT(ORKKeyValueStepModifier, ^{return [super init];});
 ORK_MAKE_TEST_INIT(ORKAnswerFormat, ^{return [super init];});
 ORK_MAKE_TEST_INIT(ORKLoginStep, ^{return [self initWithIdentifier:[NSUUID UUID].UUIDString title:@"title" text:@"text" loginViewControllerClass:NSClassFromString(@"ORKLoginStepViewController") ];});
@@ -751,6 +752,7 @@ ORK_MAKE_TEST_INIT(CLCircularRegion, (^{
     @try {
         if (([c isSubclassOfClass:[ORKStepNavigationRule class]]) ||
             ([c isSubclassOfClass:[ORKSkipStepNavigationRule class]]) ||
+            ([c isSubclassOfClass:[ORKStepModifier class]]) ||
             ([c isSubclassOfClass:[ORKStep class]]) ||
             (c == [ORKKeyValueStepModifier class]) ||
              ([c isSubclassOfClass:[ORKOrderedTask class]]) ||
@@ -774,7 +776,13 @@ ORK_MAKE_TEST_INIT(CLCircularRegion, (^{
 }
 
 - (void)testEquality {
-    NSArray *classesExcluded = @[]; // classes not intended to be serialized standalone
+    NSArray *classesExcluded = @[
+                                 [ORKStepNavigationRule class],     // abstract base class
+                                 [ORKSkipStepNavigationRule class],     // abstract base class
+                                 [ORKStepModifier class],     // abstract base class
+                                 ];
+    
+    
     // Each time ORKRegistrationStep returns a new date in its answer fromat, cannot be tested.
     NSMutableArray *stringsForClassesExcluded = [NSMutableArray arrayWithObjects:NSStringFromClass([ORKRegistrationStep class]), nil];
     for (Class c in classesExcluded) {
@@ -885,6 +893,115 @@ ORK_MAKE_TEST_INIT(CLCircularRegion, (^{
     
     XCTAssertEqualObjects(d1, d2);
     XCTAssertEqualObjects(a, b);
+}
+
+- (void)testAddResult {
+    
+    // Classes for which tests are not currently implemented
+    NSArray <NSString *> *excludedClassNames = @[
+                                                 @"ORKVisualConsentStepViewController",     // Requires step with scenes
+                                                 ];
+    
+    // Classes that do not allow adding a result should throw an exception
+    NSArray <NSString *> *exceptionClassNames = @[
+                                                  @"ORKPasscodeStepViewController",
+                                                 ];
+    
+    NSDictionary <NSString *, NSString *> *mapStepClassForViewController = @{ // classes that require custom step class
+                                                                             @"ORKActiveStepViewController" : @"ORKActiveStep",
+                                                                             @"ORKConsentReviewStepViewController" : @"ORKConsentReviewStep",
+                                                                             @"ORKFormStepViewController" : @"ORKFormStep",
+                                                                             @"ORKHolePegTestPlaceStepViewController" : @"ORKHolePegTestPlaceStep",
+                                                                             @"ORKHolePegTestRemoveStepViewController" : @"ORKHolePegTestRemoveStep",
+                                                                             @"ORKImageCaptureStepViewController" : @"ORKImageCaptureStep",
+                                                                             @"ORKPSATStepViewController" : @"ORKPSATStep",
+                                                                             @"ORKQuestionStepViewController" : @"ORKQuestionStep",
+                                                                             @"ORKSpatialSpanMemoryStepViewController" : @"ORKSpatialSpanMemoryStep",
+                                                                             @"ORKTimedWalkStepViewController" : @"ORKTimedWalkStep",
+                                                                             @"ORKTowerOfHanoiViewController" : @"ORKTowerOfHanoiStep",
+                                                                             @"ORKVideoCaptureStepViewController" : @"ORKVideoCaptureStep",
+                                                                             @"ORKVideoInstructionStepViewController" : @"ORKVideoInstructionStep",
+                                                                             @"ORKVisualConsentStepViewController" : @"ORKVisualConsentStep",
+                                                                             @"ORKWalkingTaskStepViewController" : @"ORKWalkingTaskStep",
+                                                                             };
+    
+    NSDictionary <NSString *, NSDictionary *> *kvMapForStep = @{ // Steps that require modification to validate
+                                                                   @"ORKHolePegTestPlaceStep" : @{@"numberOfPegs" : @2,
+                                                                                                  @"stepDuration" : @2.0f },
+                                                                   @"ORKHolePegTestRemoveStep" : @{@"numberOfPegs" : @2,
+                                                                                                  @"stepDuration" : @2.0f },
+                                                                   @"ORKPSATStep" : @{@"interStimulusInterval" : @1.0,
+                                                                                      @"seriesLength" : @10,
+                                                                                      @"stepDuration" : @11.0f,
+                                                                                      @"presentationMode" : @(ORKPSATPresentationModeAuditory)},
+                                                                   @"ORKSpatialSpanMemoryStep" : @{@"initialSpan" : @2,
+                                                                                                   @"maximumSpan" : @5,
+                                                                                                   @"playSpeed" : @1.0,
+                                                                                                   @"maximumTests" : @3,
+                                                                                                   @"maximumConsecutiveFailures" : @1},
+                                                                   @"ORKTimedWalkStep" : @{@"distanceInMeters" : @30.0,
+                                                                                           @"stepDuration" : @2.0},
+                                                                   @"ORKWalkingTaskStep" : @{@"numberOfStepsPerLeg" : @2},
+    };
+    
+    // Find all classes that subclass from ORKStepViewController
+    NSMutableArray *stepViewControllerClassses = [NSMutableArray new];
+    int numClasses = objc_getClassList(NULL, 0);
+    Class classes[numClasses];
+    numClasses = objc_getClassList(classes, numClasses);
+    for (int index = 0; index < numClasses; index++) {
+        Class aClass = classes[index];
+        if ([excludedClassNames containsObject:NSStringFromClass(aClass)]) {
+            continue;
+        }
+        
+        if ([NSStringFromClass(aClass) hasPrefix:@"ORK"] &&
+            [aClass isSubclassOfClass:[ORKStepViewController class]]) {
+            
+            [stepViewControllerClassses addObject:aClass];
+        }
+    }
+    
+    // Test Each class
+    for (Class aClass in stepViewControllerClassses) {
+        
+        // Instatiate the step view controller
+        NSString *stepClassName = mapStepClassForViewController[NSStringFromClass(aClass)];
+        if (stepClassName == nil) {
+            for (NSString *vcClassName in mapStepClassForViewController.allKeys) {
+                if ([aClass isSubclassOfClass:NSClassFromString(vcClassName)]) {
+                    stepClassName = mapStepClassForViewController[vcClassName];
+                }
+            }
+        }
+        Class stepClass = stepClassName ? NSClassFromString(stepClassName) : [ORKStep class];
+        ORKStep *step = [self instanceForClass:stepClass];
+        NSDictionary *kv = nil;
+        if (stepClassName && (kv = kvMapForStep[stepClassName])) {
+            [step setValuesForKeysWithDictionary:kv];
+        }
+        ORKStepViewController *stepViewController = [[aClass alloc] initWithStep:step];
+        
+        // Create a result
+        ORKBooleanQuestionResult *result = [[ORKBooleanQuestionResult alloc] initWithIdentifier:@"test"];
+        result.booleanAnswer = @YES;
+        
+        // -- Call method under test
+        if ([exceptionClassNames containsObject:NSStringFromClass(aClass)]) {
+            XCTAssertThrows([stepViewController addResult:result]);
+            continue;
+        } else {
+            XCTAssertNoThrow([stepViewController addResult:result]);
+        }
+        
+        ORKStepResult *stepResult = stepViewController.result;
+        XCTAssertNotNil(stepResult, @"Step result is nil for %@", NSStringFromClass([stepViewController class]));
+        XCTAssertTrue([stepResult isKindOfClass:[ORKStepResult class]], @"Step result is not subclass of ORKStepResult for %@", NSStringFromClass([stepViewController class]));
+        if ([stepResult isKindOfClass:[ORKStepResult class]]) {
+            XCTAssertNotNil(stepResult.results, @"Step result.results is nil for %@", NSStringFromClass([stepViewController class]));
+            XCTAssertTrue([stepResult.results containsObject:result], @"Step result does not contain added result for %@", NSStringFromClass([stepViewController class]));
+        }
+    }
 }
 
 @end

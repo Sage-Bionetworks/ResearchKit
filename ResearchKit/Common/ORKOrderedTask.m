@@ -223,24 +223,9 @@ ORKTaskProgress ORKTaskProgressMake(NSUInteger current, NSUInteger total) {
 - (NSSet *)requestedHealthKitTypesForReading {
     NSMutableSet *healthTypes = [NSMutableSet set];
     for (ORKStep *step in self.steps) {
-        if ([step isKindOfClass:[ORKFormStep class]]) {
-            ORKFormStep *formStep = (ORKFormStep *)step;
-            
-            for (ORKFormItem *formItem in formStep.formItems) {
-                ORKAnswerFormat *answerFormat = [formItem answerFormat];
-                HKObjectType *objType = [answerFormat healthKitObjectType];
-                if (objType) {
-                    [healthTypes addObject:objType];
-                }
-            }
-        } else if ([step isKindOfClass:[ORKQuestionStep class]]) {
-            HKObjectType *objType = [[(ORKQuestionStep *)step answerFormat] healthKitObjectType];
-            if (objType) {
-                [healthTypes addObject:objType];
-            }
-        } else if ([step isKindOfClass:[ORKActiveStep class]]) {
-            ORKActiveStep *activeStep = (ORKActiveStep *)step;
-            [healthTypes unionSet:[activeStep requestedHealthKitTypesForReading]];
+        NSSet *stepSet = [step requestedHealthKitTypesForReading];
+        if (stepSet) {
+            [healthTypes unionSet:stepSet];
         }
     }
     return healthTypes.count ? healthTypes : nil;
@@ -1804,10 +1789,8 @@ void ORKStepArrayAddStep(NSMutableArray *array, ORKStep *step) {
             }
         }
         
-        step.image = [UIImage imageNamed:@"tremortest2" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
-        if (leftHand) {
-            step.image = [step.image ork_flippedImage:UIImageOrientationUpMirrored];
-        }
+        NSString *imageName = leftHand ? @"tremortestLeft" : @"tremortestRight";
+        step.image = [UIImage imageNamed:imageName inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
         step.shouldTintImages = YES;
         
         ORKStepArrayAddStep(steps, step);

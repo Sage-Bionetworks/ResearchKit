@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2015, Apple Inc. All rights reserved.
+ Copyright (c) 2017, Sage Bionetworks. All rights reserved.
  
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
@@ -28,17 +28,13 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@import Foundation;
-@import HealthKit;
+@import UIKit;
+#import "ORKPicker.h"
 
-#if defined(__cplusplus)
-#  define ORK_EXTERN extern "C" __attribute__((visibility("default")))
-#else
-#  define ORK_EXTERN extern __attribute__((visibility("default")))
-#endif
+NS_ASSUME_NONNULL_BEGIN
 
-#define ORK_CLASS_AVAILABLE __attribute__((visibility("default")))
-#define ORK_ENUM_AVAILABLE
-#define ORK_AVAILABLE_DECL
+@interface ORKMultipleValuePicker : NSObject <ORKPicker>
 
-#define ORK_IOS_10_WATCHOS_3_AVAILABLE (NSClassFromString(@"HKWorkoutConfiguration") != nil)
+@end
+
+NS_ASSUME_NONNULL_END

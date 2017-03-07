@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2015, Apple Inc. All rights reserved.
+ Copyright (c) 2016, Sage Bionetworks. All rights reserved.
  
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
@@ -28,17 +28,19 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@import Foundation;
-@import HealthKit;
 
-#if defined(__cplusplus)
-#  define ORK_EXTERN extern "C" __attribute__((visibility("default")))
-#else
-#  define ORK_EXTERN extern __attribute__((visibility("default")))
-#endif
+@import UIKit;
+#import "ORKLabel.h"
 
-#define ORK_CLASS_AVAILABLE __attribute__((visibility("default")))
-#define ORK_ENUM_AVAILABLE
-#define ORK_AVAILABLE_DECL
 
-#define ORK_IOS_10_WATCHOS_3_AVAILABLE (NSClassFromString(@"HKWorkoutConfiguration") != nil)
+NS_ASSUME_NONNULL_BEGIN
+
+/**
+ Step's details text under title.
+ */
+ORK_CLASS_AVAILABLE
+@interface ORKFootnoteLabel : ORKLabel
+
+@end
+
+NS_ASSUME_NONNULL_END
