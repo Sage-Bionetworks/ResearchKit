@@ -852,6 +852,7 @@ encondingTable =
           PROPERTY(calendar, NSCalendar, NSObject, YES,
                    ^id(id calendar) { return [(NSCalendar *)calendar calendarIdentifier]; },
                    ^id(id string) { return [NSCalendar calendarWithIdentifier:string]; }),
+          PROPERTY(shouldRequestAuthorization, NSNumber, NSObject, YES, nil, nil),
           })),
   ENTRY(ORKHealthKitQuantityTypeAnswerFormat,
         ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
@@ -867,6 +868,7 @@ encondingTable =
           PROPERTY(numericAnswerStyle, NSNumber, NSObject, NO,
                    ^id(id num) { return ORKNumericAnswerStyleToString(((NSNumber *)num).integerValue); },
                    ^id(id string) { return @(ORKNumericAnswerStyleFromString(string)); }),
+          PROPERTY(shouldRequestAuthorization, NSNumber, NSObject, YES, nil, nil),
           })),
   ENTRY(ORKAnswerFormat,
         nil,
