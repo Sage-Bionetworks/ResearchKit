@@ -279,7 +279,7 @@ typedef NS_ENUM(NSInteger, ORKMeasurementSystem) {
 /**
  Frequency with which the mood question is asked.
  
- Used by `ORKMoodQuestionStep` to setup the question.
+ Used by `ORKMoodQuestionStep` to set up the question.
  */
 typedef NS_ENUM(NSUInteger, ORKMoodSurveyFrequency) {
     ORKMoodSurveyFrequencyDaily,
@@ -289,7 +289,7 @@ typedef NS_ENUM(NSUInteger, ORKMoodSurveyFrequency) {
 /**
  Type of mood survey question.
  
- Used by `ORKMoodScaleAnswerFormat` to setup the choices
+ Used by `ORKMoodScaleAnswerFormat` to set up the choices
  */
 typedef NS_ENUM(NSUInteger, ORKMoodQuestionType) {
     ORKMoodQuestionTypeCustom,
