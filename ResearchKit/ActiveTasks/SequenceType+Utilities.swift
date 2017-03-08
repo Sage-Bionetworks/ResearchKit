@@ -28,6 +28,7 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 import Foundation
 
 public extension Sequence {
@@ -35,6 +36,10 @@ public extension Sequence {
     /**
     Returns an `Array` containing the results of mapping and filtered `transform`
     over `self`.
+     
+    @param  transform   The method which returns either the transformed element or nil if filtered.
+     
+    @return     An array of the transformed elements.
     */
     public func mapAndFilter<T>(_ transform: (Self.Iterator.Element) throws -> T?) rethrows -> [T] {
         var result = [T]()
@@ -48,7 +53,11 @@ public extension Sequence {
     
     /**
      Returns an `Dictionary` containing the results of mapping and filtered `transform`
-     over `self` where.
+     over `self` where the returned values are a key/value pair.
+     
+     @param  transform  The function used to transform the input sequence into a key/value pair
+     
+     @return  A dictionary of key/value pairs.
      */
     public func filteredDictionary<Hashable, T>(_ transform: (Self.Iterator.Element) throws -> (Hashable?, T?)) rethrows -> [Hashable: T] {
         var result = [Hashable:T]()
@@ -63,6 +72,10 @@ public extension Sequence {
     
     /**
      Find the first element in the `Sequence` that matches the given criterion.
+     
+     @param  evaluate   The function to use to evaluate the search pattern.
+     
+     @return  The element that matchs the pattern
     */
     public func find(_ evaluate: (Self.Iterator.Element) throws -> Bool) rethrows -> Self.Iterator.Element? {
         for element in self {
@@ -75,6 +88,10 @@ public extension Sequence {
     
     /**
      Find the next element in the `Sequence` after the element that matches the given criterion.
+     
+     @param  evaluate   The function to use to evaluate the search pattern.
+     
+     @return  The next element after the one that matchs the pattern
      */
     public func next(_ evaluate: (Self.Iterator.Element) throws -> Bool) rethrows -> Self.Iterator.Element? {
         var found = false
@@ -89,6 +106,10 @@ public extension Sequence {
     
     /**
      Find the first element with the given `identifier`
+     
+     @param identifier  The identifier for which to search.
+     
+     @return    The element with that identifier (if found)
     */
     public func find(withIdentifier identifier: String) -> Self.Iterator.Element? {
         for element in self {
@@ -102,6 +123,10 @@ public extension Sequence {
     
     /**
      Find the last element  with the given `identifier`
+     
+     @param identifier  The identifier for which to search.
+     
+     @return    The element with that identifier (if found)
     */
     public func findLast(withIdentifier identifier: String) -> Self.Iterator.Element? {
         for element in self.reversed() {
