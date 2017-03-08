@@ -86,6 +86,7 @@ enum TaskListRow: Int, CustomStringConvertible {
     case fitness
     case gonogoTest
     case holePegTest
+    case moodSurvey
     case psat
     case reactionTime
     case shortWalk
@@ -100,6 +101,7 @@ enum TaskListRow: Int, CustomStringConvertible {
     case heightQuestion
     case kneeRangeOfMotion
     case shoulderRangeOfMotion
+    case trailMaking
     case videoInstruction
     
     class TaskListRowSection {
@@ -155,6 +157,7 @@ enum TaskListRow: Int, CustomStringConvertible {
                     .gonogoTest,
                     .holePegTest,
                     .psat,
+                    .moodSurvey,
                     .reactionTime,
                     .shortWalk,
                     .spatialSpanMemory,
@@ -167,6 +170,7 @@ enum TaskListRow: Int, CustomStringConvertible {
                     .walkBackAndForth,
                     .kneeRangeOfMotion,
                     .shoulderRangeOfMotion,
+                    .trailMaking
                 ]),
             TaskListRowSection(title: "Miscellaneous", rows:
                 [
@@ -303,6 +307,12 @@ enum TaskListRow: Int, CustomStringConvertible {
             
         case .shoulderRangeOfMotion:
             return NSLocalizedString("Shoulder Range of Motion", comment: "")
+            
+        case .moodSurvey:
+            return NSLocalizedString("Mood Survey", comment: "")
+
+        case .trailMaking:
+            return NSLocalizedString("Trail Making Test", comment: "")
         }
     }
     
@@ -451,6 +461,7 @@ enum TaskListRow: Int, CustomStringConvertible {
 		case gonogoTest
         case holePegTestTask
         case psatTask
+        case moodSurveyTask
         case reactionTime
         case shortWalkTask
         case spatialSpanMemoryTask
@@ -463,6 +474,7 @@ enum TaskListRow: Int, CustomStringConvertible {
         case walkBackAndForthTask
         case kneeRangeOfMotion
         case shoulderRangeOfMotion
+        case trailMaking
         
         // Video instruction tasks.
         case videoInstructionTask
@@ -556,6 +568,9 @@ enum TaskListRow: Int, CustomStringConvertible {
             
         case .holePegTest:
             return holePegTestTask
+
+        case .moodSurvey:
+            return moodSurveyTask
             
         case .psat:
             return PSATTask
@@ -595,6 +610,9 @@ enum TaskListRow: Int, CustomStringConvertible {
         
         case .shoulderRangeOfMotion:
             return shoulderRangeOfMotion
+ 
+        case .trailMaking:
+            return trailMaking;
         
         case .videoInstruction:
             return videoInstruction
@@ -1279,6 +1297,11 @@ enum TaskListRow: Int, CustomStringConvertible {
         return ORKNavigableOrderedTask.holePegTest(withIdentifier: String(describing:Identifier.holePegTestTask), intendedUseDescription: exampleDescription, dominantHand: .right, numberOfPegs: 9, threshold: 0.2, rotated: false, timeLimit: 300, options: [])
     }
     
+    /// This task presents the Hole Peg Test pre-defined active task.
+    private var moodSurveyTask: ORKTask {
+        return ORKOrderedTask.moodSurvey(withIdentifier: String(describing:Identifier.moodSurveyTask), intendedUseDescription: exampleDescription, frequency: .daily, customQuestionText: nil, options: [])
+    }
+    
     /// This task presents the PSAT pre-defined active task.
     private var PSATTask: ORKTask {
         return ORKOrderedTask.psatTask(withIdentifier: String(describing:Identifier.psatTask), intendedUseDescription: exampleDescription, presentationMode: ORKPSATPresentationMode.auditory.union(.visual), interStimulusInterval: 3.0, stimulusDuration: 1.0, seriesLength: 60, options: [])
@@ -1350,6 +1373,12 @@ enum TaskListRow: Int, CustomStringConvertible {
     /// This task presents a shoulder range of motion task
     private var shoulderRangeOfMotion: ORKTask {
         return ORKOrderedTask.shoulderRangeOfMotionTask(withIdentifier: String(describing: Identifier.shoulderRangeOfMotion), limbOption: .left, intendedUseDescription: exampleDescription, options: [])
+    }
+    
+    /// This task presents a trail making task
+    private var trailMaking: ORKTask {
+        let intendedUseDescription = "Tests visual attention and task switching"
+        return ORKOrderedTask.trailmakingTask(withIdentifier: String(describing: Identifier.trailMaking), intendedUseDescription: intendedUseDescription, trailmakingInstruction: nil, trailType:.B, options: [])
     }
 
     /// This task presents a video instruction step
