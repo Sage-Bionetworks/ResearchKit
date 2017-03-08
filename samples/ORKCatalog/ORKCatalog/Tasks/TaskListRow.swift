@@ -85,7 +85,7 @@ enum TaskListRow: Int, CustomStringConvertible {
     case audio
     case fitness
     case holePegTest
-	case moodSurvey
+    case moodSurvey
     case psat
     case reactionTime
     case shortWalk
@@ -455,7 +455,7 @@ enum TaskListRow: Int, CustomStringConvertible {
         case fitnessTask
         case holePegTestTask
         case psatTask
-		    case moodSurveyTask
+        case moodSurveyTask
         case reactionTime
         case shortWalkTask
         case spatialSpanMemoryTask
