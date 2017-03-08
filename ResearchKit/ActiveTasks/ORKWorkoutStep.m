@@ -37,6 +37,7 @@
 #import "ORKHeartRateCaptureStep.h"
 #import "ORKOrderedTask_Private.h"
 #import "ORKPageStep_Private.h"
+#import "ORKRecorder_Private.h"
 #import "ORKResult_Private.h"
 #import "ORKStep_Private.h"
 #import "ORKHelpers_Internal.h"
@@ -181,6 +182,14 @@ ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierUserEnded = @"userEnd
 }
 
 #pragma mark - Permissions
+
+- (ORKPermissionMask)requestedPermissions {
+    ORKPermissionMask mask = [super requestedPermissions];
+    for (ORKRecorderConfiguration *config in self.recorderConfigurations) {
+        mask |= [config requestedPermissionMask];
+    }
+    return mask;
+}
 
 - (NSSet<HKObjectType *> *)requestedHealthKitTypesForReading {
     NSMutableSet<HKObjectType *> *set = [[super requestedHealthKitTypesForReading] mutableCopy] ? : [NSMutableSet new];
