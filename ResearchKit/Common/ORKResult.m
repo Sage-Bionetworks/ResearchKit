@@ -2438,6 +2438,28 @@ static NSString *const RegionIdentifierKey = @"region.identifier";
 @end
 
 
+@implementation ORKMoodScaleQuestionResult
+  
+- (NSNumber *)scaleAnswer {
+    id scaleAnswer = [self.choiceAnswers firstObject];
+    if ([scaleAnswer isKindOfClass:[NSNumber class]]) {
+        return scaleAnswer;
+    }
+    return nil;
+}
+
+- (void)setScaleAnswer:(NSNumber *)scaleAnswer {
+    if (scaleAnswer != nil) {
+        self.choiceAnswers = @[[scaleAnswer copy]];
+    }
+    else {
+        self.choiceAnswers = nil;
+    }
+}
+
+@end
+
+
 @implementation ORKTrailmakingResult
 
 - (instancetype)initWithIdentifier:(NSString *)identifier {

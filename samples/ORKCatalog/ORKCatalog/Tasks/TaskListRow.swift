@@ -85,6 +85,7 @@ enum TaskListRow: Int, CustomStringConvertible {
     case audio
     case fitness
     case holePegTest
+    case moodSurvey
     case psat
     case reactionTime
     case shortWalk
@@ -154,6 +155,7 @@ enum TaskListRow: Int, CustomStringConvertible {
                     .fitness,
                     .holePegTest,
                     .psat,
+                    .moodSurvey,
                     .reactionTime,
                     .shortWalk,
                     .spatialSpanMemory,
@@ -301,6 +303,9 @@ enum TaskListRow: Int, CustomStringConvertible {
         case .shoulderRangeOfMotion:
             return NSLocalizedString("Shoulder Range of Motion", comment: "")
             
+        case .moodSurvey:
+            return NSLocalizedString("Mood Survey", comment: "")
+
         case .trailMaking:
             return NSLocalizedString("Trail Making Test", comment: "")
         }
@@ -450,6 +455,7 @@ enum TaskListRow: Int, CustomStringConvertible {
         case fitnessTask
         case holePegTestTask
         case psatTask
+        case moodSurveyTask
         case reactionTime
         case shortWalkTask
         case spatialSpanMemoryTask
@@ -553,6 +559,9 @@ enum TaskListRow: Int, CustomStringConvertible {
             
         case .holePegTest:
             return holePegTestTask
+
+        case .moodSurvey:
+            return moodSurveyTask
             
         case .psat:
             return PSATTask
@@ -592,7 +601,7 @@ enum TaskListRow: Int, CustomStringConvertible {
         
         case .shoulderRangeOfMotion:
             return shoulderRangeOfMotion
-            
+ 
         case .trailMaking:
             return trailMaking;
         
@@ -1269,6 +1278,11 @@ enum TaskListRow: Int, CustomStringConvertible {
     /// This task presents the Hole Peg Test pre-defined active task.
     private var holePegTestTask: ORKTask {
         return ORKNavigableOrderedTask.holePegTest(withIdentifier: String(describing:Identifier.holePegTestTask), intendedUseDescription: exampleDescription, dominantHand: .right, numberOfPegs: 9, threshold: 0.2, rotated: false, timeLimit: 300, options: [])
+    }
+    
+    /// This task presents the Hole Peg Test pre-defined active task.
+    private var moodSurveyTask: ORKTask {
+        return ORKOrderedTask.moodSurvey(withIdentifier: String(describing:Identifier.moodSurveyTask), intendedUseDescription: exampleDescription, frequency: .daily, customQuestionText: nil, options: [])
     }
     
     /// This task presents the PSAT pre-defined active task.
