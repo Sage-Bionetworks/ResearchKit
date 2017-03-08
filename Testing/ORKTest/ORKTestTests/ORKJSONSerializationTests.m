@@ -454,7 +454,7 @@ ORK_MAKE_TEST_INIT(HKWorkoutEvent, ^{return [HKWorkoutEvent workoutEventWithType
                             // Map NSObject to string, since it's used where either a string or a number is acceptable
                             [instance setValue:@"test" forKey:p.propertyName];
                         } else if (p.propertyClass == [NSNumber class]) {
-                            [instance setValue:@(123) forKey:p.propertyName];
+                            [instance setValue:@(120) forKey:p.propertyName];
                         } else if (p.propertyClass == [HKUnit class]) {
                             [instance setValue:[HKUnit unitFromString:@"kg"] forKey:p.propertyName];
                         } else if (p.propertyClass == [NSURL class]) {
@@ -556,7 +556,7 @@ ORK_MAKE_TEST_INIT(HKWorkoutEvent, ^{return [HKWorkoutEvent workoutEventWithType
             if (p.isBoolType) {
                 XCTAssertNoThrow([instance setValue:index?@YES:@NO forKey:p.propertyName]);
             } else {
-                XCTAssertNoThrow([instance setValue:index?@(12):@(123) forKey:p.propertyName]);
+                XCTAssertNoThrow([instance setValue:index?@(12):@(120) forKey:p.propertyName]);
             }
             return YES;
         } else {
@@ -571,7 +571,7 @@ ORK_MAKE_TEST_INIT(HKWorkoutEvent, ^{return [HKWorkoutEvent workoutEventWithType
         // Map NSObject to string, since it's used where either a string or a number is acceptable
         [instance setValue:index?@"blah":@"test" forKey:p.propertyName];
     } else if (p.propertyClass == [NSNumber class]) {
-        [instance setValue:index?@(12):@(123) forKey:p.propertyName];
+        [instance setValue:index?@(12):@(120) forKey:p.propertyName];
     } else if (p.propertyClass == [NSURL class]) {
         NSURL *url = [NSURL fileURLWithFileSystemRepresentation:[index?@"xxx":@"blah" UTF8String]  isDirectory:NO relativeToURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
         [instance setValue:url forKey:p.propertyName];
@@ -859,6 +859,7 @@ ORK_MAKE_TEST_INIT(HKWorkoutEvent, ^{return [HKWorkoutEvent workoutEventWithType
                                        
                                        // For a specific class
                                        @"ORKHeightAnswerFormat.useMetricSystem",
+                                       @"ORKMoodScaleQuestionResult.scaleAnswer",
                                        @"ORKNavigablePageStep.steps",
                                        @"ORKPageStep.steps",
                                        @"ORKResult.saveable",
@@ -876,10 +877,10 @@ ORK_MAKE_TEST_INIT(HKWorkoutEvent, ^{return [HKWorkoutEvent workoutEventWithType
                                    @"ORKToneAudiometryResult.outputVolume",
                                    @"ORKConsentSection.contentURL",
                                    @"ORKConsentSection.customAnimationURL",
+                                   @"ORKMoodScaleQuestionResult.scaleAnswer",
                                    @"ORKNumericAnswerFormat.minimum",
                                    @"ORKNumericAnswerFormat.maximum",
                                    @"ORKVideoCaptureStep.duration",
-                                   @"ORKMoodScaleQuestionResult.scaleAnswer",
                                    ];
     
     // Test Each class
