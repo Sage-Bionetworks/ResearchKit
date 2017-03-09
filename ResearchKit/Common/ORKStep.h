@@ -218,6 +218,14 @@ ORK_CLASS_AVAILABLE
  */
 - (ORKStepViewController *)instantiateStepViewControllerWithResult:(ORKResult *)result;
 
+/**
+ Is this an instruction step? By default, this method will return `YES` if and only if this is 
+ a subclass of `ORKInstructionStep`.
+ 
+ @return  Whether or not this is an instruction step
+ */
+- (BOOL)isInstructionStep;
+
 @end
 
 NS_ASSUME_NONNULL_END
