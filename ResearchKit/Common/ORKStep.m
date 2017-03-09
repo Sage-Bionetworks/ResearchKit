@@ -178,4 +178,8 @@
     return nil;
 }
 
+- (BOOL)isInstructionStep {
+    return NO;
+}
+
 @end
