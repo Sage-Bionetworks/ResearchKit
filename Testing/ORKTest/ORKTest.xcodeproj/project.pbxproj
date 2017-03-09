@@ -74,7 +74,7 @@
 		86717AA31AC0C0FE00AC2A23 /* ORKTestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ORKTestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		86717AA81AC0C0FE00AC2A23 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		86717AD71AC0C53800AC2A23 /* MainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainViewController.m; sourceTree = "<group>"; };
-		86717AD81AC0C53800AC2A23 /* ORKESerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORKESerialization.m; path = ../ORKTest/ORKESerialization.m; sourceTree = "<group>"; };
+		86717AD81AC0C53800AC2A23 /* ORKESerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = ORKESerialization.m; path = ../ORKTest/ORKESerialization.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		86717ADC1AC0C53800AC2A23 /* DynamicTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DynamicTask.h; sourceTree = "<group>"; };
 		86717ADD1AC0C53800AC2A23 /* DynamicTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DynamicTask.m; sourceTree = "<group>"; };
 		86717ADE1AC0C53800AC2A23 /* MainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainViewController.h; sourceTree = "<group>"; };

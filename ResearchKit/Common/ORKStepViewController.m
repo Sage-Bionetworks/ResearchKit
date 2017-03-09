@@ -38,6 +38,7 @@
 
 #import "ORKResult.h"
 #import "ORKReviewStep_Internal.h"
+#import "ORKWorkoutStep.h"
 
 #import "ORKHelpers_Internal.h"
 #import "ORKSkin.h"
@@ -47,6 +48,7 @@
     BOOL _hasBeenPresented;
     BOOL _dismissing;
     BOOL _presentingAlert;
+    NSError *_watchError;
 }
 
 @property (nonatomic, strong,readonly) UIBarButtonItem *flexSpace;
@@ -274,6 +276,12 @@
     stepResult.startDate = self.presentedDate ? : [NSDate date];
     stepResult.endDate = self.dismissedDate ? : [NSDate date];
     
+    if (_watchError) {
+        ORKErrorResult *errorResult = [[ORKErrorResult alloc] initWithIdentifier:ORKWorkoutResultIdentifierError];
+        errorResult.error = _watchError;
+        stepResult.results = [stepResult.results arrayByAddingObject:errorResult] ? : @[errorResult];
+    }
+    
     return stepResult;
 }
 
@@ -465,6 +473,16 @@ static NSString *const _ORKAddedResultsKey = @"addedResults";
 - (BOOL)accessibilityPerformEscape {
     [self goBackward];
     return YES;
+}
+
+#pragma mark - Watch Connectivity
+
+- (void)didReceiveWatchMessage:(ORKWorkoutMessage *)message {
+    // Do nothing
+}
+
+- (void)didReceiveWatchError:(NSError *)error {
+    _watchError = [error copy];
 }
 
 @end

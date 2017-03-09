@@ -31,6 +31,7 @@
 
 @import UIKit;
 @import CoreLocation;
+@import HealthKit;
 #import <ResearchKit/ORKTypes.h>
 
 
@@ -1407,6 +1408,106 @@ ORK_CLASS_AVAILABLE
 
 @end
 
+/**
+ The `ORKErrorResult` represents a result that is an error.
+ */
+ORK_CLASS_AVAILABLE
+@interface ORKErrorResult: ORKResult
+
+/**
+ The error that results from running the step.
+ */
+@property (nonatomic, copy, nullable) NSError *error;
+    
+@end
+
+/**
+ The `ORKDevice` represents a serializable representation of an `HKDevice`.
+ */
+ORK_CLASS_AVAILABLE
+@interface ORKDevice : NSObject <NSCopying, NSSecureCoding>
+
+/*!
+ @property      name
+ @abstract      The name of the receiver.
+ @discussion    The user-facing name, such as the one displayed in the Bluetooth Settings for a BLE device.
+ */
+@property (nonatomic, readonly, nullable) NSString *name;
+
+/*!
+ @property      manufacturer
+ @abstract      The manufacturer of the receiver.
+ */
+@property (nonatomic, readonly, nullable) NSString *manufacturer;
+
+/*!
+ @property      model
+ @abstract      The model of the receiver.
+ */
+@property (nonatomic, readonly, nullable) NSString *model;
+
+/*!
+ @property      hardwareVersion
+ @abstract      The hardware revision of the receiver.
+ */
+@property (nonatomic, readonly, nullable) NSString *hardwareVersion;
+
+/*!
+ @property      softwareVersion
+ @abstract      The software revision of the receiver.
+ */
+@property (nonatomic, readonly, nullable) NSString *softwareVersion;
+
++ (instancetype)new NS_UNAVAILABLE;
+- (instancetype)init NS_UNAVAILABLE;
+
+/**
+ Returns a new device initialized from an `HKDevice`
+ 
+ @param healthKitDevice `HKDevice` to copy values from
+ @return                A new device.
+ */
+- (instancetype)initWithDevice:(HKDevice *)healthKitDevice;
+
+/**
+ Returns a new device initialized with the properties of this object
+ 
+ @param name    The name of the device
+ @param manufacturer    The manufacturer of the device
+ @param model   The model of the device
+ @param hardwareVersion The hardware version of the device
+ @param softwareVersion The software version of the device
+ @return                A new device.
+ */
+- (instancetype)initWithName:(nullable NSString *)name
+                manufacturer:(nullable NSString *)manufacturer
+                       model:(nullable NSString *)model
+             hardwareVersion:(nullable NSString *)hardwareVersion
+             softwareVersion:(nullable NSString *)softwareVersion NS_DESIGNATED_INITIALIZER;
+
+/**
+ Returns a new device initialized from data in the given unarchiver.
+ 
+ @param aDecoder    Coder from which to initialize the device.
+ 
+ @return A new device.
+ */
+- (instancetype)initWithCoder:(NSCoder *)aDecoder NS_DESIGNATED_INITIALIZER;
+
+@end
+
+/**
+ The `ORKDeviceResult` represents a result that is serialized values for an `HKDevice`.
+ */
+ORK_CLASS_AVAILABLE
+@interface ORKDeviceResult: ORKResult
+
+/**
+ The error that results from running the step.
+ */
+@property (nonatomic, copy, nullable) ORKDevice *device;
+
+@end
 
 /**
  The `ORKLocation` class represents the location addess obtained from a locaton question.

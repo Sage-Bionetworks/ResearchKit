@@ -30,10 +30,14 @@
 
 
 @import Foundation;
+@import HealthKit;
 #import <ResearchKit/ORKDefines.h>
 
 
 NS_ASSUME_NONNULL_BEGIN
+
+@interface ORKTypes : NSObject
+@end
 
 /**
  An enumeration of values that identify the different types of questions that the ResearchKit
@@ -286,6 +290,7 @@ typedef NS_ENUM(NSUInteger, ORKMoodSurveyFrequency) {
     ORKMoodSurveyFrequencyWeekly,
 } ORK_ENUM_AVAILABLE;
 
+
 /**
  Type of mood survey question.
  
@@ -297,7 +302,50 @@ typedef NS_ENUM(NSUInteger, ORKMoodQuestionType) {
     ORKMoodQuestionTypeOverall,
     ORKMoodQuestionTypePain,
     ORKMoodQuestionTypeSleep,
-    ORKMoodQuestionTypeExcercise
+    ORKMoodQuestionTypeExcercise,
+    ORKMoodQuestionTypeBreathing,
+    ORKMoodQuestionTypeTired,
 } ORK_ENUM_AVAILABLE;
+
+
+/**
+ Options for excluding different recorders
+ */
+typedef NS_OPTIONS(NSUInteger, ORKPredefinedRecorderOption) {
+    /// Default behavior.
+    ORKPredefinedRecorderOptionNone = 0,
+    
+    /// Exclude accelerometer data collection.
+    ORKPredefinedRecorderOptionExcludeAccelerometer = (1 << 2),
+    
+    /// Exclude device motion data collection.
+    ORKPredefinedRecorderOptionExcludeDeviceMotion = (1 << 3),
+    
+    /// Exclude pedometer data collection.
+    ORKPredefinedRecorderOptionExcludePedometer = (1 << 4),
+    
+    /// Exclude location data collection.
+    ORKPredefinedRecorderOptionExcludeLocation = (1 << 5),
+    
+    /// Exclude heart rate data collection.
+    ORKPredefinedRecorderOptionExcludeHeartRate = (1 << 6),
+    
+    /// Exclude audio data collection.
+    ORKPredefinedRecorderOptionExcludeAudio = (1 << 7)
+    
+} ORK_ENUM_AVAILABLE;
+
+
+/**
+ Extension to HKUnit
+ */
+@interface HKUnit (ORKUnitExtension)
+
+/**
+ Beats per minute (heart rate)
+ */
++ (HKUnit *)bpmUnit;
+
+@end
 
 NS_ASSUME_NONNULL_END

@@ -143,22 +143,22 @@ typedef NS_OPTIONS(NSUInteger, ORKPredefinedTaskOption) {
     ORKPredefinedTaskOptionExcludeConclusion = (1 << 1),
     
     /// Exclude accelerometer data collection.
-    ORKPredefinedTaskOptionExcludeAccelerometer = (1 << 2),
+    ORKPredefinedTaskOptionExcludeAccelerometer = ORKPredefinedRecorderOptionExcludeAccelerometer,
     
     /// Exclude device motion data collection.
-    ORKPredefinedTaskOptionExcludeDeviceMotion = (1 << 3),
+    ORKPredefinedTaskOptionExcludeDeviceMotion = ORKPredefinedRecorderOptionExcludeDeviceMotion,
     
     /// Exclude pedometer data collection.
-    ORKPredefinedTaskOptionExcludePedometer = (1 << 4),
+    ORKPredefinedTaskOptionExcludePedometer = ORKPredefinedRecorderOptionExcludePedometer,
     
     /// Exclude location data collection.
-    ORKPredefinedTaskOptionExcludeLocation = (1 << 5),
+    ORKPredefinedTaskOptionExcludeLocation = ORKPredefinedRecorderOptionExcludeLocation,
     
     /// Exclude heart rate data collection.
-    ORKPredefinedTaskOptionExcludeHeartRate = (1 << 6),
+    ORKPredefinedTaskOptionExcludeHeartRate = ORKPredefinedRecorderOptionExcludeHeartRate,
     
     /// Exclude audio data collection.
-    ORKPredefinedTaskOptionExcludeAudio = (1 << 7)
+    ORKPredefinedTaskOptionExcludeAudio = ORKPredefinedRecorderOptionExcludeAudio
 } ORK_ENUM_AVAILABLE;
 
 /**
@@ -236,10 +236,42 @@ ORK_EXTERN ORKTrailMakingTypeIdentifier const ORKTrailMakingTypeIdentifierB;
 @interface ORKOrderedTask (ORKPredefinedActiveTask)
 
 /**
+ Returns a predefined task that consists of a cardio heart rate measuring task.
+ 
+ In a cardio challenge task, the participant is asked to walk for a specified duration
+ (typically several minutes). During this period, various sensor data are collected and returned by
+ the task view controller's delegate. Sensor data can include accelerometer, device motion,
+ pedometer, location, and heart rate data where available.
+ 
+ At the conclusion of the walk, the participant is asked to sit down and rest for a period. 
+ Data collection continues during this period.
+ 
+ By default, the task includes an instruction step that explains what the user needs to do during
+ the task, but this can be excluded with `ORKPredefinedTaskOptionExcludeInstructions`.
+ 
+ Data collected from this task can be used to compute measures of general fitness.
+ 
+ @param identifier              The task identifier to use for this task, appropriate to the study.
+ @param intendedUseDescription  A localized string describing the intended use of the data
+ collected. If the value of this parameter is `nil`, the default
+ localized text is displayed.
+ @param walkDuration            The duration of the walk (the maximum is 10 minutes).
+ @param restDuration            The duration of the post walk rest period.
+ @param options                 Options that affect the features of the predefined task.
+ 
+ @return An active fitness check task that can be presented with an `ORKTaskViewController` object.
+ */
++ (ORKOrderedTask *)cardioChallengeTaskWithIdentifier:(NSString *)identifier
+                               intendedUseDescription:(nullable NSString *)intendedUseDescription
+                                         walkDuration:(NSTimeInterval)walkDuration
+                                         restDuration:(NSTimeInterval)restDuration
+                                              options:(ORKPredefinedTaskOption)options HK_AVAILABLE_IOS_ONLY(10_0);
+
+/**
  Returns a predefined task that consists of a fitness check.
  
  In a fitness check task, the participant is asked to walk for a specified duration
- (typically several minutes). During this period, various sensor data is collected and returned by
+ (typically several minutes). During this period, various sensor data are collected and returned by
  the task view controller's delegate. Sensor data can include accelerometer, device motion,
  pedometer, location, and heart rate data where available.
  
@@ -252,9 +284,7 @@ ORK_EXTERN ORKTrailMakingTypeIdentifier const ORKTrailMakingTypeIdentifierB;
  Data collected from this task can be used to compute measures of general fitness.
  
  @param identifier              The task identifier to use for this task, appropriate to the study.
- @param intendedUseDescription  A localized string describing the intended use of the data
-                                    collected. If the value of this parameter is `nil`, the default
-                                    localized text is displayed.
+ @param intendedUseDescription  A localized string describing the intended use of the data collected. If the value of this parameter is `nil`, the default localized text is displayed.
  @param walkDuration            The duration of the walk (the maximum is 10 minutes).
  @param restDuration            The duration of the post walk rest period.
  @param options                 Options that affect the features of the predefined task.

@@ -1365,6 +1365,184 @@ const NSUInteger NumberOfPaddingSpacesForIndentationLevel = 4;
 
 @end
 
+@implementation ORKErrorResult
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    [super encodeWithCoder:aCoder];
+    ORK_ENCODE_OBJ(aCoder, error);
+}
+
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        ORK_DECODE_OBJ_CLASS(aDecoder, error, NSError);
+    }
+    return self;
+}
+
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
+- (BOOL)isEqual:(id)object {
+    BOOL isParentSame = [super isEqual:object];
+    
+    __typeof(self) castObject = object;
+    return (isParentSame &&
+            ORKEqualObjects(self.error, castObject.error));
+}
+
+- (NSUInteger)hash {
+    return super.hash ^ self.error.hash;
+}
+
+- (instancetype)copyWithZone:(NSZone *)zone {
+    __typeof(self) result = [super copyWithZone:zone];
+    result.error = self.error;
+    
+    return result;
+}
+
+- (NSString *)descriptionWithNumberOfPaddingSpaces:(NSUInteger)numberOfPaddingSpaces {
+    return [NSString stringWithFormat:@"%@; error: %@", [super descriptionPrefixWithNumberOfPaddingSpaces:numberOfPaddingSpaces], self.error];
+}
+
+@end
+
+@implementation ORKDevice
+
++ (instancetype)new {
+    ORKThrowMethodUnavailableException();
+}
+
+- (instancetype)init {
+    ORKThrowMethodUnavailableException();
+}
+
+- (instancetype)initWithDevice:(HKDevice *)healthKitDevice {
+    return [self initWithName:healthKitDevice.name
+                 manufacturer:healthKitDevice.manufacturer
+                        model:healthKitDevice.model
+              hardwareVersion:healthKitDevice.hardwareVersion
+              softwareVersion:healthKitDevice.softwareVersion];
+}
+
+- (instancetype)initWithName:(nullable NSString *)name
+                manufacturer:(nullable NSString *)manufacturer
+                       model:(nullable NSString *)model
+             hardwareVersion:(nullable NSString *)hardwareVersion
+             softwareVersion:(nullable NSString *)softwareVersion {
+    self = [super init];
+    if (self) {
+        _name = [name copy];
+        _model = [model copy];
+        _manufacturer = [manufacturer copy];
+        _softwareVersion = [softwareVersion copy];
+        _hardwareVersion = [hardwareVersion copy];
+    }
+    return self;
+}
+
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    ORK_ENCODE_OBJ(aCoder, name);
+    ORK_ENCODE_OBJ(aCoder, model);
+    ORK_ENCODE_OBJ(aCoder, manufacturer);
+    ORK_ENCODE_OBJ(aCoder, softwareVersion);
+    ORK_ENCODE_OBJ(aCoder, hardwareVersion);
+}
+
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    self = [super init];
+    if (self) {
+        ORK_DECODE_OBJ_CLASS(aDecoder, name, NSString);
+        ORK_DECODE_OBJ_CLASS(aDecoder, model, NSString);
+        ORK_DECODE_OBJ_CLASS(aDecoder, manufacturer, NSString);
+        ORK_DECODE_OBJ_CLASS(aDecoder, softwareVersion, NSString);
+        ORK_DECODE_OBJ_CLASS(aDecoder, hardwareVersion, NSString);
+    }
+    return self;
+}
+
+- (BOOL)isEqual:(id)object {
+    if ([self class] != [object class]) {
+        return NO;
+    }
+    
+    __typeof(self) castObject = object;
+    return (ORKEqualObjects(self.name, castObject.name)
+            && ORKEqualObjects(self.model, castObject.model)
+            && ORKEqualObjects(self.manufacturer, castObject.manufacturer)
+            && ORKEqualObjects(self.softwareVersion, castObject.softwareVersion)
+            && ORKEqualObjects(self.hardwareVersion, castObject.hardwareVersion));
+}
+
+- (NSUInteger)hash {
+    return _name.hash ^ _model.hash ^ _manufacturer.hash ^ _softwareVersion.hash ^ _hardwareVersion.hash;
+}
+
+- (instancetype)copyWithZone:(NSZone *)zone {
+    __typeof(self) device = [[[self class] allocWithZone:zone] initWithName:self.name
+                                                               manufacturer:self.manufacturer
+                                                                      model:self.model
+                                                            hardwareVersion:self.hardwareVersion
+                                                            softwareVersion:self.softwareVersion];
+    return device;
+}
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"name: %@, model: %@, manufacturer: %@, softwareVersion: %@, hardwareVersion: %@", self.name, self.model, self.manufacturer, self.softwareVersion, self.hardwareVersion];
+}
+
+@end
+
+@implementation ORKDeviceResult
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    [super encodeWithCoder:aCoder];
+    ORK_ENCODE_OBJ(aCoder, device);
+}
+
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        ORK_DECODE_OBJ_CLASS(aDecoder, device, ORKDevice);
+    }
+    return self;
+}
+
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
+- (BOOL)isEqual:(id)object {
+    BOOL isParentSame = [super isEqual:object];
+    
+    __typeof(self) castObject = object;
+    return (isParentSame &&
+            ORKEqualObjects(self.device, castObject.device));
+}
+
+- (NSUInteger)hash {
+    return super.hash ^ self.device.hash;
+}
+
+- (instancetype)copyWithZone:(NSZone *)zone {
+    __typeof(self) result = [super copyWithZone:zone];
+    result.device = self.device;
+    
+    return result;
+}
+
+- (NSString *)descriptionWithNumberOfPaddingSpaces:(NSUInteger)numberOfPaddingSpaces {
+    return [NSString stringWithFormat:@"%@; device: %@", [super descriptionPrefixWithNumberOfPaddingSpaces:numberOfPaddingSpaces], self.device];
+}
+
+@end
+
 
 @implementation ORKQuestionResult
 
@@ -2459,17 +2637,39 @@ static NSString *const RegionIdentifierKey = @"region.identifier";
         NSArray <NSString *> *stepIdentifiers = [step.steps valueForKey:@"identifier"];
         NSMutableArray *results = [NSMutableArray new];
         for (NSString *identifier in stepIdentifiers) {
+            
+            // Look for a marker identifier
+            NSString *markerIdentifier = [NSString stringWithFormat:@"step.%@", identifier];
+            ORKResult *markerResult = [result resultForIdentifier:markerIdentifier];
+            
+            // Look for existing subresults
             NSString *prefix = [NSString stringWithFormat:@"%@.", identifier];
             NSPredicate *predicate = [NSPredicate predicateWithFormat:@"identifier BEGINSWITH %@", prefix];
             NSArray *filteredResults = [result.results filteredArrayUsingPredicate:predicate];
-            if (filteredResults.count > 0) {
+            
+            // If either filtered results or a marker result are found then add a step result for them
+            if (markerResult || (filteredResults.count > 0)) {
+                
+                // Create the step result
+                ORKStepResult *stepResult = [[ORKStepResult alloc] initWithStepIdentifier:identifier results:nil];
+                
+                // Set the start/end date if and only if there is a marker result
+                if (markerResult) {
+                    stepResult.startDate = markerResult.startDate;
+                    stepResult.endDate = markerResult.endDate;
+                }
+
+                // Add subresults
                 NSMutableArray *subresults = [NSMutableArray new];
                 for (ORKResult *subresult in filteredResults) {
                     ORKResult *copy = [subresult copy];
                     copy.identifier = [subresult.identifier substringFromIndex:prefix.length];
                     [subresults addObject:copy];
                 }
-                [results addObject:[[ORKStepResult alloc] initWithStepIdentifier:identifier results:subresults]];
+                stepResult.results = subresults;
+                
+                // Add the step result
+                [results addObject:stepResult];
             }
         }
         self.results = results;
@@ -2516,17 +2716,20 @@ static NSString *const RegionIdentifierKey = @"region.identifier";
     for (ORKResult *result in self.results) {
         if ([result isKindOfClass:[ORKStepResult class]]) {
             ORKStepResult *stepResult = (ORKStepResult *)result;
-            if (stepResult.results.count > 0) {
-                // For each subresult in this step, append the step identifier onto the result
-                for (ORKResult *result in stepResult.results) {
-                    ORKResult *copy = [result copy];
-                    NSString *subIdentifier = result.identifier ?: [NSString stringWithFormat:@"%@", @(result.hash)];
-                    copy.identifier = [NSString stringWithFormat:@"%@.%@", stepResult.identifier, subIdentifier];
-                    [results addObject:copy];
-                }
-            } else {
-                // If this is an empty step result then add a base class instance with this identifier
-                [results addObject:[[ORKResult alloc] initWithIdentifier:stepResult.identifier]];
+            
+            // Add a result with the
+            NSString *markerIdentifier = [NSString stringWithFormat:@"step.%@", stepResult.identifier];
+            ORKResult *markerResult = [[ORKResult alloc] initWithIdentifier:markerIdentifier];
+            markerResult.startDate = stepResult.startDate;
+            markerResult.endDate = stepResult.endDate;
+            [results addObject:markerResult];
+            
+            // For each subresult in this step, append the step identifier onto the result
+            for (ORKResult *result in stepResult.results) {
+                ORKResult *copy = [result copy];
+                NSString *subIdentifier = result.identifier ?: [NSString stringWithFormat:@"%@", @(result.hash)];
+                copy.identifier = [NSString stringWithFormat:@"%@.%@", stepResult.identifier, subIdentifier];
+                [results addObject:copy];
             }
         } else {
             // If this is *not* a step result then just add it as-is

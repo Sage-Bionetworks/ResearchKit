@@ -44,11 +44,15 @@
 #import "ORKTaskViewController_Internal.h"
 #import "ORKRecorder_Internal.h"
 
+#import "ORKHealthQuantityTypeRecorder_Internal.h"
+
 #import "ORKActiveStep_Internal.h"
+#import "ORKWorkoutStep_Private.h"
 #import "ORKResult.h"
 #import "ORKTask.h"
 
 #import "ORKAccessibility.h"
+#import "ORKCodingObjects.h"
 #import "ORKHelpers_Internal.h"
 #import "ORKSkin.h"
 
@@ -252,6 +256,14 @@
     [self recordersDidChange];
 }
 
+- (void)removeRecorder:(ORKRecorder *)recorder {
+    recorder.delegate = nil;
+    [recorder stop];
+    NSMutableArray *recorders = [self.recorders mutableCopy];
+    [recorders removeObject:recorder];
+    self.recorders = [recorders copy];
+}
+
 - (void)setOutputDirectory:(NSURL *)outputDirectory {
     [super setOutputDirectory:outputDirectory];
     [self prepareStep];
@@ -378,6 +390,7 @@
             [self goForward];
         }
     }
+    
     [self stepDidFinish];
 }
 
@@ -390,6 +403,10 @@
 
 #pragma mark - timers
 
+- (NSTimeInterval)stepDuration {
+    return self.activeStep.stepDuration;
+}
+
 - (void)resetTimer {
     [_activeStepTimer reset];
     _activeStepTimer = nil;
@@ -398,7 +415,7 @@
 - (void)startTimer {
     [self resetTimer];
     
-    NSTimeInterval stepDuration = self.activeStep.stepDuration;
+    NSTimeInterval stepDuration = self.stepDuration;
     
     if (stepDuration > 0) {
         ORKWeakTypeOf(self) weakSelf = self;
@@ -455,6 +472,10 @@
     return _activeStepTimer.duration - _activeStepTimer.runtime;
 }
 
+- (NSTimeInterval)timePassed {
+    return _activeStepTimer.runtime;
+}
+
 #pragma mark - action handlers
 
 - (void)stepDidFinish {
@@ -500,6 +521,38 @@ static NSString *const _ORKRecorderResultsRestoreKey = @"recorderResults";
     
     self.finished = [coder decodeBoolForKey:_ORKFinishedRestoreKey];
     _recorderResults = [coder decodeObjectOfClass:[NSArray class] forKey:_ORKRecorderResultsRestoreKey];
+}
+
+#pragma mark - Watch Connectivity
+
+- (void)didReceiveWatchMessage:(ORKWorkoutMessage *)message {
+    
+    // If this is a change of state message then call the state change
+    if (message.workoutState) {
+        [self workoutStateChanged:message.workoutState];
+    }
+    
+    if ([message isKindOfClass:[ORKSamplesWorkoutMessage class]]) {
+        ORKSamplesWorkoutMessage *samplesMessage = (ORKSamplesWorkoutMessage *)message;
+        [self addHeathRecorderQuantitySamples: samplesMessage.samples
+                       quantityTypeIdentifier: samplesMessage.quantityTypeIdentifier];
+    }
+}
+
+- (void)workoutStateChanged:(ORKWorkoutState)workoutState {
+    // do nothing
+}
+
+- (void)addHeathRecorderQuantitySamples:(NSArray<HKQuantitySample *> *)samples quantityTypeIdentifier:(NSString *)quantityTypeIdentifier {
+    for (ORKRecorder *recorder in self.recorders) {
+        if ([recorder isKindOfClass:[ORKHealthQuantityTypeRecorder class]]) {
+            ORKHealthQuantityTypeRecorder *rec1 = (ORKHealthQuantityTypeRecorder *)recorder;
+            if ([rec1.quantityType.identifier isEqualToString:quantityTypeIdentifier]) {
+                [rec1 addQuantitySamples:samples];
+                break;
+            }
+        }
+    }
 }
 
 @end

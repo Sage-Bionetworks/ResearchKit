@@ -29,7 +29,7 @@
  */
 
 
-#import "ORKFitnessStepViewController.h"
+#import "ORKFitnessStepViewController_Internal.h"
 
 #import "ORKActiveStepTimer.h"
 #import "ORKActiveStepView.h"
@@ -37,26 +37,21 @@
 #import "ORKVerticalContainerView.h"
 
 #import "ORKStepViewController_Internal.h"
-#import "ORKHealthQuantityTypeRecorder.h"
-#import "ORKPedometerRecorder.h"
 
 #import "ORKActiveStepViewController_Internal.h"
 #import "ORKFitnessStep.h"
+#import "ORKWorkoutStep_Private.h"
 #import "ORKStep_Private.h"
+#import "ORKResult.h"
 
 #import "ORKHelpers_Internal.h"
 
-
-@interface ORKFitnessStepViewController () <ORKHealthQuantityTypeRecorderDelegate,ORKPedometerRecorderDelegate> {
+@implementation ORKFitnessStepViewController {
     NSInteger _intendedSteps;
     ORKFitnessContentView *_contentView;
     NSNumberFormatter *_hrFormatter;
+    BOOL _userEndedWorkout;
 }
-
-@end
-
-
-@implementation ORKFitnessStepViewController
 
 - (instancetype)initWithStep:(ORKStep *)step {    
     self = [super initWithStep:step];
@@ -68,6 +63,18 @@
 
 - (ORKFitnessStep *)fitnessStep {
     return (ORKFitnessStep *)self.step;
+}
+
+- (ORKStepResult *)result {
+    ORKStepResult *sResult = [super result];
+
+    if (_userEndedWorkout) {
+        ORKBooleanQuestionResult *boolResult = [[ORKBooleanQuestionResult alloc] initWithIdentifier:ORKWorkoutResultIdentifierUserEnded];
+        boolResult.booleanAnswer = @YES;
+        sResult.results = [sResult.results arrayByAddingObject:boolResult] ? : @[boolResult];
+    }
+    
+    return sResult;
 }
 
 - (void)stepDidChange {
@@ -121,7 +128,7 @@
         }
     }
     
-    if (heartRateRecorder == nil) {
+    if ((heartRateRecorder == nil) && !self.usesCamera) {
         _contentView.hasHeartRate = NO;
     }
     _contentView.heartRate = @"--";
@@ -135,10 +142,19 @@
     [super countDownTimerFired:timer finished:finished];
 }
 
+- (void)workoutStateChanged:(ORKWorkoutState)workoutState {
+    [super workoutStateChanged:workoutState];
+    if ([workoutState isEqualToString:ORKWorkoutStateEnded]) {
+        // Workout has been ended from the watch
+        _userEndedWorkout = YES;
+        [self finish];
+    }
+}
+
 #pragma mark - ORKHealthQuantityTypeRecorderDelegate
 
 - (void)healthQuantityTypeRecorderDidUpdate:(ORKHealthQuantityTypeRecorder *)healthQuantityTypeRecorder {
-    if ([[healthQuantityTypeRecorder.quantityType identifier] isEqualToString:HKQuantityTypeIdentifierHeartRate]) {
+    if (!self.usesCamera && [[healthQuantityTypeRecorder.quantityType identifier] isEqualToString:HKQuantityTypeIdentifierHeartRate]) {
         [self updateHeartRateWithQuantity:healthQuantityTypeRecorder.lastSample unit:healthQuantityTypeRecorder.unit];
     }
 }

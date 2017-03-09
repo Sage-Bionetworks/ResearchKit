@@ -77,6 +77,8 @@ FOUNDATION_EXPORT void ORKStepArrayAddStep(NSMutableArray *array, ORKStep *step)
 
 + (ORKCompletionStep *)makeCompletionStep;
 
++ (NSDateComponentsFormatter *)textTimeFormatter;
+
 @end
 
 NS_ASSUME_NONNULL_END

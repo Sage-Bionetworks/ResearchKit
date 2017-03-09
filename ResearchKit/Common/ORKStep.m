@@ -174,4 +174,12 @@
     return nil;
 }
 
+- (NSSet<HKObjectType *> *)requestedHealthKitTypesForWriting {
+    return nil;
+}
+
+- (BOOL)isInstructionStep {
+    return NO;
+}
+
 @end

@@ -33,6 +33,9 @@
 
 #import <ResearchKit/ORKHelpers_Private.h>
 
+// Only include the types and defines for other OS types.
+#if TARGET_OS_IOS
+
 // Active step support
 #import <ResearchKit/ORKDataLogger.h>
 #import <ResearchKit/ORKErrors.h>
@@ -49,7 +52,6 @@
 #import <ResearchKit/ORKAudioStep.h>
 #import <ResearchKit/ORKCompletionStep.h>
 #import <ResearchKit/ORKCountdownStep.h>
-#import <ResearchKit/ORKFitnessStep.h>
 #import <ResearchKit/ORKGoNoGoStep.h>
 #import <ResearchKit/ORKHolePegTestPlaceStep.h>
 #import <ResearchKit/ORKHolePegTestRemoveStep.h>
@@ -65,6 +67,7 @@
 #import <ResearchKit/ORKTowerOfHanoiStep.h>
 #import <ResearchKit/ORKTrailmakingStep.h>
 #import <ResearchKit/ORKWalkingTaskStep.h>
+#import <ResearchKit/ORKWorkoutStep_Private.h>
 
 #import <ResearchKit/ORKTaskViewController_Private.h>
 #import <ResearchKit/ORKQuestionStepViewController_Private.h>
@@ -72,7 +75,6 @@
 #import <ResearchKit/ORKAudioStepViewController.h>
 #import <ResearchKit/ORKConsentReviewStepViewController.h>
 #import <ResearchKit/ORKCountdownStepViewController.h>
-#import <ResearchKit/ORKFitnessStepViewController.h>
 #import <ResearchKit/ORKGoNoGoViewController.h>
 #import <ResearchKit/ORKHolePegTestPlaceStepViewController.h>
 #import <ResearchKit/ORKHolePegTestRemoveStepViewController.h>
@@ -85,13 +87,14 @@
 #import <ResearchKit/ORKToneAudiometryPracticeStepViewController.h>
 #import <ResearchKit/ORKToneAudiometryStepViewController.h>
 #import <ResearchKit/ORKTimedWalkStepViewController.h>
+#import <ResearchKit/ORKVideoInstructionStepViewController.h>
 #import <ResearchKit/ORKVisualConsentStepViewController.h>
 #import <ResearchKit/ORKWalkingTaskStepViewController.h>
-#import <ResearchKit/ORKVideoInstructionStepViewController.h>
 
 #import <ResearchKit/ORKAccelerometerRecorder.h>
 #import <ResearchKit/ORKAudioRecorder.h>
 #import <ResearchKit/ORKDeviceMotionRecorder.h>
+#import <ResearchKit/ORKHeartRateCameraRecorder.h>
 #import <ResearchKit/ORKHealthQuantityTypeRecorder.h>
 #import <ResearchKit/ORKLocationRecorder.h>
 #import <ResearchKit/ORKPedometerRecorder.h>
@@ -99,3 +102,5 @@
 
 // For custom steps
 #import <ResearchKit/ORKCustomStepView.h>
+
+#endif

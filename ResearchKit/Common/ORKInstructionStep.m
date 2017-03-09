@@ -40,6 +40,10 @@
 
 @implementation ORKInstructionStep
 
+- (BOOL)isInstructionStep {
+    return YES;
+}
+
 - (void)setAuxiliaryImage:(UIImage *)auxiliaryImage {
     _auxiliaryImage = auxiliaryImage;
     if (auxiliaryImage) {

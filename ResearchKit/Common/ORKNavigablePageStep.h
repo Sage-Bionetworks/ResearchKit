@@ -58,6 +58,9 @@ ORK_CLASS_AVAILABLE
  */
 @property (nonatomic, copy, readonly) ORKOrderedTask *pageTask;
 
+- (instancetype)initWithIdentifier:(NSString *)identifier
+                             steps:(nullable NSArray<ORKStep *> *)steps NS_UNAVAILABLE;
+
 /**
  Returns an initialized page step using the specified identifier and task.
  
