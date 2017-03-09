@@ -2638,29 +2638,38 @@ static NSString *const RegionIdentifierKey = @"region.identifier";
         NSMutableArray *results = [NSMutableArray new];
         for (NSString *identifier in stepIdentifiers) {
             
+            // Look for a marker identifier
             NSString *markerIdentifier = [NSString stringWithFormat:@"step.%@", identifier];
             ORKResult *markerResult = [result resultForIdentifier:markerIdentifier];
-            if (markerResult) {
+            
+            // Look for existing subresults
+            NSString *prefix = [NSString stringWithFormat:@"%@.", identifier];
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"identifier BEGINSWITH %@", prefix];
+            NSArray *filteredResults = [result.results filteredArrayUsingPredicate:predicate];
+            
+            // If either filtered results or a marker result are found then add a step result for them
+            if (markerResult || (filteredResults.count > 0)) {
                 
-                // Add marker result
+                // Create the step result
                 ORKStepResult *stepResult = [[ORKStepResult alloc] initWithStepIdentifier:identifier results:nil];
-                stepResult.startDate = markerResult.startDate;
-                stepResult.endDate = markerResult.endDate;
-                [results addObject:stepResult];
                 
-                // Add subresults (if any)
-                NSString *prefix = [NSString stringWithFormat:@"%@.", identifier];
-                NSPredicate *predicate = [NSPredicate predicateWithFormat:@"identifier BEGINSWITH %@", prefix];
-                NSArray *filteredResults = [result.results filteredArrayUsingPredicate:predicate];
-                if (filteredResults.count > 0) {
-                    NSMutableArray *subresults = [NSMutableArray new];
-                    for (ORKResult *subresult in filteredResults) {
-                        ORKResult *copy = [subresult copy];
-                        copy.identifier = [subresult.identifier substringFromIndex:prefix.length];
-                        [subresults addObject:copy];
-                    }
-                    stepResult.results = subresults;
+                // Set the start/end date if and only if there is a marker result
+                if (markerResult) {
+                    stepResult.startDate = markerResult.startDate;
+                    stepResult.endDate = markerResult.endDate;
                 }
+
+                // Add subresults
+                NSMutableArray *subresults = [NSMutableArray new];
+                for (ORKResult *subresult in filteredResults) {
+                    ORKResult *copy = [subresult copy];
+                    copy.identifier = [subresult.identifier substringFromIndex:prefix.length];
+                    [subresults addObject:copy];
+                }
+                stepResult.results = subresults;
+                
+                // Add the step result
+                [results addObject:stepResult];
             }
         }
         self.results = results;
