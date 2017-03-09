@@ -30,34 +30,9 @@
 @import Foundation;
 #import <ResearchKit/ORKCodingObjects.h>
 
+
 NS_ASSUME_NONNULL_BEGIN
 
-/**
- Keys into a `sendMessage:` dictionary for interactive communication between the
- watch and the phone.
- */
-//typedef NSString * ORKWorkoutMessageKey NS_STRING_ENUM;
-
-//// Workout Session State (sent by watch)
-//ORK_EXTERN ORKWorkoutMessageKey const ORKWorkoutMessageKeyState;
-//// Command (sent by phone)
-//ORK_EXTERN ORKWorkoutMessageKey const ORKWorkoutMessageKeyCommand;
-//// Error (sent by watch)
-//ORK_EXTERN ORKWorkoutMessageKey const ORKWorkoutMessageKeyError;
-//// Event (sent by watch)
-//ORK_EXTERN ORKWorkoutMessageKey const ORKWorkoutMessageKeyEvent;
-//// Instruction (sent by phone)
-//ORK_EXTERN ORKWorkoutMessageKey const ORKWorkoutMessageKeyInstruction;
-//// Ping is a message that replies with session state (sent by phone)
-//ORK_EXTERN ORKWorkoutMessageKey const ORKWorkoutMessageKeyPing;
-//// Samples collected (sent by watch)
-//ORK_EXTERN ORKWorkoutMessageKey const ORKWorkoutMessageKeyQuantityTypeIdentifier;
-//// Samples collected (sent by watch)
-//ORK_EXTERN ORKWorkoutMessageKey const ORKWorkoutMessageKeySamples;
-//// Duration (sent by phone)
-//ORK_EXTERN ORKWorkoutMessageKey const ORKWorkoutMessageKeyStepDuration;
-//// Timestamp included with message packet
-//ORK_EXTERN ORKWorkoutMessageKey const ORKWorkoutMessageKeyTimestamp;
 
 /**
  String enum for the watch's workout session state.
@@ -68,6 +43,7 @@ ORK_EXTERN ORKWorkoutState const ORKWorkoutStateNotStarted;
 ORK_EXTERN ORKWorkoutState const ORKWorkoutStateRunning;
 ORK_EXTERN ORKWorkoutState const ORKWorkoutStateEnded;
 ORK_EXTERN ORKWorkoutState const ORKWorkoutStatePaused;
+
 
 /**
  String enum for commands to change the watch's session state.
@@ -80,6 +56,7 @@ ORK_EXTERN ORKWorkoutCommand const ORKWorkoutCommandResume;
 ORK_EXTERN ORKWorkoutCommand const ORKWorkoutCommandStartMoving;
 ORK_EXTERN ORKWorkoutCommand const ORKWorkoutCommandStopMoving;
 ORK_EXTERN ORKWorkoutCommand const ORKWorkoutCommandPing;
+
 
 /**
  The `ORKWorkoutMessage` is an object that can be used to transport messages to 
@@ -124,7 +101,7 @@ ORK_CLASS_AVAILABLE
 /**
  Returns a new data object initialized with the specified dictionary representation.
  
- @param aDecoder    Coder from which to initialize.
+ @param aDecoder    Coder from which to initialize
  
  @return A new data object.
  */
@@ -132,7 +109,7 @@ ORK_CLASS_AVAILABLE
 
 /**
  Returns a new data object initialized with the specified dictionary representation,
- including mapping to a classType
+ including mapping to a classType.
  
  @param message   The dictionary representation
  
@@ -141,21 +118,14 @@ ORK_CLASS_AVAILABLE
 + (nullable instancetype)workoutMessageWithMessage:(NSDictionary<NSString *, id> *)message;
 
 /**
- @returns Dictionary representation for this data object
+ JSON serializable dictionary representing this object.
+ 
+ @return Dictionary representation for this data object.
  */
 - (NSDictionary<NSString *, id> *)dictionaryRepresentation;
 
-/**
- @returns Keys used to represent this dictionary item.
- */
-- (NSArray<NSString *> *)dictionaryRepresentationKeys;
-
-/**
- Used to check the encoding/decoding of a property.
- */
-- (Class)serializableClassOfPropertyNamed:(NSString*)propertyName;
-
 @end
+
 
 /**
  `ORKInstructionWorkoutMessage` messages are sent from the phone to the watch.
@@ -164,12 +134,12 @@ ORK_CLASS_AVAILABLE
 @interface ORKInstructionWorkoutMessage : ORKWorkoutMessage
 
 /**
- A localized string with the instruction to display
+ A localized string with the instruction to display.
  */
 @property (nonatomic, copy, nullable) NSString *instruction;
 
 /**
- A duration for the step
+ A duration for the step.
  */
 @property (nonatomic) NSTimeInterval stepDuration;
 
@@ -180,6 +150,7 @@ ORK_CLASS_AVAILABLE
 
 @end
 
+
 /**
  `ORKSamplesWorkoutMessage` messages are sent from the watch when a tracked HealthKit
  value is updated.
@@ -188,16 +159,17 @@ ORK_CLASS_AVAILABLE
 @interface ORKSamplesWorkoutMessage : ORKWorkoutMessage
 
 /**
- The quantity type identifier for this set of samples
+ The quantity type identifier for this set of samples.
  */
 @property (nonatomic, copy) HKQuantityTypeIdentifier quantityTypeIdentifier;
 
 /**
- The samples being sent
+ The samples being sent.
  */
 @property (nonatomic, copy) NSArray<HKQuantitySample *> *samples;
 
 @end
+
 
 /**
  `ORKEventWorkoutMessage` messages are sent from the watch when a workout session
@@ -214,6 +186,7 @@ HK_CLASS_AVAILABLE_IOS_WATCHOS(10_0, 3_0)
 
 @end
 
+
 /**
  `ORKErrorWorkoutMessage` messages are sent from the watch when a workout session
  error happens.
@@ -227,5 +200,6 @@ ORK_CLASS_AVAILABLE
 @property (nonatomic, copy) NSError *error;
 
 @end
+
 
 NS_ASSUME_NONNULL_END

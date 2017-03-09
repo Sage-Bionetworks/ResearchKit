@@ -54,7 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable instancetype)quantitySampleWithCodingObject:(NSDictionary<NSString *, id> *)codingObject;
 
 /**
- Create an array of samples from the coding object dictionaries
+ Create an array of samples from the coding object dictionaries.
  
  @param codingObjects   An array of dictionary of property values
  @return                An array of quantity sample objects

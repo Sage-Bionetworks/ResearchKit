@@ -1,5 +1,6 @@
 /*
  Copyright (c) 2015, Apple Inc. All rights reserved.
+ Copyright (c) 2017, Sage Bionetworks.
  
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
@@ -123,9 +124,9 @@ ORK_CLASS_AVAILABLE
 @property (nonatomic) BOOL isValidFloorLevel;
 
 /**
- Returns a new relative location from the json coding object returned by encoding the `CLLocation`
+ Returns a new relative location from the json coding object returned by encoding the `CLLocation`.
  
- @param codingObject    The coding object to use to initialize the relative location object
+ @param codingObject    The coding object to use to initialize the relative location object.
  
  @return A new relative location object.
  */

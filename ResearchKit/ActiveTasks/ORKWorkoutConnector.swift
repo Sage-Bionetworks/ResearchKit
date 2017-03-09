@@ -44,6 +44,7 @@ public protocol ORKWorkoutConnectorDelegate: class, NSObjectProtocol {
     
     /**
      Called when a workout is successfully started.
+     
      @param workoutConnector    The calling workout connector
      @param configuration       The workout configuration for the workout session to start
      */
@@ -52,6 +53,7 @@ public protocol ORKWorkoutConnectorDelegate: class, NSObjectProtocol {
     
     /**
      Called when a workout ended. This object includes the `HKWorkout` object describing this workout.
+     
      @param workoutConnector    The calling workout connector
      @param workout             The workout object
      */
@@ -60,6 +62,7 @@ public protocol ORKWorkoutConnectorDelegate: class, NSObjectProtocol {
     
     /**
      Called when a message is received from the paired phone.
+     
      @param workoutConnector    The calling workout connector
      @param message             The message object
      */
@@ -68,6 +71,7 @@ public protocol ORKWorkoutConnectorDelegate: class, NSObjectProtocol {
     
     /**
      Called when the workout state is paused.
+     
      @param workoutConnector    The calling workout connector
      */
     @objc(workoutConnectorDidPause:)
@@ -75,13 +79,15 @@ public protocol ORKWorkoutConnectorDelegate: class, NSObjectProtocol {
     
     /**
      Called when the workout state is resumed.
+     
      @param workoutConnector    The calling workout connector
      */
     @objc(workoutConnectorDidResume:)
     optional func workoutConnectorDidResume(_ workoutConnector: ORKWorkoutConnector)
     
     /**
-     Called when the total energy burned is updated
+     Called when the total energy burned is updated.
+     
      @param workoutConnector    The calling workout connector
      @param totalEnergyBurned   The total energy burned (calories)
      */
@@ -89,7 +95,8 @@ public protocol ORKWorkoutConnectorDelegate: class, NSObjectProtocol {
     optional func workoutConnector(_ workoutConnector: ORKWorkoutConnector, didUpdateTotalEnergyBurned totalEnergyBurned:HKQuantity)
     
     /**
-     Called when the total distance is updated
+     Called when the total distance is updated.
+     
      @param workoutConnector    The calling workout connector
      @param totalDistance       The total distance
      */
@@ -97,7 +104,8 @@ public protocol ORKWorkoutConnectorDelegate: class, NSObjectProtocol {
     optional func workoutConnector(_ workoutConnector: ORKWorkoutConnector, didUpdateTotalDistance totalDistance:HKQuantity)
     
     /**
-     Called when the heart rate is updated
+     Called when the heart rate is updated.
+     
      @param workoutConnector    The calling workout connector
      @param heartRate           The heart rate
      */
@@ -223,7 +231,7 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
         _connectivitySession = WCSession.default()
         _connectivitySession?.delegate = self
         
-        // Update the query identifiers (but only if they are not already setup
+        // Update the query identifiers (but only if they are not already set up
         if queryIdentifiers.count == 0 {
             queryIdentifiers = ORKWorkoutUtilities.queryIdentifiers(for: workoutConfiguration)
         }
@@ -580,7 +588,7 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
             return;
         }
         
-        // Check if this is a command to stop and handle if it is
+        // Check if this is a command message and respond to the command (if applicable)
         if let session = self.workoutSession,
             let commandMessage = workoutMessage as? ORKInstructionWorkoutMessage,
             let command = commandMessage.command {

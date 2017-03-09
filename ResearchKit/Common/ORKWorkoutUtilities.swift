@@ -43,6 +43,7 @@ public final class ORKWorkoutUtilities: NSObject {
      by Objective-c classes.
      
      @param workoutEventType    The `HKWorkoutEventType` to convert
+     
      @return                    The identifier for this event type
     */
     @objc(identifierForWorkoutEventType:)
@@ -55,6 +56,7 @@ public final class ORKWorkoutUtilities: NSObject {
      `HKWorkoutEventType`. Returns `0` if undefined.
      
      @param identifier    The identifier to convert
+     
      @return              The `rawValue` for the `HKWorkoutEventType` enum
      */
     @objc(workoutEventTypeForIdentifier:)
@@ -70,6 +72,7 @@ public final class ORKWorkoutUtilities: NSObject {
      by Objective-c classes.
      
      @param locationType        The `HKWorkoutSessionLocationType` to convert
+     
      @return                    The identifier for this event type
      */
     @available(iOS 10.0, *)
@@ -84,6 +87,7 @@ public final class ORKWorkoutUtilities: NSObject {
      `HKWorkoutSessionLocationType`. Returns `HKWorkoutSessionLocationTypeUnknown` if undefined.
      
      @param identifier    The identifier to convert
+     
      @return              The `rawValue` for the `HKWorkoutSessionLocationType` enum
      */
     @available(iOS 10.0, *)
@@ -99,6 +103,7 @@ public final class ORKWorkoutUtilities: NSObject {
      by Objective-c classes.
      
      @param workoutActivityType The `HKWorkoutActivityType` to convert
+     
      @return                    The identifier for this event type
      */
     @objc(identifierForWorkoutActivityType:)
@@ -136,6 +141,7 @@ public final class ORKWorkoutUtilities: NSObject {
      List of `HKQuantityTypeIdentifier` to include by default for a given configuration.
      
      @param  workoutConfiguration   The workout configuration
+     
      @return                        List of identifiers
     */
     @available(iOS 10.0, *)
@@ -163,7 +169,13 @@ public final class ORKWorkoutUtilities: NSObject {
     }
     
     /**
-     Using the workout events to check for pause/resume, calculate the duration of the workout 
+     Using the workout events to check for pause/resume, calculate the duration of the workout.
+     
+     @param     workoutEvents   The array of workout events (Optional)
+     @param     startDate       The start date of the workout (Optional)
+     @param     endDate         The end date of the workout (Optional)
+     
+     @return    Calculated duration
      */
     open class func computeDurationOfWorkout(withEvents workoutEvents: [HKWorkoutEvent]?, startDate: Date?, endDate: Date?) -> TimeInterval {
         var duration = 0.0
@@ -204,7 +216,7 @@ public final class ORKWorkoutUtilities: NSObject {
 public extension HKWorkoutActivityType {
     
     /**
-     Initializer that uses an `identifier` string
+     Initializer that uses an `identifier` string.
      
      @param identifier    The identifier to convert
      @return              An `HKWorkoutActivityType`. Default = `.other`
@@ -234,10 +246,10 @@ public extension HKWorkoutActivityType {
 public extension HKWorkoutEventType {
     
     /**
-     Initializer that uses an `identifier` string
+     Initializer that uses an `identifier` string.
      
      @param identifier    The identifier to convert
-     @return              An `HKWorkoutEventType` or `nil` if undefined.
+     @return              An `HKWorkoutEventType` or `nil` if undefined
      */
     public init?(identifier: String) {
         guard let idx = ORKWorkoutEventTypeIdentifiers.index(of: identifier),
@@ -264,7 +276,7 @@ public extension HKWorkoutEventType {
 public extension HKWorkoutSessionLocationType {
     
     /**
-     Initializer that uses an `identifier` string
+     Initializer that uses an `identifier` string.
      
      @param identifier    The identifier to convert
      @return              An `HKWorkoutSessionLocationType`. Default = `.unknown`

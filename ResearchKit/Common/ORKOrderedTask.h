@@ -239,7 +239,7 @@ ORK_EXTERN ORKTrailMakingTypeIdentifier const ORKTrailMakingTypeIdentifierB;
  Returns a predefined task that consists of a cardio heart rate measuring task.
  
  In a cardio challenge task, the participant is asked to walk for a specified duration
- (typically several minutes). During this period, various sensor data is collected and returned by
+ (typically several minutes). During this period, various sensor data are collected and returned by
  the task view controller's delegate. Sensor data can include accelerometer, device motion,
  pedometer, location, and heart rate data where available.
  
@@ -271,7 +271,7 @@ ORK_EXTERN ORKTrailMakingTypeIdentifier const ORKTrailMakingTypeIdentifierB;
  Returns a predefined task that consists of a fitness check.
  
  In a fitness check task, the participant is asked to walk for a specified duration
- (typically several minutes). During this period, various sensor data is collected and returned by
+ (typically several minutes). During this period, various sensor data are collected and returned by
  the task view controller's delegate. Sensor data can include accelerometer, device motion,
  pedometer, location, and heart rate data where available.
  
@@ -284,9 +284,7 @@ ORK_EXTERN ORKTrailMakingTypeIdentifier const ORKTrailMakingTypeIdentifierB;
  Data collected from this task can be used to compute measures of general fitness.
  
  @param identifier              The task identifier to use for this task, appropriate to the study.
- @param intendedUseDescription  A localized string describing the intended use of the data
-                                    collected. If the value of this parameter is `nil`, the default
-                                    localized text is displayed.
+ @param intendedUseDescription  A localized string describing the intended use of the data collected. If the value of this parameter is `nil`, the default localized text is displayed.
  @param walkDuration            The duration of the walk (the maximum is 10 minutes).
  @param restDuration            The duration of the post walk rest period.
  @param options                 Options that affect the features of the predefined task.

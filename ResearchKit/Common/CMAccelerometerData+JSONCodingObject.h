@@ -1,5 +1,6 @@
 /*
  Copyright (c) 2015, Apple Inc. All rights reserved.
+ Copyright (c) 2017, Sage Bionetworks.
  
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
@@ -66,9 +67,9 @@ ORK_CLASS_AVAILABLE
 @property (nonatomic) CMAcceleration acceleration;
 
 /**
- Returns a new acceleration data from the json coding object returned by encoding the `CMAccelerometerData`
+ Returns a new acceleration data from the json coding object returned by encoding the `CMAccelerometerData`.
  
- @param codingObject    The coding object to use to initialize the acceleration data object
+ @param codingObject    The coding object to use to initialize the acceleration data object.
  
  @return A new acceleration data object.
  */
@@ -77,7 +78,7 @@ ORK_CLASS_AVAILABLE
 /**
  Convert the accelerometer data into a JSON coded object.
  
- @return A dictionary with the properties of the accelerometer data
+ @return A dictionary with the properties of the accelerometer data.
  */
 - (NSDictionary<NSString *, id> *)ork_jsonCodingObject;
 

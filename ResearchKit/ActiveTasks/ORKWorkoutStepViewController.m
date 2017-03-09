@@ -49,6 +49,9 @@
 
 @interface ORKWorkoutStepViewController () <ORKRecorderDelegate>
 
+@property (nonatomic, strong) NSMutableArray *messagesToSend;
+@property (nonatomic, assign) BOOL workoutRunning;
+
 @end
 
 @implementation ORKWorkoutStepViewController {
@@ -56,10 +59,8 @@
     // state management
     BOOL _started;
     BOOL _connecting;
-    BOOL _workoutRunning;
     BOOL _workoutFailed;
     BOOL _userEndedWorkout;
-    NSMutableArray *_messagesToSend;
     NSDate *_workoutStartDate;
     ORKDevice *_device;
     
@@ -233,6 +234,15 @@
 
 #pragma mark - message management
 
+- (dispatch_queue_t)messageQueue {
+    static dispatch_queue_t _messageQueue = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _messageQueue = dispatch_queue_create("org.researchkit.ORKWorkoutStepViewController.messageQueue", DISPATCH_QUEUE_SERIAL);
+    });
+    return _messageQueue;
+}
+
 - (void)sendWatchMessage:(ORKWorkoutMessage *)message {
     // Add message to the pending messages queue
     [self queueMessage:[message dictionaryRepresentation]];
@@ -240,37 +250,40 @@
 }
 
 - (void)queueMessage:(NSDictionary<NSString *, id> *)message {
-    if (!_messagesToSend) {
-        _messagesToSend = [NSMutableArray new];
-    }
-    @synchronized (_messagesToSend) {
-        [_messagesToSend addObject:message];
-    }
+    ORKWeakTypeOf(self) weakSelf = self;
+    dispatch_async(self.messageQueue, ^{
+        if (!weakSelf) { return; }
+        if (!weakSelf.messagesToSend) {
+            weakSelf.messagesToSend = [NSMutableArray new];
+        }
+        [weakSelf.messagesToSend addObject:message];
+    });
 }
 
 - (void)sendPendingMessages {
-    if (!_workoutRunning || (_messagesToSend.count == 0)) {
+    if (!_workoutRunning || (self.messagesToSend.count == 0)) {
         return;
     }
     
-    @synchronized (_messagesToSend) {
-        WCSession *session = [WCSession defaultSession];
-        ORKWeakTypeOf(self) weakSelf = self;
-        if ((session.activationState == WCSessionActivationStateActivated) && session.isReachable) {
-            for (NSDictionary *message in _messagesToSend) {
+    WCSession *session = [WCSession defaultSession];
+    ORKWeakTypeOf(self) weakSelf = self;
+    if ((session.activationState == WCSessionActivationStateActivated) && session.isReachable) {
+        dispatch_async(self.messageQueue, ^{
+            ORKStrongTypeOf(weakSelf) strongSelf = weakSelf;
+            for (NSDictionary *message in strongSelf.messagesToSend) {
                 [session sendMessage:message replyHandler:nil errorHandler:^(NSError * _Nonnull error) {
                     ORK_Log_Error(@"Failed to send watch message: %@", error);
                     [weakSelf handleWatchError:error];
                 }];
             }
-            [_messagesToSend removeAllObjects];
-        } else if (session.activationState == WCSessionActivationStateActivated) {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [weakSelf sendPendingMessages];
-            });
-        } else {
-            [session activateSession];
-        }
+            [strongSelf.messagesToSend removeAllObjects];
+        });
+    } else if (session.activationState == WCSessionActivationStateActivated) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [weakSelf sendPendingMessages];
+        });
+    } else {
+        [session activateSession];
     }
 }
 
@@ -334,10 +347,10 @@
     [WCSession defaultSession].delegate = nil;
     
     // Flush the messages
-    __strong id syncObject = _messagesToSend;
-    @synchronized (syncObject) {
-        _messagesToSend = nil;
-    }
+    ORKWeakTypeOf(self) weakSelf = self;
+    dispatch_async(self.messageQueue, ^{
+        weakSelf.messagesToSend = nil;
+    });
 }
 
 - (void)addHeathRecorderQuantitySamples:(NSArray<HKQuantitySample *> *)samples
@@ -362,7 +375,7 @@
             ORK_Log_Debug(@"Watch session did become active: %@", session);
             [weakSelf watchSessionActivationCompleted:session];
         } else {
-            _workoutRunning = NO;
+            weakSelf.workoutRunning = NO;
             ORK_Log_Error(@"Watch failed to activate: %@", error);
             [weakSelf handleWatchError:error];
         }

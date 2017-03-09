@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2016, Sage Bionetworks. All rights reserved.
+ Copyright (c) 2017, Sage Bionetworks. All rights reserved.
  
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
@@ -36,9 +36,9 @@ public extension Dictionary where Value : Equatable {
     /**
      Get the `Key` associated with a given value.
      
-     @param value   The `Value` to search for
+     @param value   The `Value` to search for.
      
-     @return        The `Key` if found, else `nil`
+     @return        The `Key` if found, else `nil`.
     */
     public func key(for value: Value) -> Key? {
         return self.filter { $1 == value }.map { $0.0 }.first
@@ -48,7 +48,7 @@ public extension Dictionary where Value : Equatable {
 public extension Dictionary {
     
     /**
-     All the keys in the dictionary
+     All the keys in the dictionary.
     */
     public var allKeys: [Any]? {
         return self.map({ (key, _) -> Any in

@@ -69,7 +69,7 @@ NSString * const ORKWatchHeartRateKey = @"bpm_watch";
 #endif
     NSMutableArray *_dataPointsHue;
     NSMutableArray *_samples;
-    NSTimeInterval _timestamp;
+    NSInteger _sampleCount;
 }
 
 - (void)dealloc {
@@ -113,7 +113,7 @@ NSString * const ORKWatchHeartRateKey = @"bpm_watch";
         }
     }
     
-    _timestamp = 0;
+    _sampleCount = 0;
     self.startDate = [NSDate date];
     _dataPointsHue = [[NSMutableArray alloc] init];
     _samples = [[NSMutableArray alloc] init];
@@ -177,7 +177,7 @@ NSString * const ORKWatchHeartRateKey = @"bpm_watch";
     // create a queue to run the capture on
     dispatch_queue_t captureQueue=dispatch_queue_create("captureQueue", NULL);
     
-    // setup our delegate
+    // set up our delegate
     [videoOutput setSampleBufferDelegate:self queue:captureQueue];
     
     // configure the pixel format
@@ -250,11 +250,11 @@ NSString * const ORKWatchHeartRateKey = @"bpm_watch";
 
 - (void)timerFired {
     _bpm = 65;
-    _timestamp += ORKHeartRateSampleRate;
-    NSArray *samples = @[@{ORKTimestampKey       : @(_timestamp),
+    NSTimeInterval timestamp = -1 * [self.startDate timeIntervalSinceNow];
+    NSArray *samples = @[@{ORKTimestampKey       : @(timestamp),
                            ORKCameraHeartRateKey : @(_bpm)
                           }];
-    [self updateHeartRate:_bpm samples:samples displaySeconds:_timestamp];
+    [self updateHeartRate:_bpm samples:samples displaySeconds:timestamp];
 }
 
 #else
@@ -309,6 +309,10 @@ NSString * const ORKWatchHeartRateKey = @"bpm_watch";
     [self getHSVFromRed:r green:g blue:b hue:&hue saturation:&sat brightness:&bright];
     [_dataPointsHue addObject:@(hue)];
 
+    // increment the sample count
+    _sampleCount++;
+    NSTimeInterval timestamp = (NSTimeInterval)_sampleCount / (NSTimeInterval)ORKHeartRateFramesPerSecond;
+    
     // Only send UI updates once a second and only after min window of time
     if ((_dataPointsHue.count >= (ORKHeartRateMinWindowSeconds * ORKHeartRateFramesPerSecond)) &&
         (_dataPointsHue.count % ORKHeartRateFramesPerSecond == 0)) {
@@ -318,7 +322,7 @@ NSString * const ORKWatchHeartRateKey = @"bpm_watch";
         
         NSInteger displaySeconds = _dataPointsHue.count / ORKHeartRateFramesPerSecond;
         
-        [_samples addObject:@{ORKTimestampKey       : @(_timestamp),
+        [_samples addObject:@{ORKTimestampKey       : @(timestamp),
                               ORKCameraHeartRateKey : @(bpm),
                               ORKColorHueKey        : @(hue),
                               ORKColorSaturationKey : @(sat),
@@ -342,7 +346,7 @@ NSString * const ORKWatchHeartRateKey = @"bpm_watch";
         
     } else {
         // just save the samples in batch and send when the heart rate is updated
-        [_samples addObject:@{ORKTimestampKey           : @(_timestamp),
+        [_samples addObject:@{ORKTimestampKey           : @(timestamp),
                               ORKColorHueKey            : @(hue),
                               ORKColorSaturationKey     : @(sat),
                               ORKColorBrightnessKey     : @(bright),
@@ -351,9 +355,6 @@ NSString * const ORKWatchHeartRateKey = @"bpm_watch";
                               ORKColorBlueKey           : @(b),
                               }];
     }
-    
-    // increment the timestamp
-    _timestamp += (1.0 / (NSTimeInterval)ORKHeartRateFramesPerSecond);
 }
 
 - (void)updateHeartRate:(CGFloat)bpm samples:(NSArray *)samples displaySeconds:(NSInteger)displaySeconds {
@@ -412,7 +413,7 @@ NSString * const ORKWatchHeartRateKey = @"bpm_watch";
 {
     NSMutableArray *peaks = [[NSMutableArray alloc] init];
     int count = 4;
-    for (int i = 3; i < inputData.count - 3; i++,count++)
+    for (int i = 3; i < inputData.count - 3; i++, count++)
     {
         if (inputData[i] > 0 &&
             [inputData[i] doubleValue] > [inputData[i-1] doubleValue] &&

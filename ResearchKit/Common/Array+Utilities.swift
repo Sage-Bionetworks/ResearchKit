@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2016, Sage Bionetworks. All rights reserved.
+ Copyright (c) 2017, Sage Bionetworks. All rights reserved.
  
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
@@ -50,9 +50,9 @@ public extension Array where Element: Equatable {
 public extension Array {
     
     /**
-     Return an `Array` mutated to include the given element
+     Return an `Array` mutated to include the given element.
      
-     @param newElement  The element to append
+     @param newElement  The element to append.
      
      @return            An `Array` with the element appended to the end.
      */
@@ -63,9 +63,9 @@ public extension Array {
     }
     
     /**
-     Return an `Array` mutated to include the given elements
+     Return an `Array` mutated to include the given elements.
      
-     @param contents    The elements to append
+     @param contents    The elements to append.
      
      @return            An `Array` with the elements appended to the end.
      */

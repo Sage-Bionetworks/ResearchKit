@@ -267,7 +267,7 @@
 "CARDIO_INTRO_TITLE" = "Cardio Challenge";
 "CARDIO_INTRO_ABOUT_TEXT" = "In this activity, we will measure how your heart rate changes in response to mild excercise.";
 "CARDIO_HEART_RISK_TITLE" = "Potential heart risk";
-"CARDIO_HEART_RISK_TEXT" = "Do not attempt this test if you have experienced unstabel angina or a myocardial infraction (heart attack) during the previous month or need supplemental oxegen to walk.\n\nPlease stop immediately and seek assistance if you experience any of the following: chest pain, difficulty breathing, leg cramps, unstable balance or dizziness, excessive sweating, or a cold, clammy feeling.";
+"CARDIO_HEART_RISK_TEXT" = "Do not attempt this test if you have experienced unstable angina or a myocardial infarction (heart attack) during the previous month or need supplemental oxygen to walk.\n\nPlease stop immediately and seek assistance if you experience any of the following: chest pain, difficulty breathing, leg cramps, unstable balance or dizziness, excessive sweating, or a cold, clammy feeling.";
 "CARDIO_SAFETY_TITLE" = "Please note";
 "CARDIO_SAFETY_TEXT" = "Do not attempt this test if you feel that being on your feet for %@ will be a challenge for you. If you are unsure if you can walk for %@ without stopping, please have another person with you that can help if you need it.";
 "CARDIO_INSTRUCTIONS_1_TITLE" = "Walking Instructions";
@@ -570,9 +570,9 @@
 "MOOD_EXERCISE_AVERAGE" = "mild exercise (some effort)";
 "MOOD_EXERCISE_BAD" = "minimal exercise (no effort)";
 "MOOD_EXERCISE_TERRIBLE" = "no exercise";
-"MOOD_BREATHING_AFTER_EXCERCISE_PROMPT" = "Now, how hard is it for you to breath?";
-"MOOD_BREATHING_DAILY_PROMPT" = "Today, how hard is it for you to breath?";
-"MOOD_BREATHING_WEEKLY_PROMPT" = "This week, how hard has it been for you to breath?";
+"MOOD_BREATHING_AFTER_EXCERCISE_PROMPT" = "Now, how hard is it for you to breathe?";
+"MOOD_BREATHING_DAILY_PROMPT" = "Today, how hard is it for you to breathe?";
+"MOOD_BREATHING_WEEKLY_PROMPT" = "This week, how hard has it been for you to breathe?";
 "MOOD_BREATHING_GREAT" = "no issues with breathing";
 "MOOD_BREATHING_GOOD" = "mild difficulty in breathing";
 "MOOD_BREATHING_AVERAGE" = "moderate difficulty in breathing";

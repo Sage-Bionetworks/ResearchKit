@@ -33,7 +33,9 @@
 #import <ResearchKit/ORKDefines.h>
 #import <ResearchKit/ORKPageStep.h>
 
+
 NS_ASSUME_NONNULL_BEGIN
+
 
 typedef NSString * ORKWorkoutResultIdentifier NS_STRING_ENUM;
 
@@ -82,11 +84,17 @@ ORK_EXTERN NSString *const ORKWorkoutAfterCountdownStepIdentifier ORK_AVAILABLE_
 @class ORKRecorderConfiguration;
 
 /**
- The `ORKWorkoutStep` is a step that can be used to group a set of steps.
+ The `ORKWorkoutStep` is a step that can be used to group a set of active steps to lead the user
+ through a workout. 
  
- By default, this step will first determine if the user has a paired Apple Watch. If not, it will 
- attempt to connect to that device and get the heart rate data from the watch. Otherwise, it will 
- lead the user through getting the heart rate using the camera and flash.
+ For example, this is used in the Cardio Challenge task to instruct the user to do a 6-minute walk.
+ 
+ As a part of running this step, the `ORKWorkoutStepViewController` will attempt to start a workout
+ session, provided that the user has an Apple Watch and the watch app is installed. If the user has 
+ an Apple Watch, then the workout will include collecting data on the heart rate from the watch.
+ 
+ As a part of this step, the workout will insert an `ORKHeartRateCaptureStep` before and after the 
+ active steps to measure the user's heart rate before and after the workout.
  */
 ORK_CLASS_AVAILABLE
 HK_CLASS_AVAILABLE_IOS_WATCHOS(10_0, 3_0)
@@ -119,12 +127,27 @@ HK_CLASS_AVAILABLE_IOS_WATCHOS(10_0, 3_0)
                              steps:(nullable NSArray<ORKStep *> *)steps NS_UNAVAILABLE;
 
 /**
- Returns an initialized workout step with substeps that include the
+ Returns an initialized workout step.
  
- @param identifier  The unique identifier for the step.
- @param
+ This is the main initializer for this step. To use, include the steps that define the workout 
+ instructions in the `motionSteps` parameter. Optionally, include a custom `restStep` with 
+ custom text and/or duration. If included, the `restStep` will be copied with a new identifier
+ and inserted before the motion steps. It will also be included after the motion steps. In this 
+ way, the user's heart rate will be recorded before and after the workout by using the phone 
+ camera. If `nil`, then the `restStep` will be instantiated and included using the default 
+ parameters for an `ORKHeartRateCaptureStep`.
  
- @return An initialized workout step.
+ If available, a workout session will also be started on user's Apple Watch. To start a workout 
+ session from the Apple Watch, the application must include a watch app that implements the workout.
+ 
+ See also: `ORKWorkoutConnector` and `ORKHeartRateCaptureStep`.
+ 
+ @param identifier      The unique identifier for the step.
+ @param motionSteps     The motion steps uses to describe the workout.
+ @param restStep        Optional custom implementation of a `ORKHeartRateCaptureStep` used to capture heart rate before and after the workout.
+ @param options         The predefined recorder options to exclude from this step.
+ 
+ @return                An initialized workout step.
  */
 - (instancetype)initWithIdentifier:(NSString *)identifier
                        motionSteps:(NSArray<ORKStep *> *)motionSteps
