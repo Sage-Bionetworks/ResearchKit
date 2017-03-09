@@ -42,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Convert the accelerometer data into a JSON coded object.
  
- @return A dictionary with the properties of the accelerometer data
+ @return A dictionary with the properties of the accelerometer data.
  */
 - (NSDictionary<NSString *, id> *)ork_jsonCodingObject;
 
