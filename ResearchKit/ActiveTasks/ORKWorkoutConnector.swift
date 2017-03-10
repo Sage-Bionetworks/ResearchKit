@@ -148,7 +148,7 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
     public var connectivitySession: WCSession? {
         return _connectivitySession
     }
-    private var _connectivitySession: WCSession?
+    fileprivate var _connectivitySession: WCSession?
     
     /**
      Should the connector send messages to the phone?
@@ -210,13 +210,13 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
     
     // MARK: Internal tracking
     
-    var totalEnergyBurned = HKQuantity(unit: HKUnit.kilocalorie(), doubleValue: 0)
-    var totalDistance = HKQuantity(unit: HKUnit.meter(), doubleValue: 0)
-    var currentHeartRate: HKQuantitySample?
-    var startingHeartRate: HKQuantitySample?
-    var activeDataQueries = [HKQuery]()
-    var workoutEvents = [HKWorkoutEvent]()
-    var timer: Timer?
+    fileprivate var totalEnergyBurned = HKQuantity(unit: HKUnit.kilocalorie(), doubleValue: 0)
+    fileprivate var totalDistance = HKQuantity(unit: HKUnit.meter(), doubleValue: 0)
+    fileprivate var currentHeartRate: HKQuantitySample?
+    fileprivate var startingHeartRate: HKQuantitySample?
+    fileprivate var activeDataQueries = [HKQuery]()
+    fileprivate var workoutEvents = [HKWorkoutEvent]()
+    fileprivate var timer: Timer?
     
     // MARK: Workout session handling - override these methods to implement custom handling
     
@@ -275,7 +275,7 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
         healthStore.end(session)
     }
     
-    func createAndSaveWorkout(_ session: HKWorkoutSession) {
+    private func createAndSaveWorkout(_ session: HKWorkoutSession) {
         
         // Create and save a workout sample
         let configuration = session.workoutConfiguration
@@ -291,29 +291,29 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
         
         healthStore.save(workout) { success, _ in
             if success, let samples = self.workoutSamples {
-                self.healthStore.add(samples, to: workout) { (success: Bool, error: Error?) in
-                    DispatchQueue.main.sync {
-                        if success {
-                            self.send(message: ORKWorkoutMessage(workoutState: .ended),
-                                      replyHandler: { (_) in
-                                        self.messagesToSend.removeAll()
-                            },
-                                      errorHandler: { (_) in
-                                self.messagesToSend.removeAll()
-                            })
-                            self.delegate?.workoutConnector(self, didEndWorkout: workout)
-                        }
-                        else {
-                            self.handleError(error!)
-                        }
-                        
+                self.healthStore.add(samples, to: workout) { (_, _) in
+                    DispatchQueue.main.async {
+                        self.send(message: ORKWorkoutMessage(workoutState: .ended),
+                                  replyHandler: { (_) in
+                                    self.cleanupAfterMessageSend(workout: workout)
+                        },
+                                  errorHandler: { (_) in
+                                    self.cleanupAfterMessageSend(workout: workout)
+                        })
                     }
                 }
             }
         }
     }
     
-    func process(samples: [HKSample], quantityTypeIdentifier: HKQuantityTypeIdentifier) {
+    private func cleanupAfterMessageSend(workout: HKWorkout) {
+        DispatchQueue.main.async {
+            self.messagesToSend.removeAll()
+            self.delegate?.workoutConnector(self, didEndWorkout: workout)
+        }
+    }
+    
+    private func process(samples: [HKSample], quantityTypeIdentifier: HKQuantityTypeIdentifier) {
         guard let quantitySamples = samples as? [HKQuantitySample] else { return }
         for sample in quantitySamples {
             if ORKWorkoutUtilities.supportedDistanceTypeIdentifiers.contains(quantityTypeIdentifier) {
@@ -336,7 +336,7 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
         }
     }
     
-    func handleError(_ error: Error) {
+    private func handleError(_ error: Error) {
         #if DEBUG
         print("ERROR: Workout session did fail with error: \(error)")
         #endif
@@ -409,7 +409,7 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
     
     // MARK: Data management
     
-    func startAccumulatingData(startDate: Date) {
+    private func startAccumulatingData(startDate: Date) {
         for identifier in queryIdentifiers {
             startQuery(quantityTypeIdentifier: identifier)
         }
@@ -417,13 +417,13 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
             startTimer()
         }
         
-        DispatchQueue.main.sync {
-            guard let session = _workoutSession else { return }
+        DispatchQueue.main.async {
+            guard let session = self._workoutSession else { return }
             self.delegate?.workoutConnector(self, didStartWorkout: session.workoutConfiguration)
         }
     }
     
-    func stopAccumulatingData() {
+    private func stopAccumulatingData() {
         for query in activeDataQueries {
             healthStore.stop(query)
         }
@@ -431,21 +431,21 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
         stopTimer()
     }
     
-    func pauseAccumulatingData() {
-        DispatchQueue.main.sync {
-            _isPaused = true
+    private func pauseAccumulatingData() {
+        DispatchQueue.main.async {
+            self._isPaused = true
             self.delegate?.workoutConnectorDidPause?(self)
         }
     }
     
-    func resumeAccumulatingData() {
-        DispatchQueue.main.sync {
-            _isPaused = false
+    private func resumeAccumulatingData() {
+        DispatchQueue.main.async {
+            self._isPaused = false
             self.delegate?.workoutConnectorDidResume?(self)
         }
     }
     
-    func startQuery(quantityTypeIdentifier: HKQuantityTypeIdentifier) {
+    private func startQuery(quantityTypeIdentifier: HKQuantityTypeIdentifier) {
         let datePredicate = HKQuery.predicateForSamples(withStart: workoutStartDate, end: nil, options: .strictStartDate)
         let devicePredicate = HKQuery.predicateForObjects(from: [HKDevice.local()])
         let queryPredicate = NSCompoundPredicate(andPredicateWithSubpredicates:[datePredicate, devicePredicate])
@@ -570,14 +570,16 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
                 wcSession.sendMessage(message.dictionaryRepresentation(), replyHandler: replyHandler, errorHandler: errHandler)
             }
         } else {
+            DispatchQueue.main.async {
+                self.messagesToSend.append(MessageHandler(message: message, replyHandler: replyHandler, errorHandler: errHandler))
+            }
             let session = WCSession.default()
             session.delegate = self
             session.activate()
-            messagesToSend.append(MessageHandler(message: message, replyHandler: replyHandler, errorHandler: errHandler))
         }
     }
     
-    func messageReceived(message: [String: Any], replyHandler: (([String : Any]) -> Swift.Void)? = nil) {
+    private func messageReceived(message: [String: Any], replyHandler: (([String : Any]) -> Swift.Void)? = nil) {
         guard let workoutMessage = ORKWorkoutMessage(message: message), workoutMessage.timestamp > workoutStartDate
         else {
             // If the timestamp is from before the workout started then ignore it.
@@ -679,7 +681,7 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
     }
 }
 
-private class MessageHandler: NSObject {
+fileprivate class MessageHandler: NSObject {
     
     let message: ORKWorkoutMessage
     let replyHandler: (([String : Any]) -> Swift.Void)?

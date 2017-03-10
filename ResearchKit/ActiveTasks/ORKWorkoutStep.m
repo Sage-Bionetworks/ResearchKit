@@ -89,13 +89,6 @@ ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierUserEnded = @"userEnd
     if (!restStep) {
         restStep = [[ORKHeartRateCaptureStep alloc] initWithIdentifier:ORKWorkoutAfterStepIdentifier];
     }
-    restStep.endCommand = ORKWorkoutCommandStop;
-    
-    // Set the before step
-    ORKHeartRateCaptureStep *beforeStep = [restStep copyWithIdentifier:ORKWorkoutBeforeStepIdentifier];
-    beforeStep.minimumDuration = 0.0;
-    beforeStep.stepDuration = 0.0;
-    beforeStep.endCommand = nil;
     
     // Add countdown to heart rate measuring
     ORKCountdownStep *countBeforeStep = [[ORKCountdownStep alloc] initWithIdentifier:ORKWorkoutBeforeCountdownStepIdentifier];
@@ -103,7 +96,25 @@ ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierUserEnded = @"userEnd
     countBeforeStep.title = restStep.title;
     countBeforeStep.text = ORKLocalizedString(@"HEARTRATE_MONITOR_CAMERA_INITIAL_TEXT", nil);
     countBeforeStep.spokenInstruction = ORKLocalizedString(@"HEARTRATE_MONITOR_CAMERA_SPOKEN", nil);
+    countBeforeStep.watchInstruction = restStep.watchInstruction;
+    countBeforeStep.beginCommand = ORKWorkoutCommandStopMoving;
     ORKCountdownStep *countAfterStep = [countBeforeStep copyWithIdentifier:ORKWorkoutAfterCountdownStepIdentifier];
+    
+    // Remove the watch instruction from the rest step since it is copied to the countdown
+    restStep.watchInstruction = nil;
+    if ([restStep.beginCommand isEqualToString:countBeforeStep.beginCommand]) {
+        restStep.beginCommand = nil;
+    }
+    
+    // Set the before step - Before step only runs until heart rate is captured and watch is connected
+    // (if applicable)
+    ORKHeartRateCaptureStep *beforeStep = [restStep copyWithIdentifier:ORKWorkoutBeforeStepIdentifier];
+    beforeStep.minimumDuration = 0.0;
+    beforeStep.stepDuration = 0.0;
+    beforeStep.endCommand = nil;
+    
+    // At the end of the rest step, send command to stop the watch
+    restStep.endCommand = ORKWorkoutCommandStop;
     
     // setup the steps
     NSMutableArray *steps = [[NSMutableArray alloc] init];
