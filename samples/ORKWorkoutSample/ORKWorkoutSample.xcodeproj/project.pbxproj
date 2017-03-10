@@ -1,0 +1,695 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FFADF4901E731B820088B46E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFADF48F1E731B820088B46E /* AppDelegate.swift */; };
+		FFADF4921E731B820088B46E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFADF4911E731B820088B46E /* ViewController.swift */; };
+		FFADF4951E731B820088B46E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FFADF4931E731B820088B46E /* Main.storyboard */; };
+		FFADF4971E731B820088B46E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FFADF4961E731B820088B46E /* Assets.xcassets */; };
+		FFADF49A1E731B820088B46E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FFADF4981E731B820088B46E /* LaunchScreen.storyboard */; };
+		FFADF4B51E731B830088B46E /* ORKWorkoutSample WatchKit App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = FFADF4B41E731B830088B46E /* ORKWorkoutSample WatchKit App.app */; };
+		FFADF4BB1E731B830088B46E /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FFADF4B91E731B830088B46E /* Interface.storyboard */; };
+		FFADF4BD1E731B830088B46E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FFADF4BC1E731B830088B46E /* Assets.xcassets */; };
+		FFADF4C41E731B840088B46E /* ORKWorkoutSample WatchKit Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = FFADF4C31E731B840088B46E /* ORKWorkoutSample WatchKit Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		FFADF4CB1E731B840088B46E /* ExtensionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFADF4CA1E731B840088B46E /* ExtensionDelegate.swift */; };
+		FFADF4CD1E731B840088B46E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FFADF4CC1E731B840088B46E /* Assets.xcassets */; };
+		FFADF4E31E731BC40088B46E /* ResearchKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFADF4E21E731BC40088B46E /* ResearchKit.framework */; };
+		FFADF4E41E731BC40088B46E /* ResearchKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FFADF4E21E731BC40088B46E /* ResearchKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		FFADF4E71E731BDF0088B46E /* ResearchKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFADF4E61E731BDF0088B46E /* ResearchKit.framework */; };
+		FFADF4E81E731BDF0088B46E /* ResearchKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FFADF4E61E731BDF0088B46E /* ResearchKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		FFADF4EC1E731BF40088B46E /* ResearchKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFADF4EB1E731BF40088B46E /* ResearchKit.framework */; };
+		FFADF4ED1E731BF40088B46E /* ResearchKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FFADF4EB1E731BF40088B46E /* ResearchKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		FFADF4F21E733CE40088B46E /* DetailResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFADF4F01E733CE40088B46E /* DetailResultViewController.swift */; };
+		FFADF4F31E733CE40088B46E /* ResultsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFADF4F11E733CE40088B46E /* ResultsTableViewController.swift */; };
+		FFADF51F1E736FCC0088B46E /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFADF51E1E736FCC0088B46E /* HealthKit.framework */; };
+		FFADF5211E736FEC0088B46E /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFADF5201E736FEC0088B46E /* HealthKit.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		FFADF4B61E731B830088B46E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FFADF4841E731B820088B46E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FFADF4B31E731B830088B46E;
+			remoteInfo = "ORKWorkoutSample WatchKit App";
+		};
+		FFADF4C51E731B840088B46E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FFADF4841E731B820088B46E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FFADF4C21E731B840088B46E;
+			remoteInfo = "ORKWorkoutSample WatchKit Extension";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		FFADF4D41E731B840088B46E /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				FFADF4C41E731B840088B46E /* ORKWorkoutSample WatchKit Extension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFADF4D81E731B840088B46E /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				FFADF4B51E731B830088B46E /* ORKWorkoutSample WatchKit App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFADF4E51E731BC40088B46E /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				FFADF4E41E731BC40088B46E /* ResearchKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFADF4EA1E731BE00088B46E /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				FFADF4E81E731BDF0088B46E /* ResearchKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFADF4EE1E731BF40088B46E /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				FFADF4ED1E731BF40088B46E /* ResearchKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		FFADF48C1E731B820088B46E /* ORKWorkoutSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ORKWorkoutSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FFADF48F1E731B820088B46E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		FFADF4911E731B820088B46E /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		FFADF4941E731B820088B46E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		FFADF4961E731B820088B46E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		FFADF4991E731B820088B46E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		FFADF49B1E731B820088B46E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FFADF4B41E731B830088B46E /* ORKWorkoutSample WatchKit App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ORKWorkoutSample WatchKit App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FFADF4BA1E731B830088B46E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
+		FFADF4BC1E731B830088B46E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		FFADF4BE1E731B830088B46E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FFADF4C31E731B840088B46E /* ORKWorkoutSample WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "ORKWorkoutSample WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FFADF4CA1E731B840088B46E /* ExtensionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionDelegate.swift; sourceTree = "<group>"; };
+		FFADF4CC1E731B840088B46E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		FFADF4CE1E731B840088B46E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FFADF4E21E731BC40088B46E /* ResearchKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ResearchKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		FFADF4E61E731BDF0088B46E /* ResearchKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ResearchKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		FFADF4EB1E731BF40088B46E /* ResearchKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ResearchKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		FFADF4F01E733CE40088B46E /* DetailResultViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailResultViewController.swift; sourceTree = "<group>"; };
+		FFADF4F11E733CE40088B46E /* ResultsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultsTableViewController.swift; sourceTree = "<group>"; };
+		FFADF51D1E736FCC0088B46E /* ORKWorkoutSample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ORKWorkoutSample.entitlements; sourceTree = "<group>"; };
+		FFADF51E1E736FCC0088B46E /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
+		FFADF5201E736FEC0088B46E /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS3.1.sdk/System/Library/Frameworks/HealthKit.framework; sourceTree = DEVELOPER_DIR; };
+		FFADF5221E736FEC0088B46E /* ORKWorkoutSample WatchKit Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "ORKWorkoutSample WatchKit Extension.entitlements"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FFADF4891E731B820088B46E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FFADF4E31E731BC40088B46E /* ResearchKit.framework in Frameworks */,
+				FFADF51F1E736FCC0088B46E /* HealthKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFADF4C01E731B840088B46E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FFADF4EC1E731BF40088B46E /* ResearchKit.framework in Frameworks */,
+				FFADF5211E736FEC0088B46E /* HealthKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFADF4E91E731BDF0088B46E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FFADF4E71E731BDF0088B46E /* ResearchKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		FFADF4831E731B820088B46E = {
+			isa = PBXGroup;
+			children = (
+				FFADF48E1E731B820088B46E /* ORKWorkoutSample */,
+				FFADF4B81E731B830088B46E /* ORKWorkoutSample WatchKit App */,
+				FFADF4C71E731B840088B46E /* ORKWorkoutSample WatchKit Extension */,
+				FFADF4EF1E731C0C0088B46E /* Frameworks */,
+				FFADF48D1E731B820088B46E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FFADF48D1E731B820088B46E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FFADF48C1E731B820088B46E /* ORKWorkoutSample.app */,
+				FFADF4B41E731B830088B46E /* ORKWorkoutSample WatchKit App.app */,
+				FFADF4C31E731B840088B46E /* ORKWorkoutSample WatchKit Extension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FFADF48E1E731B820088B46E /* ORKWorkoutSample */ = {
+			isa = PBXGroup;
+			children = (
+				FFADF51D1E736FCC0088B46E /* ORKWorkoutSample.entitlements */,
+				FFADF48F1E731B820088B46E /* AppDelegate.swift */,
+				FFADF4911E731B820088B46E /* ViewController.swift */,
+				FFADF4F11E733CE40088B46E /* ResultsTableViewController.swift */,
+				FFADF4F01E733CE40088B46E /* DetailResultViewController.swift */,
+				FFADF4931E731B820088B46E /* Main.storyboard */,
+				FFADF4961E731B820088B46E /* Assets.xcassets */,
+				FFADF4981E731B820088B46E /* LaunchScreen.storyboard */,
+				FFADF49B1E731B820088B46E /* Info.plist */,
+			);
+			path = ORKWorkoutSample;
+			sourceTree = "<group>";
+		};
+		FFADF4B81E731B830088B46E /* ORKWorkoutSample WatchKit App */ = {
+			isa = PBXGroup;
+			children = (
+				FFADF4B91E731B830088B46E /* Interface.storyboard */,
+				FFADF4BC1E731B830088B46E /* Assets.xcassets */,
+				FFADF4BE1E731B830088B46E /* Info.plist */,
+			);
+			path = "ORKWorkoutSample WatchKit App";
+			sourceTree = "<group>";
+		};
+		FFADF4C71E731B840088B46E /* ORKWorkoutSample WatchKit Extension */ = {
+			isa = PBXGroup;
+			children = (
+				FFADF5221E736FEC0088B46E /* ORKWorkoutSample WatchKit Extension.entitlements */,
+				FFADF4CA1E731B840088B46E /* ExtensionDelegate.swift */,
+				FFADF4CC1E731B840088B46E /* Assets.xcassets */,
+				FFADF4CE1E731B840088B46E /* Info.plist */,
+			);
+			path = "ORKWorkoutSample WatchKit Extension";
+			sourceTree = "<group>";
+		};
+		FFADF4EF1E731C0C0088B46E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				FFADF5201E736FEC0088B46E /* HealthKit.framework */,
+				FFADF51E1E736FCC0088B46E /* HealthKit.framework */,
+				FFADF4EB1E731BF40088B46E /* ResearchKit.framework */,
+				FFADF4E61E731BDF0088B46E /* ResearchKit.framework */,
+				FFADF4E21E731BC40088B46E /* ResearchKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		FFADF48B1E731B820088B46E /* ORKWorkoutSample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FFADF4D91E731B840088B46E /* Build configuration list for PBXNativeTarget "ORKWorkoutSample" */;
+			buildPhases = (
+				FFADF4881E731B820088B46E /* Sources */,
+				FFADF4891E731B820088B46E /* Frameworks */,
+				FFADF48A1E731B820088B46E /* Resources */,
+				FFADF4D81E731B840088B46E /* Embed Watch Content */,
+				FFADF4E51E731BC40088B46E /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FFADF4B71E731B830088B46E /* PBXTargetDependency */,
+			);
+			name = ORKWorkoutSample;
+			productName = ORKWorkoutSample;
+			productReference = FFADF48C1E731B820088B46E /* ORKWorkoutSample.app */;
+			productType = "com.apple.product-type.application";
+		};
+		FFADF4B31E731B830088B46E /* ORKWorkoutSample WatchKit App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FFADF4D51E731B840088B46E /* Build configuration list for PBXNativeTarget "ORKWorkoutSample WatchKit App" */;
+			buildPhases = (
+				FFADF4B21E731B830088B46E /* Resources */,
+				FFADF4D41E731B840088B46E /* Embed App Extensions */,
+				FFADF4E91E731BDF0088B46E /* Frameworks */,
+				FFADF4EA1E731BE00088B46E /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FFADF4C61E731B840088B46E /* PBXTargetDependency */,
+			);
+			name = "ORKWorkoutSample WatchKit App";
+			productName = "ORKWorkoutSample WatchKit App";
+			productReference = FFADF4B41E731B830088B46E /* ORKWorkoutSample WatchKit App.app */;
+			productType = "com.apple.product-type.application.watchapp2";
+		};
+		FFADF4C21E731B840088B46E /* ORKWorkoutSample WatchKit Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FFADF4D11E731B840088B46E /* Build configuration list for PBXNativeTarget "ORKWorkoutSample WatchKit Extension" */;
+			buildPhases = (
+				FFADF4BF1E731B840088B46E /* Sources */,
+				FFADF4C01E731B840088B46E /* Frameworks */,
+				FFADF4C11E731B840088B46E /* Resources */,
+				FFADF4EE1E731BF40088B46E /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "ORKWorkoutSample WatchKit Extension";
+			productName = "ORKWorkoutSample WatchKit Extension";
+			productReference = FFADF4C31E731B840088B46E /* ORKWorkoutSample WatchKit Extension.appex */;
+			productType = "com.apple.product-type.watchkit2-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FFADF4841E731B820088B46E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0820;
+				LastUpgradeCheck = 0820;
+				ORGANIZATIONNAME = "Sage Bionetworks";
+				TargetAttributes = {
+					FFADF48B1E731B820088B46E = {
+						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = 4B822CZK9N;
+						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.HealthKit = {
+								enabled = 1;
+							};
+						};
+					};
+					FFADF4B31E731B830088B46E = {
+						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = 4B822CZK9N;
+						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.BackgroundModes.watchos.app = {
+								enabled = 0;
+							};
+						};
+					};
+					FFADF4C21E731B840088B46E = {
+						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = 4B822CZK9N;
+						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.BackgroundModes.watchos.extension = {
+								enabled = 1;
+							};
+							com.apple.HealthKit.watchos = {
+								enabled = 1;
+							};
+						};
+					};
+				};
+			};
+			buildConfigurationList = FFADF4871E731B820088B46E /* Build configuration list for PBXProject "ORKWorkoutSample" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = FFADF4831E731B820088B46E;
+			productRefGroup = FFADF48D1E731B820088B46E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FFADF48B1E731B820088B46E /* ORKWorkoutSample */,
+				FFADF4B31E731B830088B46E /* ORKWorkoutSample WatchKit App */,
+				FFADF4C21E731B840088B46E /* ORKWorkoutSample WatchKit Extension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FFADF48A1E731B820088B46E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FFADF49A1E731B820088B46E /* LaunchScreen.storyboard in Resources */,
+				FFADF4971E731B820088B46E /* Assets.xcassets in Resources */,
+				FFADF4951E731B820088B46E /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFADF4B21E731B830088B46E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FFADF4BD1E731B830088B46E /* Assets.xcassets in Resources */,
+				FFADF4BB1E731B830088B46E /* Interface.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFADF4C11E731B840088B46E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FFADF4CD1E731B840088B46E /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FFADF4881E731B820088B46E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FFADF4F31E733CE40088B46E /* ResultsTableViewController.swift in Sources */,
+				FFADF4921E731B820088B46E /* ViewController.swift in Sources */,
+				FFADF4F21E733CE40088B46E /* DetailResultViewController.swift in Sources */,
+				FFADF4901E731B820088B46E /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFADF4BF1E731B840088B46E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FFADF4CB1E731B840088B46E /* ExtensionDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FFADF4B71E731B830088B46E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FFADF4B31E731B830088B46E /* ORKWorkoutSample WatchKit App */;
+			targetProxy = FFADF4B61E731B830088B46E /* PBXContainerItemProxy */;
+		};
+		FFADF4C61E731B840088B46E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FFADF4C21E731B840088B46E /* ORKWorkoutSample WatchKit Extension */;
+			targetProxy = FFADF4C51E731B840088B46E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		FFADF4931E731B820088B46E /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FFADF4941E731B820088B46E /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		FFADF4981E731B820088B46E /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FFADF4991E731B820088B46E /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		FFADF4B91E731B830088B46E /* Interface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FFADF4BA1E731B830088B46E /* Base */,
+			);
+			name = Interface.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		FFADF4CF1E731B840088B46E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		FFADF4D01E731B840088B46E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		FFADF4D21E731B840088B46E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				CODE_SIGN_ENTITLEMENTS = "ORKWorkoutSample WatchKit Extension/ORKWorkoutSample WatchKit Extension.entitlements";
+				DEVELOPMENT_TEAM = 4B822CZK9N;
+				INFOPLIST_FILE = "ORKWorkoutSample WatchKit Extension/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = org.sagebase.ORKWorkoutSample.watchkitapp.watchkitextension;
+				PRODUCT_NAME = "${TARGET_NAME}";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 3.0;
+			};
+			name = Debug;
+		};
+		FFADF4D31E731B840088B46E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				CODE_SIGN_ENTITLEMENTS = "ORKWorkoutSample WatchKit Extension/ORKWorkoutSample WatchKit Extension.entitlements";
+				DEVELOPMENT_TEAM = 4B822CZK9N;
+				INFOPLIST_FILE = "ORKWorkoutSample WatchKit Extension/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = org.sagebase.ORKWorkoutSample.watchkitapp.watchkitextension;
+				PRODUCT_NAME = "${TARGET_NAME}";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 3.0;
+			};
+			name = Release;
+		};
+		FFADF4D61E731B840088B46E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 4B822CZK9N;
+				IBSC_MODULE = ORKWorkoutSample_WatchKit_Extension;
+				INFOPLIST_FILE = "ORKWorkoutSample WatchKit App/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = org.sagebase.ORKWorkoutSample.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 3.0;
+			};
+			name = Debug;
+		};
+		FFADF4D71E731B840088B46E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 4B822CZK9N;
+				IBSC_MODULE = ORKWorkoutSample_WatchKit_Extension;
+				INFOPLIST_FILE = "ORKWorkoutSample WatchKit App/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = org.sagebase.ORKWorkoutSample.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 3.0;
+			};
+			name = Release;
+		};
+		FFADF4DA1E731B840088B46E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = ORKWorkoutSample/ORKWorkoutSample.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = 4B822CZK9N;
+				INFOPLIST_FILE = ORKWorkoutSample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = org.sagebase.ORKWorkoutSample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		FFADF4DB1E731B840088B46E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = ORKWorkoutSample/ORKWorkoutSample.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = 4B822CZK9N;
+				INFOPLIST_FILE = ORKWorkoutSample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = org.sagebase.ORKWorkoutSample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FFADF4871E731B820088B46E /* Build configuration list for PBXProject "ORKWorkoutSample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FFADF4CF1E731B840088B46E /* Debug */,
+				FFADF4D01E731B840088B46E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FFADF4D11E731B840088B46E /* Build configuration list for PBXNativeTarget "ORKWorkoutSample WatchKit Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FFADF4D21E731B840088B46E /* Debug */,
+				FFADF4D31E731B840088B46E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FFADF4D51E731B840088B46E /* Build configuration list for PBXNativeTarget "ORKWorkoutSample WatchKit App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FFADF4D61E731B840088B46E /* Debug */,
+				FFADF4D71E731B840088B46E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FFADF4D91E731B840088B46E /* Build configuration list for PBXNativeTarget "ORKWorkoutSample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FFADF4DA1E731B840088B46E /* Debug */,
+				FFADF4DB1E731B840088B46E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = FFADF4841E731B820088B46E /* Project object */;
+}
