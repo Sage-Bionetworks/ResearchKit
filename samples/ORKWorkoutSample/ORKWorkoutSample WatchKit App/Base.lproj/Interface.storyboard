@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="r3w-As-h8G">
+    <device id="watch38" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="11508"/>
+    </dependencies>
+    <scenes>
+        <!--StartInterfaceController-->
+        <scene sceneID="9Gd-eZ-5lb">
+            <objects>
+                <controller identifier="StartInterfaceController" id="r3w-As-h8G" customClass="ORKStartInterfaceController" customModule="ResearchKit">
+                    <items>
+                        <label alignment="left" text="Track your heart rate while you are walking." numberOfLines="0" id="BXd-Rv-bvK"/>
+                        <button width="1" alignment="center" verticalAlignment="bottom" title="Start" id="cKU-Bc-Kaf">
+                            <connections>
+                                <action selector="didTapStartButton" destination="r3w-As-h8G" id="nQ8-Be-hid"/>
+                            </connections>
+                        </button>
+                    </items>
+                </controller>
+            </objects>
+            <point key="canvasLocation" x="170" y="61"/>
+        </scene>
+        <!--WorkoutInterfaceController-->
+        <scene sceneID="1KB-Pk-K0H">
+            <objects>
+                <controller identifier="WorkoutInterfaceController" id="chc-yA-uGg" customClass="ORKCardioWorkoutInterfaceController" customModule="ResearchKit">
+                    <items>
+                        <label alignment="left" text="Label" id="3LP-P1-esA">
+                            <color key="textColor" red="0.1283356759" green="1" blue="0.22934429619999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        </label>
+                        <label alignment="left" text="Label" numberOfLines="0" id="Exg-Lu-EyY">
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        </label>
+                        <timer alignment="left" verticalAlignment="bottom" id="l0b-nc-9HI">
+                            <color key="textColor" red="1" green="1" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                            <calendarUnit key="units" minute="YES" second="YES"/>
+                        </timer>
+                        <button width="1" alignment="right" verticalAlignment="bottom" title="Stop" id="xVU-4J-GsF">
+                            <connections>
+                                <action selector="didTapStopButton" destination="chc-yA-uGg" id="oTp-YZ-cWo"/>
+                            </connections>
+                        </button>
+                    </items>
+                    <connections>
+                        <outlet property="durationTimer" destination="l0b-nc-9HI" id="tI2-5H-KwU"/>
+                        <outlet property="heartRateLabel" destination="3LP-P1-esA" id="NIi-89-wcm"/>
+                        <outlet property="titleLabel" destination="Exg-Lu-EyY" id="4ZF-yf-g8H"/>
+                    </connections>
+                </controller>
+            </objects>
+            <point key="canvasLocation" x="393" y="61"/>
+        </scene>
+        <!--SummaryInterfaceController-->
+        <scene sceneID="s0w-TH-wDa">
+            <objects>
+                <controller identifier="SummaryInterfaceController" id="F5A-Lz-655" customClass="ORKSummaryInterfaceController" customModule="ResearchKit">
+                    <items>
+                        <label alignment="left" text="Label" id="0v3-D5-KIh"/>
+                        <label alignment="left" text="Label" id="KQO-zt-ZUW">
+                            <color key="textColor" red="1" green="0.97880674710000004" blue="0.13324607359999999" alpha="1" colorSpace="calibratedRGB"/>
+                        </label>
+                        <label alignment="left" text="Label" id="RHZ-8J-FRd">
+                            <color key="textColor" red="1" green="0.041046944600000003" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                        </label>
+                        <label alignment="left" text="Label" id="kVJ-ii-LhR">
+                            <color key="textColor" red="0.0" green="0.56638695100000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                        </label>
+                        <button width="1" alignment="left" verticalAlignment="bottom" title="Done" id="kgT-pQ-4K7">
+                            <connections>
+                                <action selector="didTapDoneButton" destination="F5A-Lz-655" id="jKi-Mr-grq"/>
+                            </connections>
+                        </button>
+                    </items>
+                    <connections>
+                        <outlet property="caloriesLabel" destination="RHZ-8J-FRd" id="z6L-ye-Hb3"/>
+                        <outlet property="distanceLabel" destination="kVJ-ii-LhR" id="rO1-GR-UJU"/>
+                        <outlet property="durationLabel" destination="KQO-zt-ZUW" id="30U-ka-Ylv"/>
+                        <outlet property="workoutLabel" destination="0v3-D5-KIh" id="qil-Wz-0yf"/>
+                    </connections>
+                </controller>
+            </objects>
+            <point key="canvasLocation" x="612" y="61"/>
+        </scene>
+    </scenes>
+</document>
