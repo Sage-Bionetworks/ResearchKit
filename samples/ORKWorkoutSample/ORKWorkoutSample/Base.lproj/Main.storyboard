@@ -12,7 +12,7 @@
         <!--View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="CardioChallenge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="ORKWorkoutSample" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
@@ -30,20 +30,31 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eYL-O9-8ev">
-                                <rect key="frame" x="114.5" y="165" width="145" height="41"/>
+                                <rect key="frame" x="114.5" y="157" width="145" height="41"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="24"/>
                                 <state key="normal" title="Workout Only"/>
                                 <connections>
                                     <action selector="workoutOnlyTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Kz6-Sn-s2N"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oiD-nE-vGK">
+                                <rect key="frame" x="110" y="210" width="155" height="41"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                <state key="normal" title="Heartrate Only"/>
+                                <connections>
+                                    <action selector="heartrateOnlyTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Juh-VD-LTb"/>
+                                    <action selector="workoutOnlyTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="u6j-5j-pk4"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
+                            <constraint firstItem="oiD-nE-vGK" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="203-dW-vRV"/>
                             <constraint firstItem="eYL-O9-8ev" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="A0d-Mb-RmW"/>
                             <constraint firstItem="T2s-lo-wdm" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="40" id="Dzb-ms-aDP"/>
                             <constraint firstItem="T2s-lo-wdm" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="NDT-QW-3N5"/>
-                            <constraint firstItem="eYL-O9-8ev" firstAttribute="top" secondItem="T2s-lo-wdm" secondAttribute="bottom" constant="20" id="u7h-kB-0cD"/>
+                            <constraint firstItem="oiD-nE-vGK" firstAttribute="top" secondItem="eYL-O9-8ev" secondAttribute="bottom" constant="12" id="m1N-TZ-LDc"/>
+                            <constraint firstItem="eYL-O9-8ev" firstAttribute="top" secondItem="T2s-lo-wdm" secondAttribute="bottom" constant="12" id="u7h-kB-0cD"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="DdN-1d-rz7"/>

@@ -28,16 +28,19 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 #import "ORKWorkoutStepViewController.h"
 #import "ORKPageStepViewController_Internal.h"
 #import "ORKStepViewController_Internal.h"
 
 #import "ORKHeartRateCaptureStep.h"
-#import "ORKHeartRateCaptureStepViewController_Internal.h"
+#import "ORKHeartRateCaptureStepViewController.h"
 #import "ORKFitnessStepViewController_Internal.h"
 
 #import "ORKActiveStep_Internal.h"
+#import "ORKDataLogger.h"
 #import "ORKHealthQuantityTypeRecorder_Internal.h"
+#import "ORKLocationRecorder.h"
 #import "ORKPageStep_Private.h"
 #import "ORKWorkoutStep_Private.h"
 
@@ -46,6 +49,7 @@
 #import "ORKCodingObjects.h"
 #import "ORKHelpers_Internal.h"
 #import "ORKSkin.h"
+
 
 typedef NS_OPTIONS(NSInteger, ORKWorkoutStepWatchState) {
     
@@ -61,12 +65,17 @@ typedef NS_OPTIONS(NSInteger, ORKWorkoutStepWatchState) {
     
 } ORK_ENUM_AVAILABLE;
 
+
+NSString * const ORKStepMarkerKey = @"step_marker";
+NSString * const ORKWorkoutWatchHeartRateKey = @"bpm_watch";
+
 @interface ORKWorkoutStepViewController () <ORKRecorderDelegate>
 
 @property (nonatomic, strong) ORKWorkoutMessage *pendingMessage;
 @property (nonatomic, assign) ORKWorkoutStepWatchState state;
 
 @end
+
 
 @implementation ORKWorkoutStepViewController {
     
@@ -80,8 +89,10 @@ typedef NS_OPTIONS(NSInteger, ORKWorkoutStepWatchState) {
     NSArray *_results;
     
     // recorders
+    ORKDataLogRecorder *_watchRecorder;
     NSArray *_recorders;
     NSDictionary *_healthRecorders;
+    ORKLocationRecorder *_locationRecorder;
 }
 
 - (ORKWorkoutStep *)workoutStep {
@@ -102,6 +113,29 @@ typedef NS_OPTIONS(NSInteger, ORKWorkoutStepWatchState) {
     
     // Always stop the recorders and watch
     [self stopRecorders];
+}
+
+- (void)stepViewControllerWillAppear:(ORKStepViewController *)stepViewController {
+    [super stepViewControllerWillAppear:stepViewController];
+    
+    // Timestamp the start of the step
+    NSTimeInterval timestamp = _watchRecorder.referenceUptime > 0 ? [NSProcessInfo processInfo].systemUptime - _watchRecorder.referenceUptime : 0;
+    NSDictionary *json = @{ORKRecorderTimestampKey  : [NSDecimalNumber numberWithDouble:timestamp],
+                           ORKStepMarkerKey         : stepViewController.step.identifier};
+    [_watchRecorder.logger append:json error:nil];
+    
+    // Reset the location recorder
+    if ([stepViewController.step isKindOfClass:[ORKFitnessStep class]]) {
+        BOOL standingStill = ((ORKFitnessStep *)stepViewController.step).isStandingStill;
+        ORKLocationRecorderConfiguration *config = (ORKLocationRecorderConfiguration *)_locationRecorder.configuration;
+        if (config.standingStill != standingStill) {
+            [_locationRecorder resetTotalDistanceWithInitialLocation:_locationRecorder.mostRecentLocation];
+            config.standingStill = standingStill;
+        }
+        if ([stepViewController isKindOfClass:[ORKHeartRateCaptureStepViewController class]]) {
+            ((ORKHeartRateCaptureStepViewController *)stepViewController).locationRecorder = _locationRecorder;
+        }
+    }
 }
 
 - (void)stepViewControllerDidAppear:(ORKStepViewController *)stepViewController {
@@ -383,9 +417,14 @@ typedef NS_OPTIONS(NSInteger, ORKWorkoutStepWatchState) {
     ORKHealthQuantityTypeRecorder *recorder = _healthRecorders[quantityTypeIdentifier];
     [recorder addQuantitySamples:samples];
     
-    if ([quantityTypeIdentifier isEqualToString:HKQuantityTypeIdentifierHeartRate] && !_device) {
-        HKQuantitySample *sample = [samples lastObject];
-        if (sample.device) {
+    HKQuantitySample *sample = [samples lastObject];
+    if ([quantityTypeIdentifier isEqualToString:HKQuantityTypeIdentifierHeartRate] && (sample != nil)) {
+        NSTimeInterval timestamp = [sample.endDate timeIntervalSinceDate:_watchRecorder.startDate];
+        double bpm = [sample.quantity doubleValueForUnit:[HKUnit bpmUnit]];
+        NSDictionary *json = @{ORKRecorderTimestampKey      : [NSDecimalNumber numberWithDouble:timestamp],
+                               ORKWorkoutWatchHeartRateKey  : @(bpm)};
+        [_watchRecorder.logger append:json error:nil];
+        if (!_device && sample.device) {
             _device = [[ORKDevice alloc] initWithDevice:sample.device];
         }
     }
@@ -484,11 +523,23 @@ typedef NS_OPTIONS(NSInteger, ORKWorkoutStepWatchState) {
         return;
     }
     
-    // Stop any existing recorders
     NSMutableArray *recorders = [NSMutableArray new];
     NSMutableDictionary *healthRecorders = [NSMutableDictionary new];
     
-    for (ORKRecorderConfiguration * provider in self.workoutStep.recorderConfigurations) {
+    // Setup the consolidated recorder that the other recorders will point at
+    _watchRecorder = [[ORKDataLogRecorder alloc] initWithIdentifier:ORKWorkoutResultIdentifierWorkoutData
+                                                               step:self.step
+                                                    outputDirectory:self.outputDirectory];
+    _watchRecorder.delegate = self;
+    NSError *error = nil;
+    _watchRecorder.logger = [_watchRecorder makeJSONDataLoggerWithError:&error];
+    if (error) {
+        [self recorder:_watchRecorder didFailWithError:error];
+        return;
+    }
+
+    // Add the other recorders
+    for (ORKRecorderConfiguration *provider in self.workoutStep.recorderConfigurations) {
         // If the outputDirectory is nil, recorders which require one will generate an error.
         // We start them anyway, because we don't know which recorders will require an outputDirectory.
         ORKRecorder *recorder = [provider recorderForStep:self.step
@@ -496,15 +547,25 @@ typedef NS_OPTIONS(NSInteger, ORKWorkoutStepWatchState) {
         recorder.configuration = provider;
         recorder.delegate = self;
         
+        // Not all the recorders support using a consolidated log file but the ones that don't
+        // will ignore this property.
+        recorder.sharedLogger = _watchRecorder.logger;
+        
         [recorders addObject:recorder];
         
         if ([recorder isKindOfClass:[ORKHealthQuantityTypeRecorder class]]) {
             ORKHealthQuantityTypeRecorder *healthRecorder = (ORKHealthQuantityTypeRecorder *)recorder;
             healthRecorders[healthRecorder.quantityType.identifier] = healthRecorder;
         }
+        
+        if ([recorder isKindOfClass:[ORKLocationRecorder class]]) {
+            _locationRecorder = (ORKLocationRecorder *)recorder;
+        }
     }
-    _recorders = recorders;
-    _healthRecorders = healthRecorders;
+    
+    [recorders addObject:_watchRecorder];
+    _recorders = [recorders copy];
+    _healthRecorders = [healthRecorders copy];
 }
 
 - (void)setOutputDirectory:(NSURL *)outputDirectory {
@@ -518,8 +579,11 @@ typedef NS_OPTIONS(NSInteger, ORKWorkoutStepWatchState) {
     }
     _started = YES;
     
+    NSTimeInterval referenceUptime = [NSProcessInfo processInfo].systemUptime;
+    
     // Start recorders
     for (ORKRecorder *recorder in _recorders) {
+        recorder.referenceUptime = referenceUptime;
         [recorder viewController:self willStartStepWithView:self.view];
         [recorder start];
     }

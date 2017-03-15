@@ -538,6 +538,7 @@ static const CGFloat HeaderSideLayoutMargin = 16.0;
                                               intendedUseDescription:nil
                                                         walkDuration:2*60
                                                         restDuration:30
+                                                relativeDistanceOnly:NO
                                                              options:ORKPredefinedTaskOptionNone];
         } else {
             return [ORKOrderedTask fitnessCheckTaskWithIdentifier:CardioTaskIdentifier

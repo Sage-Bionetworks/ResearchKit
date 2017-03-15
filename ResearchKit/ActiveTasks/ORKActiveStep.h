@@ -215,6 +215,12 @@ The default value of this property is `NO`.
 @property (nonatomic, copy, nullable) NSArray<ORKRecorderConfiguration *> *recorderConfigurations;
 
 /**
+ Default = `NO`. If `YES`, then the recorders that support consolidation will record their results to a 
+ single data file that includes all the results.
+ */
+@property (nonatomic, assign) BOOL shouldConsolidateRecorders;
+
+/**
  Command to send to the watch on start of the step.
  */
 @property (nonatomic, copy, nullable) ORKWorkoutCommand beginCommand;

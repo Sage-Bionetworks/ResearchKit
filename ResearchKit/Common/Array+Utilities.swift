@@ -31,6 +31,7 @@
 
 import Foundation
 
+
 public extension Array where Element: Equatable {
     
     /**
@@ -46,6 +47,7 @@ public extension Array where Element: Equatable {
         return self.next({ (match == $0) })
     }
 }
+
 
 public extension Array {
     

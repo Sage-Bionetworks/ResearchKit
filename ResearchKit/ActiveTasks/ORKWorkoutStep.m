@@ -28,6 +28,7 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 #import "ORKWorkoutStep_Private.h"
 
 #import "ORKWorkoutStepViewController.h"
@@ -35,6 +36,7 @@
 #import "ORKCountdownStep.h"
 #import "ORKFitnessStep_Internal.h"
 #import "ORKHeartRateCaptureStep.h"
+#import "ORKLocationRecorder.h"
 #import "ORKOrderedTask_Private.h"
 #import "ORKPageStep_Private.h"
 #import "ORKRecorder_Private.h"
@@ -44,21 +46,26 @@
 
 #import <ResearchKit/ResearchKit-Swift.h>
 
+
 NSString *const ORKWorkoutBeforeStepIdentifier = @"heartRate.before";
 NSString *const ORKWorkoutAfterStepIdentifier = @"heartRate.after";
 NSString *const ORKWorkoutCameraInstructionStepIdentifier = @"heartRate.cameraInstruction";
 NSString *const ORKWorkoutBeforeCountdownStepIdentifier = @"heartRate.before.countdown";
 NSString *const ORKWorkoutAfterCountdownStepIdentifier = @"heartRate.after.countdown";
+NSString *const ORKWorkoutOutdoorInstructionStepIdentifier = @"outdoor.instruction";
 
 NSString *const ORKHeartRateMonitorDeviceNameKey = @"heartRateDeviceNameKey";
 
 ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierHeartRateCaptureSuccess = @"heartRateSuccess";
 ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierDevice = @"heartRateDevice";
 ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierHeartRate = @"heartRateMeasurement";
-ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierHKSamples = @"healthkitHeartRate";
+ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierWorkoutData = @"workoutData";
 ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierCameraSamples = @"cameraHeartRate";
 ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierError = @"workoutError";
 ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierUserEnded = @"userEndedWorkout";
+ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierSpeed = @"speed";
+ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierIsOutdoors = @"outdoors";
+ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierDistanceTraveled = @"distance";
 
 @implementation ORKWorkoutStep
 
@@ -71,15 +78,13 @@ ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierUserEnded = @"userEnd
 }
 
 - (instancetype)initWithIdentifier:(NSString*)identifier {
-    return [self initWithIdentifier:identifier
-                        motionSteps:@[]
-                           restStep:nil
-                            options:0];
+    return [super initWithIdentifier:identifier pageTask:[[ORKOrderedTask alloc] initWithIdentifier:identifier steps:nil]];
 }
 
 - (instancetype)initWithIdentifier:(NSString *)identifier
                        motionSteps:(NSArray<ORKStep *> *)motionSteps
                           restStep:(nullable ORKHeartRateCaptureStep *)restStep
+              relativeDistanceOnly:(BOOL)relativeDistanceOnly
                            options:(ORKPredefinedRecorderOption)options {
     
     // Add step for the camera instruction
@@ -92,7 +97,7 @@ ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierUserEnded = @"userEnd
     
     // Add countdown to heart rate measuring
     ORKCountdownStep *countBeforeStep = [[ORKCountdownStep alloc] initWithIdentifier:ORKWorkoutBeforeCountdownStepIdentifier];
-    countBeforeStep.stepDuration = 3.0;
+    countBeforeStep.stepDuration = 5.0;
     countBeforeStep.title = restStep.title;
     countBeforeStep.text = ORKLocalizedString(@"HEARTRATE_MONITOR_CAMERA_INITIAL_TEXT", nil);
     countBeforeStep.spokenInstruction = ORKLocalizedString(@"HEARTRATE_MONITOR_CAMERA_SPOKEN", nil);
@@ -112,31 +117,63 @@ ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierUserEnded = @"userEnd
     beforeStep.minimumDuration = 0.0;
     beforeStep.stepDuration = 0.0;
     beforeStep.endCommand = nil;
+    beforeStep.beforeWorkout = YES;
     
     // At the end of the rest step, send command to stop the watch
     restStep.endCommand = ORKWorkoutCommandStop;
+    restStep.beforeWorkout = NO;
     
     // setup the steps
     NSMutableArray *steps = [[NSMutableArray alloc] init];
     [steps addObject:instructionStep];
-    [steps addObject:countBeforeStep];
-    [steps addObject:beforeStep];
-    [steps addObjectsFromArray:motionSteps];
+    if (motionSteps.count > 0) {
+        // Only if there are motion steps should the before step be added
+        // This allows a workout step to be created that just measures heart rate
+        [steps addObject:countBeforeStep];
+        [steps addObject:beforeStep];
+        [steps addObjectsFromArray:motionSteps];
+    }
     [steps addObject:countAfterStep];
     [steps addObject:restStep];
     
     self = [super initWithIdentifier:identifier steps:steps];
     if (self) {
+        
+        // default workout is outdoor walking
         _workoutConfiguration = [[HKWorkoutConfiguration alloc] init];
         _workoutConfiguration.activityType = HKWorkoutActivityTypeWalking;
         _workoutConfiguration.locationType = HKWorkoutSessionLocationTypeOutdoor;
-        _recorderConfigurations = [ORKFitnessStep recorderConfigurationsWithOptions:options relativeDistanceOnly:YES];
+        
+        // If the heart rate isn't excluded then add that recorder
+        _recorderConfigurations = [ORKFitnessStep recorderConfigurationsWithOptions:options
+                                                               relativeDistanceOnly:relativeDistanceOnly
+                                                                      standingStill:YES];
     }
     return self;
 }
 
 - (Class)stepViewControllerClass {
     return [ORKWorkoutStepViewController class];
+}
+
+- (ORKStep *)stepAfterStepWithIdentifier:(NSString *)identifier withResult:(ORKTaskResult *)result {
+    ORKStepResult *stepResult = [result stepResultForStepIdentifier:identifier];
+    if ([identifier isEqualToString:ORKWorkoutOutdoorInstructionStepIdentifier]) {
+        NSString *nextIdentifier = [[(ORKChoiceQuestionResult *)[stepResult.results firstObject] choiceAnswers] firstObject];
+        return [self.pageTask stepWithIdentifier:(nextIdentifier ? : ORKWorkoutBeforeCountdownStepIdentifier)];
+    } else {
+        ORKStep *nextStep = [super stepAfterStepWithIdentifier:identifier withResult:result];
+        if ((self.workoutConfiguration.locationType == HKWorkoutSessionLocationTypeOutdoor) &&
+            [identifier isEqualToString:ORKWorkoutBeforeStepIdentifier]) {
+            // If this is an outdoor workout and the accuracy indicates that the user is indoors
+            // then instruct them to move outdoors.
+            ORKBooleanQuestionResult *outdoorsResult = (ORKBooleanQuestionResult *)[stepResult resultForIdentifier:ORKWorkoutResultIdentifierIsOutdoors];
+            if ((outdoorsResult != nil) && ![outdoorsResult.booleanAnswer boolValue]) {
+                return [self createOutdoorsInstructionStepWithNextStep:nextStep];
+            }
+        }
+        return nextStep;
+    }
 }
 
 - (ORKStep *)stepBeforeStepWithIdentifier:(NSString *)identifier withResult:(ORKTaskResult *)result {
@@ -150,6 +187,24 @@ ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierUserEnded = @"userEnd
 
 - (BOOL)shouldStopRecordersOnFinishedWithStep:(ORKStep *)step {
     return [step.identifier isEqualToString:[self.steps lastObject].identifier];
+}
+
+- (ORKQuestionStep *)createOutdoorsInstructionStepWithNextStep:(ORKStep *)nextStep {
+    
+    ORKTextChoice *choice1 = [ORKTextChoice choiceWithText:ORKLocalizedString(@"CARDIO_OUTDOOR_ALREADY_OUTSIDE", nil)
+                                                     value:nextStep.identifier];
+    ORKTextChoice *choice2 = [ORKTextChoice choiceWithText:ORKLocalizedString(@"CARDIO_OUTDOOR_CONTINUE", nil)
+                                                     value:ORKWorkoutBeforeCountdownStepIdentifier];
+    ORKAnswerFormat *format = [ORKAnswerFormat choiceAnswerFormatWithStyle:ORKChoiceAnswerStyleSingleChoice
+                                                               textChoices:@[choice1, choice2]];
+    
+    ORKQuestionStep *step = [ORKQuestionStep questionStepWithIdentifier:ORKWorkoutOutdoorInstructionStepIdentifier
+                                                                  title:ORKLocalizedString(@"CARDIO_OUTDOOR_INSTRUCTION_TITLE", nil)
+                                                                   text:ORKLocalizedString(@"CARDIO_OUTDOOR_INSTRUCTION_TEXT", nil)
+                                                                 answer:format];
+    step.useSurveyMode = YES;
+    step.optional = NO;
+    return step;
 }
 
 #pragma mark - Encoding, Copying and Equality

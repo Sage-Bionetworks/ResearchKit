@@ -51,6 +51,7 @@ typedef NS_ENUM(NSInteger, ORKPageNavigationDirection) {
 
 - (ORKStepViewController *)currentStepViewController;
 
+- (void)stepViewControllerWillAppear:(ORKStepViewController *)stepViewController;
 - (void)stepViewControllerDidAppear:(ORKStepViewController *)stepViewController;
 
 - (ORKStep *)stepInDirection:(ORKPageNavigationDirection)delta;

@@ -28,6 +28,7 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 @import Foundation;
 @import HealthKit;
 #import <ResearchKit/ORKDefines.h>
@@ -35,7 +36,6 @@
 
 
 NS_ASSUME_NONNULL_BEGIN
-
 
 typedef NSString * ORKWorkoutResultIdentifier NS_STRING_ENUM;
 
@@ -55,9 +55,10 @@ ORK_EXTERN ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierDevice;
 ORK_EXTERN ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierHeartRate;
 
 /**
- Maps to an `ORKFileResult` with the heart rate sample data from HealthKit (if available).
+ Maps to an `ORKFileResult` with the consolidated data for the workout. This includes a consolidated
+ data for the motion, location, heart rate and watch sensors with normalized timestamps.
  */
-ORK_EXTERN ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierHKSamples;
+ORK_EXTERN ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierWorkoutData;
 
 /**
  Maps to an `ORKFileResult` with the sample data from using the camera to measure heart rate.
@@ -73,6 +74,21 @@ ORK_EXTERN ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierError;
  Maps to an `ORKBooleanQuestionResult` with a `booleanAnswer` of `YES` if the user ended the workout.
  */
 ORK_EXTERN ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierUserEnded;
+
+/**
+ Maps to an `ORKNumericQuestionResult` with the `CLLocation.speed` at the end of the step.
+ */
+ORK_EXTERN ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierSpeed;
+
+/**
+ Maps to an `ORKBooleanQuestionResult` with whether or not the user's GPS indicates that they are outdoors.
+ */
+ORK_EXTERN ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierIsOutdoors;
+
+/**
+ Maps to an `ORKNumericQuestionResult` with the total distance traveled during the step.
+ */
+ORK_EXTERN ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierDistanceTraveled;
 
 ORK_EXTERN NSString *const ORKWorkoutBeforeStepIdentifier ORK_AVAILABLE_DECL;
 ORK_EXTERN NSString *const ORKWorkoutAfterStepIdentifier ORK_AVAILABLE_DECL;
@@ -152,6 +168,7 @@ HK_CLASS_AVAILABLE_IOS_WATCHOS(10_0, 3_0)
 - (instancetype)initWithIdentifier:(NSString *)identifier
                        motionSteps:(NSArray<ORKStep *> *)motionSteps
                           restStep:(nullable ORKHeartRateCaptureStep *)restStep
+              relativeDistanceOnly:(BOOL)relativeDistanceOnly
                            options:(ORKPredefinedRecorderOption)options NS_DESIGNATED_INITIALIZER;
 
 /**

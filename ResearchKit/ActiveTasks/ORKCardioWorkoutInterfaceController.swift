@@ -42,7 +42,6 @@ open class ORKCardioWorkoutInterfaceController: WKInterfaceController, ORKWorkou
     public var summaryControllerName = ORKSummaryInterfaceController.name
     
     public var walkingDuration: TimeInterval = 6 * 60
-    public var restDuration: TimeInterval = 3 * 60
     
     // MARK: IBOutlets
     
@@ -72,10 +71,6 @@ open class ORKCardioWorkoutInterfaceController: WKInterfaceController, ORKWorkou
         if let workoutConfiguration = context as? HKWorkoutConfiguration {
             // start the workout with a phone connection
             connector.startedFromPhone = true
-            // Set the default workout duration to the walking duration plus
-            // 2 * rest duration. This will cause the watch to automatically timeout
-            // even if the connection to the phone is dropped
-            connector.workoutDuration = walkingDuration + 2 * restDuration
             connector.startWorkout(with: workoutConfiguration)
             
         } else {
@@ -83,9 +78,6 @@ open class ORKCardioWorkoutInterfaceController: WKInterfaceController, ORKWorkou
             let workoutConfiguration = HKWorkoutConfiguration()
             workoutConfiguration.activityType = .walking
             workoutConfiguration.locationType = .outdoor
-            
-            // Initially, do not set the workout duration. This will be set once the heart rate is captured.
-            connector.workoutDuration = 0
             
             // Start the workout
             connector.startWorkout(with: workoutConfiguration)

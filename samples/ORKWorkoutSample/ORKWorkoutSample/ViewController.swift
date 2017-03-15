@@ -37,24 +37,41 @@ import ResearchKit
 class ViewController: UIViewController, ORKTaskViewControllerDelegate {
 
     @IBAction func cardioChallegeTapped(_ sender: Any) {
-        showTask(workoutOnly: false)
+        showWorkout(workoutOnly: false)
     }
 
     @IBAction func workoutOnlyTapped(_ sender: Any) {
-        showTask(workoutOnly: true)
+        showWorkout(workoutOnly: true)
     }
     
-    func showTask(workoutOnly:Bool) {
+    @IBAction func heartrateOnlyTapped(_ sender: Any) {
+        let workoutStep = ORKWorkoutStep(identifier: "workout",
+                                         motionSteps: [],
+                                         restStep: nil,
+                                         relativeDistanceOnly: false,
+                                         options: [.excludeAccelerometer, .excludeDeviceMotion, .excludeLocation, .excludePedometer])
+        let bpmCrossRefStep = ORKQuestionStep(identifier: "bpm_oximeter", title: "What is your heart rate using the oximeter?", answer: ORKNumericAnswerFormat(style: .integer, unit: "bpm"))
+        
+        
+        let task = ORKOrderedTask(identifier: "heartrateOnly", steps: [workoutStep, bpmCrossRefStep])
+        show(task: task);
+    }
+    
+    func showWorkout(workoutOnly:Bool) {
         var task = ORKOrderedTask.cardioChallenge(withIdentifier: "cardioChallege",
                                                   intendedUseDescription: "This is an example of how the task works.",
                                                   walkDuration: 2 * 60,
                                                   restDuration: 30,
-                                                  options: [])
+                                                  relativeDistanceOnly: false,
+                                                  options: [.excludeAccelerometer, .excludeDeviceMotion])
         if (workoutOnly) {
             let workoutSteps = task.steps.filter({ $0 is ORKWorkoutStep })
             task = ORKOrderedTask(identifier: "workoutOnly", steps: workoutSteps)
         }
-        
+        show(task: task);
+    }
+    
+    func show(task:ORKOrderedTask) {
         let taskVC = ORKTaskViewController(task: task, taskRun: nil)
         taskVC.delegate = self
         

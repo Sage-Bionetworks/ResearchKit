@@ -28,10 +28,11 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 @import Foundation;
 #import <ResearchKit/ORKWorkoutStep.h>
 #import <ResearchKit/ORKHeartRateCameraInstructionStep.h>
-#import <ResearchKit/ORKHeartRateDeviceNotFoundStep.h>
+
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -44,6 +45,8 @@ ORK_EXTERN NSString *const ORKHeartRateMonitorDeviceNameKey ORK_AVAILABLE_DECL;
 + (NSString *)defaultDeviceName;
 + (nullable NSString *)storedDeviceName;
 + (void)setStoredDeviceName:(nullable NSString *)storedDeviceName;
+
+- (instancetype)initWithIdentifier:(NSString *)identifier NS_DESIGNATED_INITIALIZER;
 
 - (instancetype)initWithIdentifier:(NSString *)identifier
                           pageTask:(ORKOrderedTask *)task NS_DESIGNATED_INITIALIZER;

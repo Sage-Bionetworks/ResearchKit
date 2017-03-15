@@ -31,10 +31,12 @@
 
 @import UIKit;
 @import CoreLocation;
-#import <ResearchKit/ORKRecorder.h>
+#import <ResearchKit/ORKRecorder_Private.h>
 
 
 NS_ASSUME_NONNULL_BEGIN
+
+ORK_EXTERN CLLocationAccuracy const ORKLocationRequiredAccuracy;
 
 /**
  The `ORKLocationRecorder` class represents a recorder for collecting location data from CoreLocation.
@@ -45,7 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
  The accuracy of location data may be limited indoors.
  */
 ORK_CLASS_AVAILABLE
-@interface ORKLocationRecorder : ORKRecorder
+@interface ORKLocationRecorder : ORKDataLogRecorder
 
 /**
  Returns an initialized location recorder.
@@ -65,6 +67,29 @@ ORK_CLASS_AVAILABLE
  The location manager, if any, being used by this recorder.
  */
 @property (nonatomic, strong, nullable, readonly) CLLocationManager *locationManager;
+
+/**
+ The most recent location recorded by the location manager. This is used to record relative location.
+ */
+@property (nonatomic, strong, nullable, readonly) CLLocation *mostRecentLocation;
+
+/**
+ Reset the total distance calculation.
+ 
+ @param initialLocation     The location to use as the current location. (if available)
+ */
+- (void)resetTotalDistanceWithInitialLocation:(nullable CLLocation *)initialLocation;
+
+/**
+ The distance traveled since the last reset of the total distance counter.
+ @return    Calculated distance from an initial starting point, calculated along the path traveled.
+ */
+- (CLLocationDistance)distanceTraveled;
+
+/**
+ Does the horizontal accuracy indicate that the user is outdoors?
+ */
+- (BOOL)isOutdoors;
 
 @end
 

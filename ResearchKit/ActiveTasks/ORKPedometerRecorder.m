@@ -40,11 +40,12 @@
 
 
 @interface ORKPedometerRecorder () {
-    ORKDataLogger *_logger;
     BOOL _isRecording;
 }
 
 @property (nonatomic, strong) CMPedometer *pedometer;
+
+@property (nonatomic) NSTimeInterval uptime;
 
 @end
 
@@ -61,10 +62,6 @@
         self.continuesInBackground = YES;
     }
     return self;
-}
-
-- (void)dealloc {
-    [_logger finishCurrentLog];
 }
 
 - (void)updateStatisticsWithData:(CMPedometerData *)pedometerData {
@@ -93,15 +90,7 @@
     _totalNumberOfSteps = 0;
     _totalDistance = -1;
     
-    if (!_logger) {
-        NSError *error = nil;
-        _logger = [self makeJSONDataLoggerWithError:&error];
-        if (!_logger) {
-            [self finishRecordingWithError:error];
-            return;
-        }
-    }
-    
+    self.uptime = [NSProcessInfo processInfo].systemUptime;
     self.pedometer = [self createPedometer];
     
     if (![[self.pedometer class] isStepCountingAvailable]) {
@@ -117,7 +106,10 @@
         
         BOOL success = NO;
         if (pedometerData) {
-            success = [_logger append:[pedometerData ork_JSONDictionary] error:&error];
+            NSTimeInterval offset = (self.referenceUptime > 0) ? (self.uptime - self.referenceUptime) : 0;
+            NSMutableDictionary *dict = [[pedometerData ork_JSONDictionaryWithOffset:offset] mutableCopy];
+            dict[ORKRecorderIdentifierKey] = self.identifier;
+            success = [self.logger append:[dict copy] error:&error];
             dispatch_async(dispatch_get_main_queue(), ^{
                 ORKStrongTypeOf(self) strongSelf = weakSelf;
                 [strongSelf updateStatisticsWithData:pedometerData];
@@ -138,17 +130,7 @@
 
 - (void)stop {
     [self doStopRecording];
-    [_logger finishCurrentLog];
-    
-    NSError *error = nil;
-    __block NSURL *fileUrl = nil;
-    [_logger enumerateLogs:^(NSURL *logFileUrl, BOOL *stop) {
-        fileUrl = logFileUrl;
-    }
-                     error:&error];
-    
-    [self reportFileResultWithFile:fileUrl error:error];
-    
+
     [super stop];
 }
 
@@ -171,12 +153,6 @@
 
 - (NSString *)mimeType {
     return @"application/json";
-}
-
-- (void)reset {
-    [super reset];
-    
-    _logger = nil;
 }
 
 @end

@@ -98,9 +98,9 @@ ORK_CLASS_AVAILABLE
 - (instancetype)initWithCoordinate:(CLLocationCoordinate2D)coordinate
                             region:(nullable CLCircularRegion *)region
                          userInput:(nullable NSString *)userInput
-                 addressDictionary:(NSDictionary *)addressDictionary;
+                 addressDictionary:(nullable NSDictionary *)addressDictionary;
 
-- (instancetype)initWithPlacemark:(CLPlacemark *)placemark userInput:(NSString *)userInput;
+- (instancetype)initWithPlacemark:(CLPlacemark *)placemark userInput:(nullable NSString *)userInput;
 
 @end
 

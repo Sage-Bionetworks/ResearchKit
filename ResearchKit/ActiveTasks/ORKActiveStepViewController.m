@@ -57,6 +57,9 @@
 #import "ORKSkin.h"
 
 
+NSString * const ORKConsolidatedRecorderId = @"recorder_data";
+
+
 @interface ORKActiveStepViewController () {
     ORKActiveStepView *_activeStepView;
     ORKActiveStepTimer *_activeStepTimer;
@@ -241,6 +244,21 @@
     }
     NSMutableArray *recorders = [NSMutableArray array];
     
+    // Setup the consolidated recorder that the other recorders will point at
+    ORKDataLogRecorder *sharedRecorder = nil;
+    if ([self activeStep].shouldConsolidateRecorders) {
+        sharedRecorder = [[ORKDataLogRecorder alloc] initWithIdentifier:ORKConsolidatedRecorderId
+                                                                   step:self.step
+                                                        outputDirectory:self.outputDirectory];
+        sharedRecorder.delegate = self;
+        NSError *error = nil;
+        sharedRecorder.logger = [sharedRecorder makeJSONDataLoggerWithError:&error];
+        if (error) {
+            [self recorder:sharedRecorder didFailWithError:error];
+            return;
+        }
+    }
+    
     for (ORKRecorderConfiguration * provider in self.activeStep.recorderConfigurations) {
         // If the outputDirectory is nil, recorders which require one will generate an error.
         // We start them anyway, because we don't know which recorders will require an outputDirectory.
@@ -249,8 +267,18 @@
         recorder.configuration = provider;
         recorder.delegate = self;
         
+        // Not all the recorders support using a consolidated log file but the ones that don't
+        // will ignore this property.
+        recorder.sharedLogger = sharedRecorder.logger;
+        
         [recorders addObject:recorder];
     }
+    
+    // Add the shared recorder last so that it is stopped last.
+    if (sharedRecorder) {
+        [recorders addObject:sharedRecorder];
+    }
+    
     self.recorders = recorders;
     
     [self recordersDidChange];
@@ -295,7 +323,9 @@
 - (void)startRecorders {
     [self recordersWillStart];
     // Start recorders
+    NSTimeInterval referenceUptime = [self activeStep].shouldConsolidateRecorders ? [NSProcessInfo processInfo].systemUptime : 0;
     for (ORKRecorder *recorder in self.recorders) {
+        recorder.referenceUptime = referenceUptime;
         [recorder viewController:self willStartStepWithView:self.customViewContainer];
         [recorder start];
     }

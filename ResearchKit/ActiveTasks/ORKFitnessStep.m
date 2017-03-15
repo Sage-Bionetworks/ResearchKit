@@ -43,7 +43,8 @@
 @implementation ORKFitnessStep
 
 + (NSArray *)recorderConfigurationsWithOptions:(ORKPredefinedRecorderOption)options
-                          relativeDistanceOnly:(BOOL)relativeDistanceOnly {
+                          relativeDistanceOnly:(BOOL)relativeDistanceOnly
+                                 standingStill:(BOOL)standingStill {
     NSMutableArray *recorderConfigurations = [NSMutableArray arrayWithCapacity:5];
     if (!(ORKPredefinedRecorderOptionExcludePedometer & options)) {
         [recorderConfigurations addObject:[[ORKPedometerRecorderConfiguration alloc] initWithIdentifier:ORKPedometerRecorderIdentifier]];
@@ -59,6 +60,7 @@
     if (!(ORKPredefinedRecorderOptionExcludeLocation & options)) {
         ORKLocationRecorderConfiguration *locationConfig = [[ORKLocationRecorderConfiguration alloc] initWithIdentifier:ORKLocationRecorderIdentifier];
         locationConfig.relativeDistanceOnly = relativeDistanceOnly;
+        locationConfig.standingStill = standingStill;
         [recorderConfigurations addObject:locationConfig];
     }
     if (!(ORKPredefinedRecorderOptionExcludeHeartRate & options)) {
@@ -68,25 +70,6 @@
                                                                                               healthQuantityType:heartRateType unit:bpmUnit]];
     }
     return recorderConfigurations;
-}
-
-+ (instancetype)fitnessStepWithIdentifier:(NSString *)identifier walkDuration:(NSTimeInterval)walkDuration options:(ORKPredefinedRecorderOption)options relativeDistanceOnly:(BOOL)relativeDistanceOnly {
-    NSDateComponentsFormatter *formatter = [ORKOrderedTask textTimeFormatter];
-    ORKFitnessStep *fitnessStep = [[ORKFitnessStep alloc] initWithIdentifier:ORKFitnessWalkStepIdentifier];
-    fitnessStep.stepDuration = walkDuration;
-    fitnessStep.title = [NSString stringWithFormat:ORKLocalizedString(@"FITNESS_WALK_INSTRUCTION_FORMAT", nil), [formatter stringFromTimeInterval:walkDuration]];
-    fitnessStep.spokenInstruction = fitnessStep.title;
-    fitnessStep.recorderConfigurations = [self recorderConfigurationsWithOptions:options relativeDistanceOnly:relativeDistanceOnly];
-    fitnessStep.shouldContinueOnFinish = YES;
-    fitnessStep.optional = NO;
-    fitnessStep.shouldStartTimerAutomatically = YES;
-    fitnessStep.shouldTintImages = YES;
-    fitnessStep.image = [UIImage imageNamed:@"walkingman" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
-    fitnessStep.shouldVibrateOnStart = YES;
-    fitnessStep.shouldPlaySoundOnStart = YES;
-    fitnessStep.watchInstruction = ORKLocalizedString(@"FITNESS_WALK_INSTRUCTION_WATCH", nil);
-    fitnessStep.beginCommand = ORKWorkoutCommandStartMoving;
-    return fitnessStep;
 }
 
 + (Class)stepViewControllerClass {
@@ -117,7 +100,35 @@
 
 - (instancetype)copyWithZone:(NSZone *)zone {
     ORKFitnessStep *step = [super copyWithZone:zone];
+    step.standingStill = self.standingStill;
     return step;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    self = [super initWithCoder:aDecoder];
+    ORK_DECODE_BOOL(aDecoder, standingStill);
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    [super encodeWithCoder:aCoder];
+    ORK_ENCODE_BOOL(aCoder, standingStill);
+}
+
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
+- (NSUInteger)hash {
+    return super.hash ^ self.standingStill;
+}
+
+- (BOOL)isEqual:(id)object {
+    BOOL isParentSame = [super isEqual:object];
+    
+    __typeof(self) castObject = object;
+    return isParentSame &&
+    (self.standingStill == castObject.standingStill);
 }
 
 - (BOOL)startsFinished {

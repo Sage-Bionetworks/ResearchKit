@@ -28,10 +28,12 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 @import Foundation;
 @import AVFoundation;
 @import HealthKit;
-#import <ResearchKit/ORKRecorder.h>
+#import <ResearchKit/ORKRecorder_Private.h>
+
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -40,14 +42,14 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol ORKHeartRateCameraRecorderDelegate
 
 @optional
-- (void)heartRateDidUpdate:(ORKHeartRateCameraRecorder*)recorder sample:(HKQuantitySample *)sample;
+- (void)heartRateRecorder:(ORKHeartRateCameraRecorder*)recorder didUpdateSample:(HKQuantitySample *)sample;
 
 @end
 
 ORK_CLASS_AVAILABLE
-@interface ORKHeartRateCameraRecorder : ORKRecorder
+@interface ORKHeartRateCameraRecorder : ORKDataLogRecorder
 
-@property (nonatomic, readonly) CGFloat bpm;
+@property (nonatomic, readonly) double bpm;
 
 - (void)addWatchSamples:(NSArray<HKQuantitySample *> *)watchSamples;
 

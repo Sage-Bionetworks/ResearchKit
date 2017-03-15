@@ -47,6 +47,11 @@ NS_ASSUME_NONNULL_BEGIN
 ORK_CLASS_AVAILABLE
 @interface ORKFitnessStep : ORKActiveStep
 
+/**
+ Is the user expected to be standing still (or sitting) during this step.
+ */
+@property (nonatomic, assign, getter=isStandingStill) BOOL standingStill;
+
 @end
 
 NS_ASSUME_NONNULL_END

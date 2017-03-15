@@ -60,7 +60,7 @@ class ResultsTableViewController: UITableViewController {
         let result = self.result(at: indexPath)
         cell.textLabel?.text = result.identifier
         if let questionResult = result as? ORKQuestionResult {
-            cell.detailTextLabel?.text = "\(questionResult.answer)"
+            cell.detailTextLabel?.text = "\(questionResult.answer ?? "--")"
         }
         else {
             cell.detailTextLabel?.text = "\(result)"

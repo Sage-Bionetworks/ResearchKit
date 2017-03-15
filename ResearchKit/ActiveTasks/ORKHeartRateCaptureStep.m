@@ -28,6 +28,7 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 #import "ORKHeartRateCaptureStep.h"
 
 #import "ORKHeartRateCaptureStepViewController.h"
@@ -38,6 +39,7 @@
 #import "ORKRecorder.h"
 
 #import "ORKHelpers_Internal.h"
+
 
 @implementation ORKHeartRateCaptureStep
 
@@ -54,11 +56,12 @@
         self.shouldPlaySoundOnFinish = YES;
         self.shouldVibrateOnFinish = YES;
         self.beginCommand = ORKWorkoutCommandStopMoving;
+        self.standingStill = YES;
+        self.beforeWorkout = YES;
         
         self.title = ORKLocalizedString(@"HEARTRATE_MONITOR_CAMERA_STAND_STILL_TITLE", nil);
-        self.watchInstruction = ORKLocalizedString(@"FITNESS_STAND_INSTRUCTION_WATCH", nil);
-        self.spokenInstruction = ORKLocalizedString(@"HEARTRATE_MONITOR_CAMERA_CONTINUE_SPOKEN", nil);
         self.text = ORKLocalizedString(@"HEARTRATE_MONITOR_CAMERA_CONTINUE_TEXT", nil);
+        self.watchInstruction = ORKLocalizedString(@"FITNESS_STAND_INSTRUCTION_WATCH", nil);
         
         ORKHeartRateCameraRecorderConfiguration *cameraRecorder = [[ORKHeartRateCameraRecorderConfiguration alloc] initWithIdentifier:ORKWorkoutResultIdentifierCameraSamples];
         self.recorderConfigurations = @[cameraRecorder];
@@ -104,6 +107,7 @@
     self = [super initWithCoder:aDecoder];
     if (self) {
         ORK_DECODE_DOUBLE(aDecoder, minimumDuration);
+        ORK_DECODE_BOOL(aDecoder, beforeWorkout);
     }
     return self;
 }
@@ -111,11 +115,13 @@
 - (void)encodeWithCoder:(NSCoder *)aCoder {
     [super encodeWithCoder:aCoder];
     ORK_ENCODE_DOUBLE(aCoder, minimumDuration);
+    ORK_DECODE_BOOL(aCoder, beforeWorkout);
 }
 
 - (instancetype)copyWithZone:(NSZone *)zone {
     __typeof(self) step = [super copyWithZone:zone];
     step.minimumDuration = self.minimumDuration;
+    step.beforeWorkout = self.beforeWorkout;
     return step;
 }
 
@@ -124,11 +130,12 @@
     
     __typeof(self) castObject = object;
     return (isParentSame &&
+            (self.beforeWorkout == castObject.beforeWorkout) &&
             (self.minimumDuration == castObject.minimumDuration));
 }
 
 - (NSUInteger)hash {
-    return [super hash] ^ (NSInteger)self.minimumDuration;
+    return [super hash] ^ (NSInteger)self.minimumDuration ^ (NSInteger)self.beforeWorkout;
 }
 
 @end

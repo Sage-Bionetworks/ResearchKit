@@ -30,59 +30,37 @@
  */
 
 
-@import CoreMotion;
+@import CoreLocation;
 #import <ResearchKit/ORKTypes.h>
 
 
 NS_ASSUME_NONNULL_BEGIN
 
-
-@interface CMAccelerometerData (ORKJSONDictionary)
+@interface CLLocation (ORKJSONDictionary)
 
 /**
- Convert the accelerometer data into a JSON coded object.
+ Convert the location to a json coding object.
  
- @return A dictionary with the properties of the accelerometer data.
+ @return    JSON object
  */
-- (NSDictionary<NSString *, id> *)ork_jsonCodingObject;
+- (NSDictionary<NSString *, id> *)ork_JSONDictionary;
+
+/**
+ Convert the location to a json coding object.
+ 
+ @param     relativeDistanceOnly    Encode the distance and bearing rather than the latitude and longitude
+ @param     previous                Previous location
+ @param     timestamp               If not nil, this value will be recorded for the timestamp. Otherwise, the "timestamp" key will map to an ISO-8601 formatted date.
+ 
+ @return    JSON object
+ */
+- (NSDictionary<NSString *, id> *)ork_JSONDictionaryWithRelativeDistanceOnly:(BOOL)relativeDistanceOnly previous:(nullable CLLocation *)previous timestamp:(nullable id)timestamp;
+
+/**
+ The direction of travel (in degrees) between two locations
+ */
+- (CLLocationDirection)bearingFromLocation:(CLLocation *)previousLocation;
 
 @end
-
-
-/**
- `CMAccelerometerData` is readonly so this object allows accessing the 
- object that has been json encoded.
- */
-ORK_CLASS_AVAILABLE
-@interface ORKAccelerometerData : NSObject <NSCopying>
-
-/**
- Time at which the item is valid.
- */
-@property (nonatomic) NSTimeInterval timestamp;
-
-/**
- The acceleration measured by the accelerometer.
- */
-@property (nonatomic) CMAcceleration acceleration;
-
-/**
- Returns a new acceleration data from the json coding object returned by encoding the `CMAccelerometerData`.
- 
- @param codingObject    The coding object to use to initialize the acceleration data object.
- 
- @return A new acceleration data object.
- */
-- (instancetype)initWithCodingObject:(NSDictionary<NSString *, id> *)codingObject NS_DESIGNATED_INITIALIZER;
-
-/**
- Convert the accelerometer data into a JSON coded object.
- 
- @return A dictionary with the properties of the accelerometer data.
- */
-- (NSDictionary<NSString *, id> *)ork_jsonCodingObject;
-
-@end
-
 
 NS_ASSUME_NONNULL_END

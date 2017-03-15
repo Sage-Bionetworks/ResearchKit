@@ -1,5 +1,6 @@
 /*
- Copyright (c) 2017, Sage Bionetworks. All rights reserved.
+ Copyright (c) 2015, Apple Inc. All rights reserved.
+ Copyright (c) 2017, Sage Bionetworks.
  
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
@@ -28,21 +29,27 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@import Foundation;
-#import <ResearchKit/ORKDefines.h>
-#import <ResearchKit/ORKQuestionStep.h>
 
-NS_ASSUME_NONNULL_BEGIN
+#import "CMAccelerometerData+ORKJSONDictionary.h"
 
-@class ORKTaskResult;
+#import "ORKHelpers_Internal.h"
 
-ORK_CLASS_AVAILABLE
-@interface ORKHeartRateDeviceNotFoundStep : ORKQuestionStep
 
-- (instancetype)initWithIdentifier:(NSString *)identifier
-                        deviceName:(nullable NSString *)deviceName
-                            result:(nullable ORKTaskResult *)taskResult;
+@implementation CMAccelerometerData (ORKJSONDictionary)
+
+- (NSDictionary *)ork_JSONDictionary {
+    return [self ork_JSONDictionaryWithTimestamp:self.timestamp consolidated:NO];
+}
+
+- (NSDictionary *)ork_JSONDictionaryWithTimestamp:(NSTimeInterval)timestamp consolidated:(BOOL)consolidated {
+    
+    NSString *format = consolidated ? @"acceleration_%@" : @"%@";
+    NSDictionary *dictionary = @{@"timestamp": [NSDecimalNumber numberWithDouble:timestamp],
+                                 [NSString stringWithFormat:format, @"x"]: [NSDecimalNumber numberWithDouble:self.acceleration.x],
+                                 [NSString stringWithFormat:format, @"y"]: [NSDecimalNumber numberWithDouble:self.acceleration.y],
+                                 [NSString stringWithFormat:format, @"z"]: [NSDecimalNumber numberWithDouble:self.acceleration.z]
+                                 };
+    return dictionary;
+}
 
 @end
-
-NS_ASSUME_NONNULL_END

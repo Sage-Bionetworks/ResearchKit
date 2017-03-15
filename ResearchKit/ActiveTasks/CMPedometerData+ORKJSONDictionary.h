@@ -38,6 +38,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSDictionary *)ork_JSONDictionary;
 
+- (NSDictionary *)ork_JSONDictionaryWithOffset:(NSTimeInterval)offset;
+
 @end
 
 NS_ASSUME_NONNULL_END

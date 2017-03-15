@@ -35,6 +35,7 @@
 
 #import "ORKHelpers_Internal.h"
 
+
 @implementation NSError (ORKJSONCodingObject)
 
 - (NSDictionary<NSString *, id> *)ork_jsonCodingObject {

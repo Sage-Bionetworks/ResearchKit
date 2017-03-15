@@ -156,9 +156,9 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
     public var startedFromPhone = false
     
     /**
-     Should the connector timeout after a given duration?
+     Should the connector timeout after a given duration? Default = 15 minutes.
      */
-    public var workoutDuration: TimeInterval = 0 {
+    public var workoutDuration: TimeInterval = 15.0 * 60.0 {
         didSet {
             if workoutDuration > 0 && timer == nil && _workoutSession != nil {
                 startTimer()
@@ -470,6 +470,7 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
             guard let strongSelf = self, !strongSelf.isPaused, let querySamples = samples else { return }
             strongSelf.process(samples: querySamples, quantityTypeIdentifier: quantityTypeIdentifier)
         }
+        checkWorkoutDuration()
     }
     
     
@@ -485,6 +486,10 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
     }
     
     func timerDidFire(timer: Timer) {
+        checkWorkoutDuration()
+    }
+    
+    func checkWorkoutDuration() {
         guard workoutDuration > 0 && _workoutSession != nil else { return }
         DispatchQueue.main.async {
             let duration = ORKWorkoutUtilities.computeDurationOfWorkout(withEvents: self.workoutEvents, startDate: self.workoutStartDate, endDate: nil)
@@ -604,13 +609,13 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
                 
             case ORKWorkoutCommand.stop:
                 stopWorkout()
-                WKInterfaceDevice.current().play(.stop)
+                WKInterfaceDevice.current().play(.notification)
                 
             case ORKWorkoutCommand.startMoving:
-                WKInterfaceDevice.current().play(.start)
+                WKInterfaceDevice.current().play(.notification)
                 
             case ORKWorkoutCommand.stopMoving:
-                WKInterfaceDevice.current().play(.stop)
+                WKInterfaceDevice.current().play(.notification)
                 
             default: break
             }
