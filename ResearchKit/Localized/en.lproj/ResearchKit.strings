@@ -280,6 +280,10 @@
 "CARDIO_POST_SURVEY_CHOICE_FEELING_TIRED" = "Feeling tired";
 "CARDIO_POST_SURVEY_CHOICE_PAIN" = "Pain or physical discomfort";
 "CARDIO_POST_SURVEY_CHOICE_INTERRUPTED" = "Interrupted";
+"CARDIO_OUTDOOR_INSTRUCTION_TITLE" = "Please move outdoors";
+"CARDIO_OUTDOOR_INSTRUCTION_TEXT" = "Your phone GPS indicates that you are currently indoors. Please step outdoors to before continuing.";
+"CARDIO_OUTDOOR_ALREADY_OUTSIDE" = "I am already outdoors.";
+"CARDIO_OUTDOOR_CONTINUE" = "I have moved outdoors and I am ready to continue.";
 
 /* Watch Connectivity */
 "WATCH_SESSION_ERROR_DESCRIPTION_NOT_SUPPORTED" = "The Apple Watch is not supported by this iOS device.";

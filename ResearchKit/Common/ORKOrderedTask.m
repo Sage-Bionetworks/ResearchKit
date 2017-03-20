@@ -679,6 +679,7 @@ void ORKStepArrayAddStep(NSMutableArray *array, ORKStep *step) {
                                intendedUseDescription:(nullable NSString *)intendedUseDescription
                                          walkDuration:(NSTimeInterval)walkDuration
                                          restDuration:(NSTimeInterval)restDuration
+                                 relativeDistanceOnly:(BOOL)relativeDistanceOnly
                                               options:(ORKPredefinedTaskOption)options {
     
     NSDateComponentsFormatter *formatter = [self textTimeFormatter];
@@ -765,24 +766,30 @@ void ORKStepArrayAddStep(NSMutableArray *array, ORKStep *step) {
         ORKCountdownStep *countdownStep = [[ORKCountdownStep alloc] initWithIdentifier:ORKCountdownStepIdentifier];
         countdownStep.stepDuration = 5.0;
 
-        // Initialize a walking step with only a pedometer and heart rate
-        ORKPredefinedRecorderOption walkOptions =
-            ORKPredefinedRecorderOptionExcludeAccelerometer |
-            ORKPredefinedRecorderOptionExcludeDeviceMotion |
-            ORKPredefinedRecorderOptionExcludeLocation;
-        ORKStep *walkingStep = [ORKFitnessStep fitnessStepWithIdentifier:ORKFitnessWalkStepIdentifier
-                                                            walkDuration:walkDuration
-                                                                 options:walkOptions
-                                                    relativeDistanceOnly:YES];
+        ORKFitnessStep *fitnessStep = [[ORKFitnessStep alloc] initWithIdentifier:ORKFitnessWalkStepIdentifier];
+        fitnessStep.stepDuration = walkDuration;
+        fitnessStep.title = [NSString stringWithFormat:ORKLocalizedString(@"FITNESS_WALK_INSTRUCTION_FORMAT", nil), [formatter stringFromTimeInterval:walkDuration]];
+        fitnessStep.spokenInstruction = fitnessStep.title;
+        fitnessStep.recorderConfigurations = [ORKFitnessStep recorderConfigurationsWithOptions:(ORKPredefinedRecorderOption)options relativeDistanceOnly:relativeDistanceOnly standingStill:NO];
+        fitnessStep.shouldContinueOnFinish = YES;
+        fitnessStep.optional = NO;
+        fitnessStep.shouldStartTimerAutomatically = YES;
+        fitnessStep.shouldTintImages = YES;
+        fitnessStep.image = [UIImage imageNamed:@"walkingman" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
+        fitnessStep.shouldVibrateOnStart = YES;
+        fitnessStep.shouldPlaySoundOnStart = YES;
+        fitnessStep.watchInstruction = ORKLocalizedString(@"FITNESS_WALK_INSTRUCTION_WATCH", nil);
+        fitnessStep.beginCommand = ORKWorkoutCommandStartMoving;
+        fitnessStep.shouldConsolidateRecorders = YES;
         
-        // Initialize the rest step to include all the recorders
         ORKHeartRateCaptureStep *restStep = [[ORKHeartRateCaptureStep alloc] initWithIdentifier:ORKWorkoutAfterStepIdentifier];
         restStep.stepDuration = restDuration;
         restStep.minimumDuration = restDuration;
         
         ORKWorkoutStep *step = [[ORKWorkoutStep alloc] initWithIdentifier:ORKWorkoutStepIdentifier
-                                                              motionSteps:@[pocketStep, countdownStep, walkingStep]
+                                                              motionSteps:@[pocketStep, countdownStep, fitnessStep]
                                                                  restStep:restStep
+                                                     relativeDistanceOnly:relativeDistanceOnly
                                                                   options:(ORKPredefinedRecorderOption)options];
         
         ORKStepArrayAddStep(steps, step);
@@ -846,7 +853,6 @@ void ORKStepArrayAddStep(NSMutableArray *array, ORKStep *step) {
                                           options:(ORKPredefinedTaskOption)options {
     
     NSDateComponentsFormatter *formatter = [self textTimeFormatter];
-    NSArray *recorderConfigurations = [ORKFitnessStep recorderConfigurationsWithOptions:(ORKPredefinedRecorderOption)options relativeDistanceOnly:NO];
     
     NSMutableArray *steps = [NSMutableArray array];
     if (!(options & ORKPredefinedTaskOptionExcludeInstructions)) {
@@ -885,7 +891,7 @@ void ORKStepArrayAddStep(NSMutableArray *array, ORKStep *step) {
             fitnessStep.stepDuration = walkDuration;
             fitnessStep.title = [NSString stringWithFormat:ORKLocalizedString(@"FITNESS_WALK_INSTRUCTION_FORMAT", nil), [formatter stringFromTimeInterval:walkDuration]];
             fitnessStep.spokenInstruction = fitnessStep.title;
-            fitnessStep.recorderConfigurations = recorderConfigurations;
+            fitnessStep.recorderConfigurations = [ORKFitnessStep recorderConfigurationsWithOptions:(ORKPredefinedRecorderOption)options relativeDistanceOnly:NO standingStill:NO];
             fitnessStep.shouldContinueOnFinish = YES;
             fitnessStep.optional = NO;
             fitnessStep.shouldStartTimerAutomatically = YES;
@@ -906,7 +912,7 @@ void ORKStepArrayAddStep(NSMutableArray *array, ORKStep *step) {
             stillStep.stepDuration = restDuration;
             stillStep.title = [NSString stringWithFormat:ORKLocalizedString(@"FITNESS_SIT_INSTRUCTION_FORMAT", nil), [formatter stringFromTimeInterval:restDuration]];
             stillStep.spokenInstruction = stillStep.title;
-            stillStep.recorderConfigurations = recorderConfigurations;
+            stillStep.recorderConfigurations = [ORKFitnessStep recorderConfigurationsWithOptions:(ORKPredefinedRecorderOption)options relativeDistanceOnly:NO standingStill:YES];
             stillStep.shouldContinueOnFinish = YES;
             stillStep.optional = NO;
             stillStep.shouldStartTimerAutomatically = YES;

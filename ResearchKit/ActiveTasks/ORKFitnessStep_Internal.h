@@ -33,9 +33,8 @@
 @interface ORKFitnessStep ()
 
 + (NSArray *)recorderConfigurationsWithOptions:(ORKPredefinedRecorderOption)options
-                          relativeDistanceOnly:(BOOL)relativeDistanceOnly;
-
-+ (instancetype)fitnessStepWithIdentifier:(NSString *)identifier walkDuration:(NSTimeInterval)walkDuration options:(ORKPredefinedRecorderOption)options relativeDistanceOnly:(BOOL)relativeDistanceOnly;
+                          relativeDistanceOnly:(BOOL)relativeDistanceOnly
+                                 standingStill:(BOOL)standingStill;
 
 - (void)ork_superValidateParameters;
 

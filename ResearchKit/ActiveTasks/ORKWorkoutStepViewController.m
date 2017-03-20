@@ -28,16 +28,19 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 #import "ORKWorkoutStepViewController.h"
 #import "ORKPageStepViewController_Internal.h"
 #import "ORKStepViewController_Internal.h"
 
 #import "ORKHeartRateCaptureStep.h"
-#import "ORKHeartRateCaptureStepViewController_Internal.h"
+#import "ORKHeartRateCaptureStepViewController.h"
 #import "ORKFitnessStepViewController_Internal.h"
 
 #import "ORKActiveStep_Internal.h"
+#import "ORKDataLogger.h"
 #import "ORKHealthQuantityTypeRecorder_Internal.h"
+#import "ORKLocationRecorder.h"
 #import "ORKPageStep_Private.h"
 #import "ORKWorkoutStep_Private.h"
 
@@ -47,20 +50,38 @@
 #import "ORKHelpers_Internal.h"
 #import "ORKSkin.h"
 
+
+typedef NS_OPTIONS(NSInteger, ORKWorkoutStepWatchState) {
+    
+    ORKWorkoutStepWatchStateNotStarted  = 0,
+    
+    ORKWorkoutStepWatchStateRunning     = 1,
+    ORKWorkoutStepWatchStateStarting    = ORKWorkoutStepWatchStateRunning | 2,
+    ORKWorkoutStepWatchStateStopping    = ORKWorkoutStepWatchStateRunning | 4,
+    
+    ORKWorkoutStepWatchStateStopped     = 8,
+    ORKWorkoutStepWatchStateFailed      = ORKWorkoutStepWatchStateStopped | 16,
+    ORKWorkoutStepWatchStateUserStopped = ORKWorkoutStepWatchStateStopped | 32,
+    
+} ORK_ENUM_AVAILABLE;
+
+
+NSString * const ORKStepMarkerKey = @"step_marker";
+NSString * const ORKWorkoutWatchHeartRateKey = @"bpm_watch";
+
 @interface ORKWorkoutStepViewController () <ORKRecorderDelegate>
 
-@property (nonatomic, strong) NSMutableArray *messagesToSend;
-@property (nonatomic, assign) BOOL workoutRunning;
+@property (nonatomic, strong) ORKWorkoutMessage *pendingMessage;
+@property (nonatomic, assign) ORKWorkoutStepWatchState state;
 
 @end
+
 
 @implementation ORKWorkoutStepViewController {
     
     // state management
     BOOL _started;
-    BOOL _connecting;
-    BOOL _workoutFailed;
-    BOOL _userEndedWorkout;
+    BOOL _stopped;
     NSDate *_workoutStartDate;
     ORKDevice *_device;
     
@@ -68,8 +89,10 @@
     NSArray *_results;
     
     // recorders
+    ORKDataLogRecorder *_watchRecorder;
     NSArray *_recorders;
     NSDictionary *_healthRecorders;
+    ORKLocationRecorder *_locationRecorder;
 }
 
 - (ORKWorkoutStep *)workoutStep {
@@ -78,13 +101,43 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    ORK_Log_Debug(@"%@",self);
     
     // Wait for animation complete
     dispatch_async(dispatch_get_main_queue(), ^{
         [self startRecorders];
     });
 }
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    // Always stop the recorders and watch
+    [self stopRecorders];
+}
+
+- (void)stepViewControllerWillAppear:(ORKStepViewController *)stepViewController {
+    [super stepViewControllerWillAppear:stepViewController];
+    
+    // Timestamp the start of the step
+    NSTimeInterval timestamp = _watchRecorder.referenceUptime > 0 ? [NSProcessInfo processInfo].systemUptime - _watchRecorder.referenceUptime : 0;
+    NSDictionary *json = @{ORKRecorderTimestampKey  : [NSDecimalNumber numberWithDouble:timestamp],
+                           ORKStepMarkerKey         : stepViewController.step.identifier};
+    [_watchRecorder.logger append:json error:nil];
+    
+    // Reset the location recorder
+    if ([stepViewController.step isKindOfClass:[ORKFitnessStep class]]) {
+        BOOL standingStill = ((ORKFitnessStep *)stepViewController.step).isStandingStill;
+        ORKLocationRecorderConfiguration *config = (ORKLocationRecorderConfiguration *)_locationRecorder.configuration;
+        if (config.standingStill != standingStill) {
+            [_locationRecorder resetTotalDistanceWithInitialLocation:_locationRecorder.mostRecentLocation];
+            config.standingStill = standingStill;
+        }
+        if ([stepViewController isKindOfClass:[ORKHeartRateCaptureStepViewController class]]) {
+            ((ORKHeartRateCaptureStepViewController *)stepViewController).locationRecorder = _locationRecorder;
+        }
+    }
+}
+
 - (void)stepViewControllerDidAppear:(ORKStepViewController *)stepViewController {
     [super stepViewControllerDidAppear:stepViewController];
     [self sendMessageForStepViewController:stepViewController isStart:YES];
@@ -101,14 +154,14 @@
 }
 
 - (void)sendMessageForStepViewController:(ORKStepViewController *)stepViewController isStart:(BOOL)isStart {
-    if (!_workoutRunning) {
+    if (self.state != ORKWorkoutStepWatchStateRunning) {
         return;
     }
     
     // Send startup message
     ORKActiveStep *currentStep = (ORKActiveStep *)stepViewController.step;
     if ([currentStep isKindOfClass:[ORKActiveStep class]]) {
-        ORKWorkoutMessage *message = isStart ? [currentStep watchStartMessage] : [currentStep watchFinishMessage];
+        ORKInstructionWorkoutMessage *message = isStart ? [currentStep watchStartMessage] : [currentStep watchFinishMessage];
         if (message) {
             [self sendWatchMessage:message];
         }
@@ -118,13 +171,13 @@
 - (ORKStepViewController *)stepViewControllerForStep:(ORKStep *)step {
     ORKStepViewController *stepViewController = [super stepViewControllerForStep:step];
     if ([stepViewController isKindOfClass:[ORKFitnessStepViewController class]]) {
-        ((ORKFitnessStepViewController *)stepViewController).usesWatch = _workoutRunning;
+        ((ORKFitnessStepViewController *)stepViewController).usesWatch = (self.state | ORKWorkoutStepWatchStateRunning);
     }
     return stepViewController;
 }
 
 - (ORKStep *)stepInDirection:(ORKPageNavigationDirection)delta {
-    if (_userEndedWorkout) {
+    if (self.state == ORKWorkoutStepWatchStateUserStopped) {
         return nil;
     } else {
         return [super stepInDirection:delta];
@@ -134,10 +187,10 @@
 #pragma mark - Error handling
 
 - (void)handleWatchError:(NSError *)error {
-    if (_workoutFailed) {
+    if (self.state & ORKWorkoutStepWatchStateStopped) {
         return;
     }
-    _workoutFailed = YES;
+    self.state = ORKWorkoutStepWatchStateFailed;
     
     // Save the error to the result set
     ORKErrorResult *errorResult = [[ORKErrorResult alloc] initWithIdentifier:ORKWorkoutResultIdentifierError];
@@ -180,7 +233,7 @@
         return;
     }
     
-    _connecting = YES;
+    self.state = ORKWorkoutStepWatchStateStarting;
     WCSession *session = [WCSession defaultSession];
     session.delegate = self;
     
@@ -192,7 +245,7 @@
 }
 
 - (void)watchSessionActivationCompleted:(WCSession *)session {
-    if (_workoutRunning) {
+    if (self.state == ORKWorkoutStepWatchStateRunning) {
         [self sendPendingMessages];
         return;
     } else if (!session.isPaired) {
@@ -219,10 +272,9 @@
 }
 
 - (void)handleStartAppComplete:(BOOL)success error:(NSError *)error {
-    _connecting = NO;
     if (success) {
         ORK_Log_Debug(@"Health workout session started");
-        _workoutRunning = YES;
+        self.state = ORKWorkoutStepWatchStateRunning;
         
         // Send startup message
         [self sendMessageForStepViewController:[self currentStepViewController] isStart:YES];
@@ -234,61 +286,78 @@
 
 #pragma mark - message management
 
-- (dispatch_queue_t)messageQueue {
-    static dispatch_queue_t _messageQueue = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        _messageQueue = dispatch_queue_create("org.researchkit.ORKWorkoutStepViewController.messageQueue", DISPATCH_QUEUE_SERIAL);
-    });
-    return _messageQueue;
-}
-
-- (void)sendWatchMessage:(ORKWorkoutMessage *)message {
-    // Add message to the pending messages queue
-    [self queueMessage:[message dictionaryRepresentation]];
+- (void)sendWatchMessage:(ORKInstructionWorkoutMessage *)message {
+    if (![[NSThread currentThread] isMainThread]) {
+        ORKWeakTypeOf(self) weakSelf = self;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [weakSelf sendWatchMessage:message];
+        });
+        return;
+    }
+    
+    // Check the current state and only continue if the state is running
+    if (self.state != ORKWorkoutStepWatchStateRunning) {
+        return;
+    }
+    
+    // If this is a message to stop the workout then call this controller's version of that
+    // message instead of just putting the message in the queue
+    if ([message.command isEqualToString:ORKWorkoutCommandStop]) {
+        self.state = ORKWorkoutStepWatchStateStopping;
+    }
+    
+    // Set the pending message and call method to
+    self.pendingMessage = message;
     [self sendPendingMessages];
 }
 
-- (void)queueMessage:(NSDictionary<NSString *, id> *)message {
-    ORKWeakTypeOf(self) weakSelf = self;
-    dispatch_async(self.messageQueue, ^{
-        if (!weakSelf) { return; }
-        if (!weakSelf.messagesToSend) {
-            weakSelf.messagesToSend = [NSMutableArray new];
-        }
-        [weakSelf.messagesToSend addObject:message];
-    });
-}
-
 - (void)sendPendingMessages {
-    if (!_workoutRunning || (self.messagesToSend.count == 0)) {
+    
+    if (![[NSThread currentThread] isMainThread]) {
+        ORKWeakTypeOf(self) weakSelf = self;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [weakSelf sendPendingMessages];
+        });
+        return;
+    }
+    
+    // If not in a running state or there is no pending message then return
+    if (((self.state & ORKWorkoutStepWatchStateRunning) == 0) || (self.pendingMessage == nil)) {
         return;
     }
     
     WCSession *session = [WCSession defaultSession];
-    ORKWeakTypeOf(self) weakSelf = self;
     if ((session.activationState == WCSessionActivationStateActivated) && session.isReachable) {
-        dispatch_async(self.messageQueue, ^{
-            ORKStrongTypeOf(weakSelf) strongSelf = weakSelf;
-            for (NSDictionary *message in strongSelf.messagesToSend) {
-                [session sendMessage:message replyHandler:nil errorHandler:^(NSError * _Nonnull error) {
+        
+        // Copy the dictionary and clear the pending message
+        NSDictionary *message = [self.pendingMessage dictionaryRepresentation];
+        self.pendingMessage = nil;
+        if (self.state == ORKWorkoutStepWatchStateStopping) {
+            self.state = ORKWorkoutStepWatchStateStopped;
+        }
+        
+        // send the message
+        ORKWeakTypeOf(self) weakSelf = self;
+        [session sendMessage:message
+                replyHandler:nil
+                errorHandler:^(NSError * _Nonnull error) {
                     ORK_Log_Error(@"Failed to send watch message: %@", error);
                     [weakSelf handleWatchError:error];
                 }];
-            }
-            [strongSelf.messagesToSend removeAllObjects];
-        });
+        
     } else if (session.activationState == WCSessionActivationStateActivated) {
+        ORKWeakTypeOf(self) weakSelf = self;
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [weakSelf sendPendingMessages];
         });
+        
     } else {
         [session activateSession];
     }
 }
 
 - (NSDictionary *)forwardWatchMessage:(NSDictionary<NSString *, id> *)msg {
-    
+        
     ORKWorkoutMessage *workoutMessage = [ORKWorkoutMessage workoutMessageWithMessage:msg];
     
     if (!workoutMessage || !_workoutStartDate) {
@@ -301,17 +370,19 @@
         return @{};
     }
     
-    if (workoutMessage.workoutState == ORKWorkoutStateEnded) {
-        if (_workoutRunning) {
-            // If this is a stop message that was not received in response to the user stopping the
+    if ([workoutMessage.workoutState isEqualToString:ORKWorkoutStateEnded]) {
+        if (self.state == ORKWorkoutStepWatchStateRunning) {
+            // If this is a stop message that was received in response to the user stopping the
             // workout from the watch, then add the event to the result set
-            _userEndedWorkout = YES;
+            self.state = ORKWorkoutStepWatchStateUserStopped;
             ORKBooleanQuestionResult *boolResult = [[ORKBooleanQuestionResult alloc] initWithIdentifier:ORKWorkoutResultIdentifierUserEnded];
             boolResult.booleanAnswer = @YES;
             boolResult.startDate = workoutMessage.timestamp;
             _results = [_results arrayByAddingObject:boolResult] ? : @[boolResult];
         }
-        [self didStopWatchWorkout];
+        
+        // Unassign self as delegate
+        [WCSession defaultSession].delegate = nil;
     }
     
     if ([workoutMessage isKindOfClass:[ORKSamplesWorkoutMessage class]]) {
@@ -328,39 +399,32 @@
 }
 
 - (void)stopWatchWorkout {
-    if (!_workoutRunning) {
+    if (self.state & ORKWorkoutStepWatchStateStopped) {
         return;
     }
-    _workoutRunning = NO;
-    
-    // Send message to stop the workout
-    ORKInstructionWorkoutMessage *message = [[ORKInstructionWorkoutMessage alloc] init];
+
+    ORKInstructionWorkoutMessage *message = [[ORKInstructionWorkoutMessage alloc] initWithIdentifier:self.step.identifier];
     message.command = ORKWorkoutCommandStop;
     [self sendWatchMessage:message];
 }
 
-- (void)didStopWatchWorkout {
-    _workoutRunning = NO;
-    _workoutStartDate = nil;
-    
-    // Unassign self as delegate
-    [WCSession defaultSession].delegate = nil;
-    
-    // Flush the messages
-    ORKWeakTypeOf(self) weakSelf = self;
-    dispatch_async(self.messageQueue, ^{
-        weakSelf.messagesToSend = nil;
-    });
-}
-
 - (void)addHeathRecorderQuantitySamples:(NSArray<HKQuantitySample *> *)samples
                  quantityTypeIdentifier:(NSString *)quantityTypeIdentifier {
+    if (_stopped) {
+        return;
+    }
+    
     ORKHealthQuantityTypeRecorder *recorder = _healthRecorders[quantityTypeIdentifier];
     [recorder addQuantitySamples:samples];
     
-    if ([quantityTypeIdentifier isEqualToString:HKQuantityTypeIdentifierHeartRate] && !_device) {
-        HKQuantitySample *sample = [samples lastObject];
-        if (sample.device) {
+    HKQuantitySample *sample = [samples lastObject];
+    if ([quantityTypeIdentifier isEqualToString:HKQuantityTypeIdentifierHeartRate] && (sample != nil)) {
+        NSTimeInterval timestamp = [sample.endDate timeIntervalSinceDate:_watchRecorder.startDate];
+        double bpm = [sample.quantity doubleValueForUnit:[HKUnit bpmUnit]];
+        NSDictionary *json = @{ORKRecorderTimestampKey      : [NSDecimalNumber numberWithDouble:timestamp],
+                               ORKWorkoutWatchHeartRateKey  : @(bpm)};
+        [_watchRecorder.logger append:json error:nil];
+        if (!_device && sample.device) {
             _device = [[ORKDevice alloc] initWithDevice:sample.device];
         }
     }
@@ -375,7 +439,6 @@
             ORK_Log_Debug(@"Watch session did become active: %@", session);
             [weakSelf watchSessionActivationCompleted:session];
         } else {
-            weakSelf.workoutRunning = NO;
             ORK_Log_Error(@"Watch failed to activate: %@", error);
             [weakSelf handleWatchError:error];
         }
@@ -460,11 +523,23 @@
         return;
     }
     
-    // Stop any existing recorders
     NSMutableArray *recorders = [NSMutableArray new];
     NSMutableDictionary *healthRecorders = [NSMutableDictionary new];
     
-    for (ORKRecorderConfiguration * provider in self.workoutStep.recorderConfigurations) {
+    // Setup the consolidated recorder that the other recorders will point at
+    _watchRecorder = [[ORKDataLogRecorder alloc] initWithIdentifier:ORKWorkoutResultIdentifierWorkoutData
+                                                               step:self.step
+                                                    outputDirectory:self.outputDirectory];
+    _watchRecorder.delegate = self;
+    NSError *error = nil;
+    _watchRecorder.logger = [_watchRecorder makeJSONDataLoggerWithError:&error];
+    if (error) {
+        [self recorder:_watchRecorder didFailWithError:error];
+        return;
+    }
+
+    // Add the other recorders
+    for (ORKRecorderConfiguration *provider in self.workoutStep.recorderConfigurations) {
         // If the outputDirectory is nil, recorders which require one will generate an error.
         // We start them anyway, because we don't know which recorders will require an outputDirectory.
         ORKRecorder *recorder = [provider recorderForStep:self.step
@@ -472,15 +547,25 @@
         recorder.configuration = provider;
         recorder.delegate = self;
         
+        // Not all the recorders support using a consolidated log file but the ones that don't
+        // will ignore this property.
+        recorder.sharedLogger = _watchRecorder.logger;
+        
         [recorders addObject:recorder];
         
         if ([recorder isKindOfClass:[ORKHealthQuantityTypeRecorder class]]) {
             ORKHealthQuantityTypeRecorder *healthRecorder = (ORKHealthQuantityTypeRecorder *)recorder;
             healthRecorders[healthRecorder.quantityType.identifier] = healthRecorder;
         }
+        
+        if ([recorder isKindOfClass:[ORKLocationRecorder class]]) {
+            _locationRecorder = (ORKLocationRecorder *)recorder;
+        }
     }
-    _recorders = recorders;
-    _healthRecorders = healthRecorders;
+    
+    [recorders addObject:_watchRecorder];
+    _recorders = [recorders copy];
+    _healthRecorders = [healthRecorders copy];
 }
 
 - (void)setOutputDirectory:(NSURL *)outputDirectory {
@@ -494,8 +579,11 @@
     }
     _started = YES;
     
+    NSTimeInterval referenceUptime = [NSProcessInfo processInfo].systemUptime;
+    
     // Start recorders
     for (ORKRecorder *recorder in _recorders) {
+        recorder.referenceUptime = referenceUptime;
         [recorder viewController:self willStartStepWithView:self.view];
         [recorder start];
     }
@@ -503,6 +591,12 @@
 }
 
 - (void)stopRecorders {
+    if (_stopped) {
+        return;
+    }
+    _stopped = YES;
+    
+    [self stopWatchWorkout];
     for (ORKRecorder *recorder in _recorders) {
         [recorder stop];
     }

@@ -110,6 +110,7 @@
 - (instancetype)copyWithZone:(NSZone *)zone {
     ORKActiveStep *step = [super copyWithZone:zone];
     step.stepDuration = self.stepDuration;
+    step.shouldConsolidateRecorders = self.shouldConsolidateRecorders;
     step.shouldStartTimerAutomatically = self.shouldStartTimerAutomatically;
     step.shouldSpeakCountDown = self.shouldSpeakCountDown;
     step.shouldSpeakRemainingTimeAtHalfway = self.shouldSpeakRemainingTimeAtHalfway;
@@ -135,6 +136,7 @@
     self = [super initWithCoder:aDecoder];
     if (self ) {
         ORK_DECODE_DOUBLE(aDecoder, stepDuration);
+        ORK_DECODE_BOOL(aDecoder, shouldConsolidateRecorders);
         ORK_DECODE_BOOL(aDecoder, shouldStartTimerAutomatically);
         ORK_DECODE_BOOL(aDecoder, shouldSpeakCountDown);
         ORK_DECODE_BOOL(aDecoder, shouldSpeakRemainingTimeAtHalfway);
@@ -159,6 +161,7 @@
 - (void)encodeWithCoder:(NSCoder *)aCoder {
     [super encodeWithCoder:aCoder];
     ORK_ENCODE_DOUBLE(aCoder, stepDuration);
+    ORK_ENCODE_BOOL(aCoder, shouldConsolidateRecorders);
     ORK_ENCODE_BOOL(aCoder, shouldStartTimerAutomatically);
     ORK_ENCODE_BOOL(aCoder, shouldSpeakCountDown);
     ORK_ENCODE_BOOL(aCoder, shouldSpeakRemainingTimeAtHalfway);
@@ -191,6 +194,7 @@
             ORKEqualObjects(self.recorderConfigurations, castObject.recorderConfigurations) &&
             ORKEqualObjects(self.image, castObject.image) &&
             (self.stepDuration == castObject.stepDuration) &&
+            (self.shouldConsolidateRecorders == castObject.shouldConsolidateRecorders) &&
             (self.shouldShowDefaultTimer == castObject.shouldShowDefaultTimer) &&
             (self.shouldStartTimerAutomatically == castObject.shouldStartTimerAutomatically) &&
             (self.shouldSpeakCountDown == castObject.shouldSpeakCountDown) &&

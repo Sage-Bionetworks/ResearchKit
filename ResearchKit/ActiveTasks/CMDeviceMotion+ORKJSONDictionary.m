@@ -35,13 +35,18 @@
 @implementation CMDeviceMotion (ORKJSONDictionary)
 
 - (NSDictionary *)ork_JSONDictionary {
+    return [self ork_JSONDictionaryWithTimestamp:self.timestamp consolidated:NO];
+}
+
+- (NSDictionary *)ork_JSONDictionaryWithTimestamp:(NSTimeInterval)timestamp consolidated:(BOOL)consolidated {
     CMQuaternion attitude = self.attitude.quaternion;
     CMRotationRate rotationRate = self.rotationRate;
     CMAcceleration gravity = self.gravity;
     CMAcceleration userAccel = self.userAcceleration;
     CMCalibratedMagneticField field = self.magneticField;
     
-    NSDictionary *dictionary = @{@"timestamp": [NSDecimalNumber numberWithDouble:self.timestamp],
+    if (!consolidated) {
+    NSDictionary *dictionary = @{@"timestamp": [NSDecimalNumber numberWithDouble:timestamp],
                                  @"attitude": @{
                                          @"x": [NSDecimalNumber numberWithDouble:attitude.x],
                                          @"y": [NSDecimalNumber numberWithDouble:attitude.y],
@@ -70,7 +75,31 @@
                                          @"accuracy": [NSDecimalNumber numberWithDouble:field.accuracy]
                                          }
                                  };
-    return dictionary;
+        return dictionary;
+        
+    } else {
+        // The schema should flatten the data into a consolidated format
+        NSDictionary *dictionary = @{@"timestamp": [NSDecimalNumber numberWithDouble:timestamp],
+                                     @"attitude_x": [NSDecimalNumber numberWithDouble:attitude.x],
+                                     @"attitude_y": [NSDecimalNumber numberWithDouble:attitude.y],
+                                     @"attitude_z": [NSDecimalNumber numberWithDouble:attitude.z],
+                                     @"attitude_w": [NSDecimalNumber numberWithDouble:attitude.w],
+                                     @"rotationRate_x": [NSDecimalNumber numberWithDouble:rotationRate.x],
+                                     @"rotationRate_y": [NSDecimalNumber numberWithDouble:rotationRate.y],
+                                     @"rotationRate_z": [NSDecimalNumber numberWithDouble:rotationRate.z],
+                                     @"gravity_x": [NSDecimalNumber numberWithDouble:gravity.x],
+                                     @"gravity_y": [NSDecimalNumber numberWithDouble:gravity.y],
+                                     @"gravity_z": [NSDecimalNumber numberWithDouble:gravity.z],
+                                     @"userAcceleration_x": [NSDecimalNumber numberWithDouble:userAccel.x],
+                                     @"userAcceleration_y": [NSDecimalNumber numberWithDouble:userAccel.y],
+                                     @"userAcceleration_z": [NSDecimalNumber numberWithDouble:userAccel.z],
+                                     @"magneticField_x": [NSDecimalNumber numberWithDouble:field.field.x],
+                                     @"magneticField_y": [NSDecimalNumber numberWithDouble:field.field.y],
+                                     @"magneticField_z": [NSDecimalNumber numberWithDouble:field.field.z],
+                                     @"magneticField_accuracy": [NSDecimalNumber numberWithDouble:field.accuracy]
+                                     };
+        return dictionary;
+    }
 }
 
 @end

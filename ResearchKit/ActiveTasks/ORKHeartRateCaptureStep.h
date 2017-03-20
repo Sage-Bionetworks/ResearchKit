@@ -28,9 +28,11 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 @import Foundation;
 #import <ResearchKit/ORKDefines.h>
 #import <ResearchKit/ORKFitnessStep.h>
+
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -44,6 +46,11 @@ ORK_CLASS_AVAILABLE
  Minimum time interval to run the step. 
  */
 @property (nonatomic) NSTimeInterval minimumDuration;
+
+/**
+ Is this measurement checking the user's heartrate before the workout? Default = `YES`.
+ */
+@property (nonatomic, getter=isBeforeWorkout) BOOL beforeWorkout;
 
 @end
 

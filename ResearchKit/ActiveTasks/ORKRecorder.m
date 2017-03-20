@@ -39,6 +39,10 @@
 #import "ORKHelpers_Internal.h"
 
 
+NSString *const ORKRecorderIdentifierKey = @"recorderId";
+NSString *const ORKRecorderTimestampKey = @"timestamp";
+
+
 @implementation ORKRecorderConfiguration
 
 + (instancetype)new {
@@ -258,6 +262,83 @@
         }
         [self finishRecordingWithError:error];
     }
+}
+
+@end
+
+
+@implementation ORKDataLogRecorder {
+    BOOL _isRecording;
+}
+
+@synthesize logger = _logger;
+
+- (ORKDataLogger *)logger {
+    return self.sharedLogger ? : _logger;
+}
+
+- (void)dealloc {
+    [_logger finishCurrentLog];
+}
+
+- (void)createLoggerIfNeeded {
+    if (!self.logger) {
+        // Only create a logger if not already using a shared logger
+        NSError *error = nil;
+        _logger = [self makeJSONDataLoggerWithError:&error];
+        if (!_logger) {
+            [self finishRecordingWithError:error];
+            return;
+        }
+    }
+}
+
+- (void)start {
+    if (_isRecording) {
+        [super start];
+        return;
+    }
+    _isRecording = YES;
+    
+    [self createLoggerIfNeeded];
+
+    [super start];
+}
+
+- (void)stop {
+    if (!_isRecording) {
+        [super stop];
+        return;
+    }
+    _isRecording = NO;
+    
+    [_logger finishCurrentLog];
+    
+    NSError *error = nil;
+    __block NSURL *fileUrl = nil;
+    [_logger enumerateLogs:^(NSURL *logFileUrl, BOOL *stop) {
+        fileUrl = logFileUrl;
+    } error:&error];
+    
+    [self reportFileResultWithFile:fileUrl error:error];
+    _logger = nil;
+    
+    [super stop];
+}
+
+- (void)finishRecordingWithError:(NSError *)error {
+    [self cleanupLogger];
+    [super finishRecordingWithError:error];
+}
+
+- (void)reset {
+    [self cleanupLogger];
+    [super reset];
+}
+
+- (void)cleanupLogger {
+    _isRecording = NO;
+    _logger = nil;
 }
 
 @end

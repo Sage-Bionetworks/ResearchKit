@@ -28,9 +28,6 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <ResearchKit/CLLocation+JSONCodingObject.h>
-
-#import <ResearchKit/CMAccelerometerData+JSONCodingObject.h>
 
 #import <ResearchKit/HKDevice+JSONCodingObject.h>
 #import <ResearchKit/HKQuantitySample+JSONCodingObject.h>
@@ -38,4 +35,3 @@
 #import <ResearchKit/HKWorkoutEvent+JSONCodingObject.h>
 
 #import <ResearchKit/NSError+JSONCodingObject.h>
-

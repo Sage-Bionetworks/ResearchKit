@@ -31,11 +31,13 @@
 #import "ORKFitnessStepViewController.h"
 #import "ORKHealthQuantityTypeRecorder.h"
 #import "ORKPedometerRecorder.h"
+#import "ORKLocationRecorder.h"
 
 @interface ORKFitnessStepViewController () <ORKHealthQuantityTypeRecorderDelegate, ORKPedometerRecorderDelegate>
 
 @property (nonatomic, readonly) BOOL usesCamera;
 @property (nonatomic) BOOL usesWatch;
+@property (nonatomic, weak) ORKLocationRecorder *locationRecorder;
 
 - (void)updateHeartRateWithQuantity:(HKQuantitySample *)quantity unit:(HKUnit *)unit;
 

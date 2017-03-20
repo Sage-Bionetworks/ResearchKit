@@ -40,6 +40,7 @@
 
 #import "ORKActiveStepViewController_Internal.h"
 #import "ORKFitnessStep.h"
+#import "ORKLocationRecorder.h"
 #import "ORKWorkoutStep_Private.h"
 #import "ORKStep_Private.h"
 #import "ORKResult.h"
@@ -67,13 +68,31 @@
 
 - (ORKStepResult *)result {
     ORKStepResult *sResult = [super result];
+    
+    NSMutableArray *results = [sResult.results mutableCopy] ? : [NSMutableArray new];
 
     if (_userEndedWorkout) {
         ORKBooleanQuestionResult *boolResult = [[ORKBooleanQuestionResult alloc] initWithIdentifier:ORKWorkoutResultIdentifierUserEnded];
         boolResult.booleanAnswer = @YES;
-        sResult.results = [sResult.results arrayByAddingObject:boolResult] ? : @[boolResult];
+        [results addObject:boolResult];
     }
     
+    CLLocation *location = self.locationRecorder.mostRecentLocation;
+    if (location) {
+        ORKNumericQuestionResult *speedResult = [[ORKNumericQuestionResult alloc] initWithIdentifier:ORKWorkoutResultIdentifierSpeed];
+        speedResult.numericAnswer = [NSDecimalNumber numberWithDouble:location.speed];
+        [results addObject:speedResult];
+        
+        ORKBooleanQuestionResult *outdoorsResult = [[ORKBooleanQuestionResult alloc] initWithIdentifier:ORKWorkoutResultIdentifierIsOutdoors];
+        outdoorsResult.booleanAnswer = @([self.locationRecorder isOutdoors]);
+        [results addObject:outdoorsResult];
+        
+        ORKNumericQuestionResult *distanceResult = [[ORKNumericQuestionResult alloc] initWithIdentifier:ORKWorkoutResultIdentifierDistanceTraveled];
+        distanceResult.numericAnswer = [NSDecimalNumber numberWithDouble:[self.locationRecorder distanceTraveled]];
+        [results addObject:distanceResult];
+    }
+    
+    sResult.results = results;
     return sResult;
 }
 
@@ -99,8 +118,9 @@
     if (quantity != nil) {
         _contentView.hasHeartRate = YES;
     }
-    if (quantity) {
-        _contentView.heartRate = [_hrFormatter stringFromNumber:@([quantity.quantity doubleValueForUnit:unit])];
+    double bpm = [quantity.quantity doubleValueForUnit:unit];
+    if (bpm > 0) {
+        _contentView.heartRate = [_hrFormatter stringFromNumber:@(bpm)];
     } else {
         _contentView.heartRate = @"--";
     }
@@ -109,7 +129,6 @@
 - (void)updateDistance:(double)distanceInMeters {
     _contentView.hasDistance = YES;
     _contentView.distanceInMeters = distanceInMeters;
-    
 }
 
 - (void)recordersDidChange {
@@ -125,6 +144,8 @@
             if ([[[rec1 quantityType] identifier] isEqualToString:HKQuantityTypeIdentifierHeartRate]) {
                 heartRateRecorder = (ORKHealthQuantityTypeRecorder *)recorder;
             }
+        } else if ([recorder isKindOfClass:[ORKLocationRecorder class]]) {
+            _locationRecorder = (ORKLocationRecorder *)recorder;
         }
     }
     

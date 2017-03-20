@@ -28,6 +28,7 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 #import "ORKHeartRateCameraInstructionStep.h"
 
 #import "ORKStepViewController_Internal.h"
@@ -37,6 +38,7 @@
 
 #import "ORKAnswerFormat.h"
 #import "ORKHelpers_Internal.h"
+
 
 @implementation ORKHeartRateCameraInstructionStep
 

@@ -50,72 +50,62 @@
     [super tearDown];
 }
 
-- (void)testORKAccelerometerData {
+- (void)testHKDeviceCoding {
+    HKDevice *input = [[HKDevice alloc] initWithName:@"device"
+                                         manufacturer:@"foo"
+                                                model:@"bar"
+                                      hardwareVersion:@"1"
+                                      firmwareVersion:@"2"
+                                      softwareVersion:@"3"
+                                      localIdentifier:nil
+                                  UDIDeviceIdentifier:nil];
     
-    NSTimeInterval timestamp = 5.0;
-    double x = 1.0;
-    double y = 2.0;
-    double z = 3.0;
-
-    NSDictionary *codingObject = @{@"timestamp": [NSDecimalNumber numberWithDouble:timestamp],
-                                   @"x": [NSDecimalNumber numberWithDouble:x],
-                                   @"y": [NSDecimalNumber numberWithDouble:y],
-                                   @"z": [NSDecimalNumber numberWithDouble:z]};
+    NSDictionary *json = [input ork_jsonCodingObject];
+    XCTAssertEqualObjects(json[@"name"], @"device");
+    XCTAssertEqualObjects(json[@"manufacturer"], @"foo");
+    XCTAssertEqualObjects(json[@"model"], @"bar");
+    XCTAssertEqualObjects(json[@"hardwareVersion"], @"1");
+    XCTAssertEqualObjects(json[@"firmwareVersion"], @"2");
+    XCTAssertEqualObjects(json[@"softwareVersion"], @"3");
     
-    ORKAccelerometerData *output = [[ORKAccelerometerData alloc] initWithCodingObject:codingObject];
-    XCTAssertNotNil(output);
-    XCTAssertEqual(output.timestamp, timestamp);
-    XCTAssertEqual(output.acceleration.x, x);
-    XCTAssertEqual(output.acceleration.y, y);
-    XCTAssertEqual(output.acceleration.z, z);
-    
-    NSDictionary *outputDict = [output ork_jsonCodingObject];
-    XCTAssertEqualObjects(outputDict, codingObject);
+    HKDevice *output = [HKDevice deviceWithCodingObject:json];
+    XCTAssertEqualObjects(input, output);
 }
 
-- (void)testORKRelativeLocation {
+- (void)testHKWorkoutConfigurationCoding {
+    HKWorkoutConfiguration *input = [[HKWorkoutConfiguration alloc] init];
+    input.locationType = HKWorkoutSessionLocationTypeOutdoor;
+    input.activityType = HKWorkoutActivityTypeBarre;
     
-    CLLocationDistance distance = 123.067;
-    CLLocationDirection bearing = 56.2;
-    CLLocationDistance altitude = 23.63;
-    CLLocationAccuracy horizontalAccuracy = 1.0;
-    CLLocationAccuracy verticalAccuracy = 2.0;
-    CLLocationDirection course = 290.0;
-    CLLocationSpeed speed = 55.0;
-    NSDate *timestamp = [NSDate date];
-    NSInteger floorLevel = 5;
-    
-    NSDictionary *dict1 = @{@"timestamp": ORKStringFromDateISO8601(timestamp)};
-    
-    ORKRelativeLocation *loc1 = [[ORKRelativeLocation alloc] initWithCodingObject:dict1];
-    XCTAssertEqualWithAccuracy(loc1.timestamp.timeIntervalSinceNow, timestamp.timeIntervalSinceNow, 0.001);
-    XCTAssertLessThan(loc1.horizontalAccuracy, 0.0);
-    XCTAssertLessThan(loc1.verticalAccuracy, 0.0);
-    XCTAssertLessThan(loc1.course, 0.0);
-    XCTAssertLessThan(loc1.speed, 0.0);
-    XCTAssertFalse(loc1.isValidFloorLevel);
+    NSDictionary *json = [input ork_jsonCodingObject];
+    XCTAssertEqualObjects(json[@"locationType"], @"outdoor");
+    XCTAssertEqualObjects(json[@"activityType"], @"barre");
 
-    NSMutableDictionary *dict2 = [dict1 mutableCopy];
-    dict2[@"distance"] = @(distance);
-    dict2[@"bearing"] = @(bearing);
-    dict2[@"altitude"] = @(altitude);
-    dict2[@"horizontalAccuracy"] = @(horizontalAccuracy);
-    dict2[@"verticalAccuracy"] = @(verticalAccuracy);
-    dict2[@"course"] = @(course);
-    dict2[@"speed"] = @(speed);
-    dict2[@"floor"] = @(floorLevel);
-    
-    ORKRelativeLocation *loc2 = [[ORKRelativeLocation alloc] initWithCodingObject:dict2];
-    XCTAssertEqualWithAccuracy(loc2.timestamp.timeIntervalSinceNow, timestamp.timeIntervalSinceNow, 0.001);
-    XCTAssertEqualWithAccuracy(loc2.distance, distance, 0.00001);
-    XCTAssertEqualWithAccuracy(loc2.bearing, bearing, 0.00001);
-    XCTAssertEqualWithAccuracy(loc2.horizontalAccuracy, horizontalAccuracy, 0.00001);
-    XCTAssertEqualWithAccuracy(loc2.verticalAccuracy, verticalAccuracy, 0.00001);
-    XCTAssertEqualWithAccuracy(loc2.course, course, 0.00001);
-    XCTAssertEqualWithAccuracy(loc2.speed, speed, 0.00001);
-    XCTAssertEqual(loc2.floorLevel, floorLevel);
-    XCTAssertTrue(loc2.isValidFloorLevel);
+    HKWorkoutConfiguration *output = [HKWorkoutConfiguration workoutConfigurationWithCodingObject:json];
+    XCTAssertEqualObjects(input, output);
 }
 
+- (void)testHKQuantitySample {
+    HKUnit *unit = [HKUnit bpmUnit];
+    HKQuantity *quantity = [HKQuantity quantityWithUnit:unit doubleValue:80];
+    HKQuantityType *quantityType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeartRate];
+    HKQuantitySample *input = [HKQuantitySample quantitySampleWithType:quantityType
+                                                       quantity:quantity
+                                                      startDate:[NSDate dateWithTimeIntervalSinceNow:-2]
+                                                        endDate:[NSDate dateWithTimeIntervalSinceNow:-1]];
+    
+    NSDictionary *json = [input ork_jsonCodingObject];
+    XCTAssertEqualObjects(json[@"type"], @"HKQuantityTypeIdentifierHeartRate");
+    XCTAssertTrue([json[@"startDate"] isKindOfClass:[NSString class]]);
+    XCTAssertTrue([json[@"endDate"] isKindOfClass:[NSString class]]);
+    XCTAssertTrue([json[@"value"] isKindOfClass:[NSNumber class]]);
+    XCTAssertTrue([json[@"unit"] isKindOfClass:[NSString class]]);
+
+    HKQuantitySample *output = [HKQuantitySample quantitySampleWithCodingObject:json];
+    XCTAssertEqualObjects(input.quantity, output.quantity);
+    XCTAssertEqualObjects(input.quantityType, output.quantityType);
+    XCTAssertEqualWithAccuracy([input.startDate timeIntervalSinceReferenceDate], [output.startDate timeIntervalSinceReferenceDate], 0.001);
+    XCTAssertEqualWithAccuracy([input.endDate timeIntervalSinceReferenceDate], [output.endDate timeIntervalSinceReferenceDate], 0.001);
+}
 
 @end

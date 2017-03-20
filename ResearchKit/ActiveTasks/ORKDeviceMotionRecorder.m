@@ -41,9 +41,7 @@
 @import CoreMotion;
 
 
-@interface ORKDeviceMotionRecorder () {
-    ORKDataLogger *_logger;
-}
+@interface ORKDeviceMotionRecorder ()
 
 @property (nonatomic, strong) CMMotionManager *motionManager;
 
@@ -68,10 +66,6 @@
     return self;
 }
 
-- (void)dealloc {
-    [_logger finishCurrentLog];
-}
-
 - (void)setFrequency:(double)frequency {
     if (frequency <= 0) {
         _frequency = 1;
@@ -86,16 +80,7 @@
 
 - (void)start {
     [super start];
-    
-    if (!_logger) {
-        NSError *error = nil;
-        _logger = [self makeJSONDataLoggerWithError:&error];
-        if (!_logger) {
-            [self finishRecordingWithError:error];
-            return;
-        }
-    }
-    
+        
     self.motionManager = [self createMotionManager];
     self.motionManager.deviceMotionUpdateInterval = 1.0 / _frequency;
     
@@ -106,7 +91,16 @@
     [self.motionManager startDeviceMotionUpdatesToQueue:[NSOperationQueue mainQueue] withHandler:^(CMDeviceMotion *data, NSError *error) {
          BOOL success = NO;
          if (data) {
-             success = [_logger append:[data ork_JSONDictionary] error:&error];
+             NSTimeInterval timestamp = data.timestamp;
+             if (self.referenceUptime > 0) {
+                 timestamp = (data.timestamp - self.referenceUptime);
+             }
+             BOOL consolidated = (self.sharedLogger != nil);
+             NSMutableDictionary *dict = [[data ork_JSONDictionaryWithTimestamp:timestamp consolidated:consolidated] mutableCopy];
+             if (consolidated) {
+                 dict[ORKRecorderIdentifierKey] = self.identifier;
+             }
+             success = [self.logger append:[dict copy] error:&error];
              id delegate = self.delegate;
              if ([delegate respondsToSelector:@selector(deviceMotionRecorderDidUpdateWithMotion:)]) {
                  [delegate deviceMotionRecorderDidUpdateWithMotion:data];
@@ -126,16 +120,7 @@
 
 - (void)stop {
     [self doStopRecording];
-    [_logger finishCurrentLog];
-    
-    NSError *error = nil;
-    __block NSURL *fileUrl = nil;
-    [_logger enumerateLogs:^(NSURL *logFileUrl, BOOL *stop) {
-        fileUrl = logFileUrl;
-    } error:&error];
-    
-    [self reportFileResultWithFile:fileUrl error:error];
-    
+
     [super stop];
 }
 
@@ -157,12 +142,6 @@
 
 - (NSString *)mimeType {
     return @"application/json";
-}
-
-- (void)reset {
-    [super reset];
-    
-    _logger = nil;
 }
 
 @end

@@ -28,21 +28,36 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@import Foundation;
-#import <ResearchKit/ORKDefines.h>
-#import <ResearchKit/ORKQuestionStep.h>
 
-NS_ASSUME_NONNULL_BEGIN
+import UIKit
+import ResearchKit
 
-@class ORKTaskResult;
+class DetailResultViewController: UIViewController {
+    
+    var result: ORKResult!
+    
+    @IBOutlet var textView: UITextView?
 
-ORK_CLASS_AVAILABLE
-@interface ORKHeartRateDeviceNotFoundStep : ORKQuestionStep
+    override func viewDidLoad() {
+        super.viewDidLoad()
 
-- (instancetype)initWithIdentifier:(NSString *)identifier
-                        deviceName:(nullable NSString *)deviceName
-                            result:(nullable ORKTaskResult *)taskResult;
+        if (self.textView == nil) {
+            self.textView = UITextView(frame: self.view.bounds)
+            self.textView!.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            self.view.addSubview(self.textView!)
+        }
+        
+        if let fileResult = result as? ORKFileResult,
+            let url = fileResult.fileURL,
+            let data = try? Data(contentsOf: url),
+            let json = try? JSONSerialization.jsonObject(with: data, options: []) {
+            
+            self.textView?.text = "\(result!)\n\n\(json)"
+        }
+        else {
+            self.textView?.text = "\(result!)"
+        }
+        
+    }
 
-@end
-
-NS_ASSUME_NONNULL_END
+}

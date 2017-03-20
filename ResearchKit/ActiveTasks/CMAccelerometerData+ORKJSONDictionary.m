@@ -1,5 +1,6 @@
 /*
- Copyright (c) 2017, Sage Bionetworks. All rights reserved.
+ Copyright (c) 2015, Apple Inc. All rights reserved.
+ Copyright (c) 2017, Sage Bionetworks.
  
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
@@ -28,37 +29,27 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ORKHeartRateDeviceNotFoundStep.h"
 
-#import "ORKStep_Private.h"
-#import "ORKWorkoutStep_Private.h"
+#import "CMAccelerometerData+ORKJSONDictionary.h"
 
-#import "ORKAnswerFormat.h"
 #import "ORKHelpers_Internal.h"
 
-@implementation ORKHeartRateDeviceNotFoundStep
 
-- (instancetype)initWithIdentifier:(NSString *)identifier
-                        deviceName:(nullable NSString *)deviceName
-                            result:(nullable ORKTaskResult *)taskResult {
-    self = [self initWithIdentifier:identifier];
-    if (self) {
-        self.title = [NSString localizedStringWithFormat:ORKLocalizedString(@"HEARTRATE_MONITOR_DEVICE_NOT_FOUND_TITLE_%@", nil), deviceName];
-        self.text = [NSString localizedStringWithFormat:ORKLocalizedString(@"HEARTRATE_MONITOR_DEVICE_NOT_FOUND_TEXT_%@", nil), deviceName];
-        
+@implementation CMAccelerometerData (ORKJSONDictionary)
 
-        ORKTextChoice *useCameraChoice = [ORKTextChoice choiceWithText:ORKLocalizedString(@"HEARTRATE_MONITOR_CAMERA_INSTRUCTION_TITLE", nil) value:@YES];
-        
-        NSString *useWatchText = [NSString localizedStringWithFormat:
-                                   ORKLocalizedString(@"HEARTRATE_MONITOR_DEVICE_NOT_FOUND_TRY_AGAIN_%@", nil), deviceName];
-        ORKTextChoice *useWatchChoice = [ORKTextChoice choiceWithText:useWatchText value:@NO];
-        
-        self.answerFormat = [ORKAnswerFormat choiceAnswerFormatWithStyle:ORKChoiceAnswerStyleSingleChoice textChoices:
-                             @[useCameraChoice, useWatchChoice]];
-        self.optional = NO;
-        self.useSurveyMode = NO;
-    }
-    return self;
+- (NSDictionary *)ork_JSONDictionary {
+    return [self ork_JSONDictionaryWithTimestamp:self.timestamp consolidated:NO];
+}
+
+- (NSDictionary *)ork_JSONDictionaryWithTimestamp:(NSTimeInterval)timestamp consolidated:(BOOL)consolidated {
+    
+    NSString *format = consolidated ? @"acceleration_%@" : @"%@";
+    NSDictionary *dictionary = @{@"timestamp": [NSDecimalNumber numberWithDouble:timestamp],
+                                 [NSString stringWithFormat:format, @"x"]: [NSDecimalNumber numberWithDouble:self.acceleration.x],
+                                 [NSString stringWithFormat:format, @"y"]: [NSDecimalNumber numberWithDouble:self.acceleration.y],
+                                 [NSString stringWithFormat:format, @"z"]: [NSDecimalNumber numberWithDouble:self.acceleration.z]
+                                 };
+    return dictionary;
 }
 
 @end

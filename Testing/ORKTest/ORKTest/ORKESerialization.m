@@ -421,12 +421,6 @@ encondingTable =
          },
          (@{
             })),
-   ENTRY(ORKHeartRateDeviceNotFoundStep,
-         ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
-             return [[ORKHeartRateDeviceNotFoundStep alloc] initWithIdentifier:GETPROP(dict, identifier)];
-         },
-         (@{
-            })),
    ENTRY(ORKWorkoutStep,
          ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
              ORKWorkoutStep *step = [[ORKWorkoutStep alloc] initWithIdentifier:GETPROP(dict, identifier) pageTask:GETPROP(dict, pageTask)];
@@ -557,6 +551,7 @@ encondingTable =
          },
          (@{
             PROPERTY(stepDuration, NSNumber, NSObject, YES, nil, nil),
+            PROPERTY(shouldConsolidateRecorders, NSNumber, NSObject, YES, nil, nil),
             PROPERTY(shouldShowDefaultTimer, NSNumber, NSObject, YES, nil, nil),
             PROPERTY(shouldSpeakCountDown, NSNumber, NSObject, YES, nil, nil),
             PROPERTY(shouldSpeakRemainingTimeAtHalfway, NSNumber, NSObject, YES, nil, nil),
@@ -797,6 +792,7 @@ encondingTable =
             return [[ORKFitnessStep alloc] initWithIdentifier:GETPROP(dict, identifier)];
         },
         (@{
+           PROPERTY(standingStill, NSNumber, NSObject, YES, nil, nil),
            })),
   ENTRY(ORKConsentSection,
         ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
@@ -1137,7 +1133,8 @@ encondingTable =
             return [[ORKLocationRecorderConfiguration alloc] initWithIdentifier:GETPROP(dict,identifier)];
         },
         (@{
-           PROPERTY(relativeDistanceOnly, NSNumber, NSObject, YES, nil, nil)
+           PROPERTY(relativeDistanceOnly, NSNumber, NSObject, YES, nil, nil),
+           PROPERTY(standingStill, NSNumber, NSObject, YES, nil, nil),
           })),
    ENTRY(ORKPedometerRecorderConfiguration,
          ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {

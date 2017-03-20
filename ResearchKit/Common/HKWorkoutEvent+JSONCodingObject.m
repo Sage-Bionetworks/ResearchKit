@@ -35,6 +35,7 @@
 
 #import <ResearchKit/ResearchKit-Swift.h>
 
+
 @implementation HKWorkoutEvent (ORKJSONCodingObject)
 
 - (NSDictionary<NSString *, id> *)ork_jsonCodingObject {

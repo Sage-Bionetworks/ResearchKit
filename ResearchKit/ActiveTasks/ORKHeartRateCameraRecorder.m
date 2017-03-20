@@ -29,47 +29,64 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 #import "ORKHeartRateCameraRecorder.h"
 @import AVFoundation;
 
+#import "ORKCodingObjects.h"
+#import "ORKChartTypes.h"
 #import "ORKDataLogger.h"
-
+#import "ORKHelpers_Internal.h"
 #import "ORKRecorder_Internal.h"
 
-#import "ORKHelpers_Internal.h"
-
-#import "ORKCodingObjects.h"
 
 const NSTimeInterval ORKHeartRateSampleRate = 1.0;
 const int ORKHeartRateFramesPerSecond = 30;
-const int ORKHeartRateMaxWindowSeconds = 30;
-const int ORKHeartRateMinWindowSeconds = 5;
+const int ORKHeartRateSettleSeconds = 3;
+const int ORKHeartRateWindowSeconds = 10;
+const int ORKHeartRateMinFrameCount = (ORKHeartRateSettleSeconds + ORKHeartRateWindowSeconds) * ORKHeartRateFramesPerSecond;
 
-NSString * const ORKTimestampKey = @"timestamp";
 NSString * const ORKColorHueKey = @"hue";
 NSString * const ORKColorSaturationKey = @"saturation";
 NSString * const ORKColorBrightnessKey = @"brightness";
 NSString * const ORKColorRedKey = @"red";
 NSString * const ORKColorGreenKey = @"green";
 NSString * const ORKColorBlueKey = @"blue";
-NSString * const ORKCameraHeartRateKey = @"bpm";
+NSString * const ORKCameraHeartRateKey = @"bpm_camera";
 NSString * const ORKWatchHeartRateKey = @"bpm_watch";
+
 
 @interface ORKHeartRateCameraRecorder() <AVCaptureVideoDataOutputSampleBufferDelegate>
 
+@property (nonatomic) NSTimeInterval uptime;
+
 @end
+
 
 @implementation ORKHeartRateCameraRecorder {
     BOOL _started;
-    ORKDataLogger *_logger;
+    
 #if TARGET_OS_SIMULATOR
     NSTimer *_simulationTimer;
 #else
     AVCaptureSession *_session;
 #endif
+    
     NSMutableArray *_dataPointsHue;
-    NSMutableArray *_samples;
-    NSInteger _sampleCount;
+    dispatch_queue_t _processingQueue;
+    NSMutableArray *_loggingSamples;
+}
+
+- (instancetype)initWithIdentifier:(NSString *)identifier step:(ORKStep *)step outputDirectory:(NSURL *)outputDirectory
+{
+    self = [super initWithIdentifier:identifier step:step outputDirectory:outputDirectory];
+    if (self) {
+        NSString *processingQueueId = [@"org.ResearchKit.heartRate.processing." stringByAppendingString:self.identifier];
+        _processingQueue = dispatch_queue_create([processingQueueId cStringUsingEncoding:NSUTF8StringEncoding], DISPATCH_QUEUE_SERIAL);
+        _dataPointsHue = [[NSMutableArray alloc] init];
+        _loggingSamples = [[NSMutableArray alloc] init];
+    }
+    return self;
 }
 
 - (void)dealloc {
@@ -80,7 +97,6 @@ NSString * const ORKWatchHeartRateKey = @"bpm_watch";
 #else
     [_session stopRunning];
 #endif
-    [_logger finishCurrentLog];
 }
 
 #pragma mark - Data collection
@@ -98,25 +114,14 @@ NSString * const ORKWatchHeartRateKey = @"bpm_watch";
 }
 
 - (void)start {
+    [super start];
+    
     if (_started) {
-        [super start];
         return;
     }
     _started = YES;
     
-    if (!_logger) {
-        NSError *error = nil;
-        _logger = [self makeJSONDataLoggerWithError:&error];
-        if (!_logger) {
-            [self finishRecordingWithError:error];
-            return;
-        }
-    }
-    
-    _sampleCount = 0;
-    self.startDate = [NSDate date];
-    _dataPointsHue = [[NSMutableArray alloc] init];
-    _samples = [[NSMutableArray alloc] init];
+    self.uptime = [NSProcessInfo processInfo].systemUptime;
     
 #if TARGET_OS_SIMULATOR
     _simulationTimer = [NSTimer scheduledTimerWithTimeInterval:ORKHeartRateSampleRate
@@ -175,7 +180,8 @@ NSString * const ORKWatchHeartRateKey = @"bpm_watch";
     AVCaptureVideoDataOutput* videoOutput = [[AVCaptureVideoDataOutput alloc] init];
     
     // create a queue to run the capture on
-    dispatch_queue_t captureQueue=dispatch_queue_create("captureQueue", NULL);
+    NSString *captureQueueId = [@"org.ResearchKit.heartRate.capture." stringByAppendingString:self.identifier];
+    dispatch_queue_t captureQueue=dispatch_queue_create([captureQueueId cStringUsingEncoding:NSUTF8StringEncoding], NULL);
     
     // set up our delegate
     [videoOutput setSampleBufferDelegate:self queue:captureQueue];
@@ -191,8 +197,7 @@ NSString * const ORKWatchHeartRateKey = @"bpm_watch";
     [_session startRunning];
     
 #endif
-    
-    [super start];
+
 }
 
 - (void)stop {
@@ -202,16 +207,6 @@ NSString * const ORKWatchHeartRateKey = @"bpm_watch";
     }
     
     [self doStopRecording];
-    
-    [_logger finishCurrentLog];
-    
-    NSError *error = nil;
-    __block NSURL *fileUrl = nil;
-    [_logger enumerateLogs:^(NSURL *logFileUrl, BOOL *stop) {
-        fileUrl = logFileUrl;
-    } error:&error];
-    
-    [self reportFileResultWithFile:fileUrl error:error];
     
     [super stop];
 }
@@ -240,8 +235,6 @@ NSString * const ORKWatchHeartRateKey = @"bpm_watch";
     [super reset];
     
     [self doStopRecording];
-    
-    _logger = nil;
 }
 
 #pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate
@@ -251,16 +244,28 @@ NSString * const ORKWatchHeartRateKey = @"bpm_watch";
 - (void)timerFired {
     _bpm = 65;
     NSTimeInterval timestamp = -1 * [self.startDate timeIntervalSinceNow];
-    NSArray *samples = @[@{ORKTimestampKey       : @(timestamp),
-                           ORKCameraHeartRateKey : @(_bpm)
+    NSArray *samples = @[@{ORKRecorderTimestampKey       : @(timestamp),
+                           ORKCameraHeartRateKey         : @(_bpm)
                           }];
-    [self updateHeartRate:_bpm samples:samples displaySeconds:timestamp];
+    
+    NSDate *endDate = [NSDate date];
+    NSDate *startDate = [endDate dateByAddingTimeInterval:-1.0];
+    HKQuantity *quantity = [HKQuantity quantityWithUnit:[HKUnit bpmUnit] doubleValue:_bpm];
+    HKQuantityType *quantityType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeartRate];
+    HKQuantitySample *hkSample = [HKQuantitySample quantitySampleWithType:quantityType
+                                                                 quantity:quantity
+                                                                startDate:startDate
+                                                                  endDate:endDate];
+    
+    [self updateHeartRate:hkSample samples:samples];
 }
 
 #else
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
+    CMTime pts = CMSampleBufferGetPresentationTimeStamp(sampleBuffer);
+    
     // only run if we're not already processing an image
     // this is the image buffer
     CVImageBufferRef cvimgRef = CMSampleBufferGetImageBuffer(sampleBuffer);
@@ -275,7 +280,7 @@ NSString * const ORKWatchHeartRateKey = @"bpm_watch";
     // get the raw image bytes
     uint8_t *buf=(uint8_t *) CVPixelBufferGetBaseAddress(cvimgRef);
     size_t bprow=CVPixelBufferGetBytesPerRow(cvimgRef);
-    float r = 0,g = 0,b = 0;
+    float r = 0, g = 0, b = 0;
     
     long widthScaleFactor = width / 192;
     long heightScaleFactor = height / 144;
@@ -297,103 +302,142 @@ NSString * const ORKWatchHeartRateKey = @"bpm_watch";
     CVPixelBufferUnlockBaseAddress(cvimgRef,0);
     
     // record the color
-    [self recordColorWithRed:r green:g blue:b];
+    ORKWeakTypeOf(self) weakSelf = self;
+    dispatch_async(_processingQueue, ^{
+        ORKStrongTypeOf(weakSelf) strongSelf = weakSelf;
+        [strongSelf recordColorWithRed:r green:g blue:b timestamp:pts];
+    });
 }
 
 #endif
 
-- (void)recordColorWithRed:(float)r green:(float)g blue:(float)b {
+- (void)recordColorWithRed:(float)r green:(float)g blue:(float)b timestamp:(CMTime)pts {
     
-    // save the hue
+    // Get the HSV values
     float hue, sat, bright;
     [self getHSVFromRed:r green:g blue:b hue:&hue saturation:&sat brightness:&bright];
-    [_dataPointsHue addObject:@(hue)];
+ 
+    if (hue > 0) {
+        // Since the hue for blood is in the red zone which cross the degrees point,
+        // offset that value by 180.
+        double offsetHue = hue + 180.0;
+        if (offsetHue > 360.0) {
+            offsetHue -= 360.0;
+        }
+        [_dataPointsHue addObject:@(offsetHue)];
+    } else {
+        [_dataPointsHue removeAllObjects];
+    }
 
     // increment the sample count
-    _sampleCount++;
-    NSTimeInterval timestamp = (NSTimeInterval)_sampleCount / (NSTimeInterval)ORKHeartRateFramesPerSecond;
+    NSTimeInterval timestamp = ((NSTimeInterval)pts.value) / (NSTimeInterval)pts.timescale;
+    if (self.referenceUptime > 0) {
+        timestamp = timestamp - self.referenceUptime;
+    } else {
+        timestamp = timestamp - self.uptime;
+    }
+    
+    NSDictionary *sample = @{ORKRecorderTimestampKey    : @(timestamp),
+                             ORKRecorderIdentifierKey   : self.identifier,
+                             ORKColorHueKey             : @(hue),
+                             ORKColorSaturationKey      : @(sat),
+                             ORKColorBrightnessKey      : @(bright),
+                             ORKColorRedKey             : @(r),
+                             ORKColorGreenKey           : @(g),
+                             ORKColorBlueKey            : @(b),
+                             };
     
     // Only send UI updates once a second and only after min window of time
-    if ((_dataPointsHue.count >= (ORKHeartRateMinWindowSeconds * ORKHeartRateFramesPerSecond)) &&
-        (_dataPointsHue.count % ORKHeartRateFramesPerSecond == 0)) {
+    if (_loggingSamples.count >= ORKHeartRateFramesPerSecond) {
         
         CGFloat bpm = [self calculateBPM];
         _bpm = bpm;
         
-        NSInteger displaySeconds = _dataPointsHue.count / ORKHeartRateFramesPerSecond;
+        // Add calculated bpm to the dictionary
+        NSMutableDictionary *dict = [sample mutableCopy];
+        dict[ORKCameraHeartRateKey] = @(bpm);
+        [_loggingSamples addObject:[dict copy]];
+        NSArray *samples = [_loggingSamples sortedArrayUsingDescriptors:@[[[NSSortDescriptor alloc] initWithKey:ORKRecorderTimestampKey ascending:YES]]];
+        [_loggingSamples removeAllObjects];
         
-        [_samples addObject:@{ORKTimestampKey       : @(timestamp),
-                              ORKCameraHeartRateKey : @(bpm),
-                              ORKColorHueKey        : @(hue),
-                              ORKColorSaturationKey : @(sat),
-                              ORKColorBrightnessKey : @(bright),
-                              ORKColorRedKey        : @(r),
-                              ORKColorGreenKey      : @(g),
-                              ORKColorBlueKey       : @(b),
-                              }];
-        
-        NSArray *samples = [_samples copy];
-        [_samples removeAllObjects];
-        
-        // If we have enough data points then remove from beginning
-        if (_dataPointsHue.count >= (ORKHeartRateMaxWindowSeconds * ORKHeartRateFramesPerSecond)) {
-            [_dataPointsHue removeObjectsInRange:NSMakeRange(0, ORKHeartRateFramesPerSecond)];
-        }
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self updateHeartRate:bpm samples:samples displaySeconds:displaySeconds];
-        });
-        
-    } else {
-        // just save the samples in batch and send when the heart rate is updated
-        [_samples addObject:@{ORKTimestampKey           : @(timestamp),
-                              ORKColorHueKey            : @(hue),
-                              ORKColorSaturationKey     : @(sat),
-                              ORKColorBrightnessKey     : @(bright),
-                              ORKColorRedKey            : @(r),
-                              ORKColorGreenKey          : @(g),
-                              ORKColorBlueKey           : @(b),
-                              }];
-    }
-}
-
-- (void)updateHeartRate:(CGFloat)bpm samples:(NSArray *)samples displaySeconds:(NSInteger)displaySeconds {
-    
-    NSError *error;
-    if (![_logger appendObjects:samples error:&error]) {
-        [self finishRecordingWithError:error];
-        
-    } else if ([self.delegate respondsToSelector:@selector(heartRateDidUpdate:sample:)]) {
-        NSDate *endDate = [NSDate date];
+        // Create a sample to update the UI
+        NSDate *endDate = [self.startDate dateByAddingTimeInterval:(timestamp - self.uptime)];
         NSDate *startDate = [endDate dateByAddingTimeInterval:-1.0];
         HKQuantity *quantity = [HKQuantity quantityWithUnit:[HKUnit bpmUnit] doubleValue:bpm];
         HKQuantityType *quantityType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeartRate];
-        HKQuantitySample *sample = [HKQuantitySample quantitySampleWithType:quantityType
-                                                                   quantity:quantity
-                                                                  startDate:startDate
-                                                                    endDate:endDate];
-        [(id)self.delegate heartRateDidUpdate:self sample:sample];
+        HKQuantitySample *hkSample = [HKQuantitySample quantitySampleWithType:quantityType
+                                                                     quantity:quantity
+                                                                    startDate:startDate
+                                                                      endDate:endDate];
+        // record the samples and update the UI
+        [self updateHeartRate:hkSample samples:samples];
+        
+    } else {
+        // just save the samples in batch and send when the heart rate is updated
+        [_loggingSamples addObject:sample];
     }
 }
 
-- (void)addWatchSamples:(NSArray<HKQuantitySample *> *)watchSamples {
-    NSMutableArray *samples = [NSMutableArray new];
-    HKUnit *unit = [HKUnit bpmUnit];
-    for (HKQuantitySample *sample in watchSamples) {
-        NSTimeInterval timestamp = [sample.endDate timeIntervalSinceDate:self.startDate];
-        double bpm = [sample.quantity doubleValueForUnit:unit];
-        [samples addObject:@{ ORKTimestampKey : @(timestamp),
-                              ORKWatchHeartRateKey : @(bpm) }];
-    }
+- (void)updateHeartRate:(HKQuantitySample *)hkSample samples:(NSArray *)samples {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSError *error;
-        if (![_logger appendObjects:samples error:&error]) {
+        if (![self.logger appendObjects:samples error:&error]) {
             [self finishRecordingWithError:error];
+        } else if ([self.delegate respondsToSelector:@selector(heartRateRecorder:didUpdateSample:)] && (hkSample != nil)) {
+            [(id)self.delegate heartRateRecorder:self didUpdateSample:hkSample];
         }
     });
 }
 
+- (void)addWatchSamples:(NSArray<HKQuantitySample *> *)watchSamples {
+    if (self.uptime == 0) {
+        return;
+    }
+    
+    // record the color
+    ORKWeakTypeOf(self) weakSelf = self;
+    dispatch_async(_processingQueue, ^{
+        ORKStrongTypeOf(weakSelf) strongSelf = weakSelf;
+        [strongSelf processWatchSamples:watchSamples];
+    });
+}
+
+- (void)processWatchSamples:(NSArray<HKQuantitySample *> *)watchSamples {
+    HKUnit *unit = [HKUnit bpmUnit];
+    NSTimeInterval offset = (self.referenceUptime > 0) ? (self.uptime - self.referenceUptime) : 0;
+    for (HKQuantitySample *sample in watchSamples) {
+        NSTimeInterval timestamp = [sample.endDate timeIntervalSinceDate:self.startDate] + offset;
+        double bpm = [sample.quantity doubleValueForUnit:unit];
+        [_loggingSamples addObject:@{ ORKRecorderTimestampKey   : @(timestamp),
+                                      ORKRecorderIdentifierKey  : self.identifier,
+                                      ORKWatchHeartRateKey      : @(bpm) }];
+    }
+}
+
+
 #pragma mark - Data processing
+
+- (double)calculateBPM {
+    
+    // If a valid heart rate cannot be calculated then return -1 as an invalid marker
+    if (_dataPointsHue.count < ORKHeartRateMinFrameCount) {
+        return -1;
+    }
+    
+    // Get a window of data points that is the length of the window we are looking at
+    NSUInteger len = ORKHeartRateWindowSeconds * ORKHeartRateFramesPerSecond;
+    NSArray *dataPoints = [_dataPointsHue subarrayWithRange:NSMakeRange(_dataPointsHue.count - len, len)];
+    
+    // If we have enough data points then remove from beginning
+    if (_dataPointsHue.count > ORKHeartRateMinFrameCount) {
+        NSInteger len = _dataPointsHue.count - ORKHeartRateMinFrameCount;
+        [_dataPointsHue removeObjectsInRange:NSMakeRange(0, len)];
+    }
+    
+    // If the heart rate calculated is too low, then it isn't valid
+    int heartRate = [self calculateBPMWithData:dataPoints];
+    return heartRate >= 40 ? heartRate : -1;
+}
 
 // Algorithms adapted from: https://github.com/lehn0058/ATHeartRate (March 19, 2015)
 // with additional modifications by: https://github.com/Litekey/heartbeat-cordova-plugin (July 30, 2015)
@@ -401,8 +445,8 @@ NSString * const ORKWatchHeartRateKey = @"bpm_watch";
 #define USE_LIGHT_KEY_ALGORITHM 1
 #ifdef USE_LIGHT_KEY_ALGORITHM
 
-- (CGFloat)calculateBPM {
-    NSArray *bandpassFilteredItems = [self butterworthBandpassFilter:_dataPointsHue];
+- (double)calculateBPMWithData:(NSArray *)dataPoints {
+    NSArray *bandpassFilteredItems = [self butterworthBandpassFilter:dataPoints];
     NSArray *smoothedBandpassItems = [self medianSmoothing:bandpassFilteredItems];
     int peak = [self medianPeak:smoothedBandpassItems];
     int heartRate = 60 * ORKHeartRateFramesPerSecond / peak;
@@ -429,19 +473,22 @@ NSString * const ORKWatchHeartRateKey = @"bpm_watch";
             count = 3;
         }
     }
+    if (peaks.count == 0) {
+        return -1;
+    }
     [peaks setObject:@([peaks[0] integerValue] + count + 3) atIndexedSubscript: 0];
     [peaks sortUsingComparator:^(NSNumber *a, NSNumber *b){
         return [a compare:b];
     }];
     int medianPeak = (int)[peaks[peaks.count * 2 / 3] integerValue];
-    return medianPeak;
+    return (medianPeak != 0) ? medianPeak : -1;
 }
 
 #else
 
-- (CGFloat)calculateBPM {
+- (double)calculateBPMWithData:(NSArray *)dataPoints  {
 
-    NSArray *bandpassFilteredItems = [self butterworthBandpassFilter:_dataPointsHue];
+    NSArray *bandpassFilteredItems = [self butterworthBandpassFilter:dataPoints];
     NSArray *smoothedBandpassItems = [self medianSmoothing:bandpassFilteredItems];
     NSInteger peakCount = [self peakCount:smoothedBandpassItems];
     
@@ -488,7 +535,7 @@ NSString * const ORKWatchHeartRateKey = @"bpm_watch";
     float min = MIN(r, MIN(g, b));
     float max = MAX(r, MAX(g, b));
     float delta = max - min;
-    if (max == 0) {
+    if (((int)round(delta * 1000.0) == 0) || ((int)round(delta * 1000.0) == 0)) {
         *h = -1;
         return;
     }
@@ -573,8 +620,7 @@ NSString * const ORKWatchHeartRateKey = @"bpm_watch";
     
     return newData;
 }
-
-
+             
 @end
 
 @implementation ORKHeartRateCameraRecorderConfiguration

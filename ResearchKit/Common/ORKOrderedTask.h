@@ -257,6 +257,7 @@ ORK_EXTERN ORKTrailMakingTypeIdentifier const ORKTrailMakingTypeIdentifierB;
  localized text is displayed.
  @param walkDuration            The duration of the walk (the maximum is 10 minutes).
  @param restDuration            The duration of the post walk rest period.
+ @param relativeDistanceOnly    Should latitude/longitude coordinates be recorded or only save relative distance
  @param options                 Options that affect the features of the predefined task.
  
  @return An active fitness check task that can be presented with an `ORKTaskViewController` object.
@@ -265,6 +266,7 @@ ORK_EXTERN ORKTrailMakingTypeIdentifier const ORKTrailMakingTypeIdentifierB;
                                intendedUseDescription:(nullable NSString *)intendedUseDescription
                                          walkDuration:(NSTimeInterval)walkDuration
                                          restDuration:(NSTimeInterval)restDuration
+                                 relativeDistanceOnly:(BOOL)relativeDistanceOnly
                                               options:(ORKPredefinedTaskOption)options HK_AVAILABLE_IOS_ONLY(10_0);
 
 /**

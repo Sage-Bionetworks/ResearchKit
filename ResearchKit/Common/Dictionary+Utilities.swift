@@ -31,6 +31,7 @@
 
 import Foundation
 
+
 public extension Dictionary where Value : Equatable {
     
     /**
@@ -44,6 +45,7 @@ public extension Dictionary where Value : Equatable {
         return self.filter { $1 == value }.map { $0.0 }.first
     }
 }
+
 
 public extension Dictionary {
     

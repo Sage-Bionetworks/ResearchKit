@@ -13,4 +13,7 @@
    <FileRef
       location = "group:samples/ORKSample/ORKSample.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:samples/ORKWorkoutSample/ORKWorkoutSample.xcodeproj">
+   </FileRef>
 </Workspace>

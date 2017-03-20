@@ -29,7 +29,7 @@
  */
 
 
-#import "ORKHeartRateCaptureStepViewController_Internal.h"
+#import "ORKHeartRateCaptureStepViewController.h"
 
 #import "ORKHeartRateCaptureStep.h"
 #import "ORKWorkoutStep.h"
@@ -39,12 +39,14 @@
 #import "ORKStepHeaderView_Internal.h"
 
 #import "ORKActiveStepViewController_Internal.h"
+#import "ORKFitnessStepViewController_Internal.h"
 #import "ORKNavigationContainerView_Internal.h"
 #import "ORKStepViewController_Internal.h"
 
 #import "ORKActiveStep.h"
 #import "ORKActiveStepTimer.h"
 #import "ORKHealthQuantityTypeRecorder.h"
+#import "ORKHeartRateCameraRecorder.h"
 
 #import "ORKResult.h"
 
@@ -54,12 +56,19 @@
 
 @import WatchConnectivity;
 
+
+@interface ORKHeartRateCaptureStepViewController () <ORKHeartRateCameraRecorderDelegate>
+
+@property (nonatomic, weak) ORKHeartRateCameraRecorder *cameraRecorder;
+
+@end
+
+
 @implementation ORKHeartRateCaptureStepViewController {
     NSTimeInterval _runtime;
-    NSMutableArray<HKQuantitySample *> *_heartRateSamples;
+    NSMutableArray<NSNumber *> *_heartRateSamples;
     CGFloat _heartRate;
     BOOL _hasWatchSample;
-    ORKHeartRateCameraRecorder *_cameraRecorder;
 }
 
 - (ORKHeartRateCaptureStep *)captureStep {
@@ -89,8 +98,7 @@
 }
 
 - (NSTimeInterval)minimumDuration {
-    NSTimeInterval const min = 20.0;
-    return MAX(min, [self captureStep].minimumDuration);
+    return [self captureStep].minimumDuration;
 }
 
 - (void)countDownTimerFired:(ORKActiveStepTimer *)timer finished:(BOOL)finished {
@@ -102,13 +110,9 @@
 }
 
 - (BOOL)continueIfReady {
-    CGFloat heartRate = 0.0;
     if ((_runtime >= [self minimumDuration]) &&
-        ((heartRate = [self calculateHeartRate]) > 0.1) &&
+        (_heartRate > 0.1) &&
         (!self.usesWatch || _hasWatchSample)) {
-        
-        // Set heartrate and finish
-        _heartRate = heartRate;
         
         [self finish];
         return YES;
@@ -118,42 +122,38 @@
 
 - (CGFloat)calculateHeartRate {
     
-    NSInteger count = self.usesCamera ? 5 : 2;
+    NSInteger count = [self captureStep].beforeWorkout ? 5 : 2;
     
     if (_heartRateSamples.count < count ) {
-        return 0.0;
+        return _heartRate;
     }
     
-    NSArray<HKQuantitySample *> *samples = [_heartRateSamples copy];
-    HKUnit *unit = [HKUnit bpmUnit];
+    NSArray *values = [_heartRateSamples subarrayWithRange:NSMakeRange(_heartRateSamples.count - count, count)];
     CGFloat total = 0;
-    NSMutableArray<NSNumber *> *values = [NSMutableArray new];
-    for (NSInteger ii = _heartRateSamples.count - count; ii < _heartRateSamples.count; ii++) {
-        CGFloat value = [[samples[ii] quantity] doubleValueForUnit:unit];
-        [values addObject:@(value)];
-        total += value;
+    for (NSInteger ii = 0; ii < values.count; ii++) {
+        total += [values[ii] doubleValue];
     }
-    
     CGFloat mean = total / count;
-    total = 0;
+    
+    CGFloat stdTotal = 0;
     for (NSNumber *num in values) {
         CGFloat diff = [num doubleValue] - mean;
-        total += diff * diff;
+        stdTotal += diff * diff;
     }
-    CGFloat std = sqrt(total / count);
+    CGFloat std = sqrt(stdTotal / count);
     
     CGFloat const ORKAllowedStandardDeviation = 5.0;
     if (std < ORKAllowedStandardDeviation) {
         return mean;
     } else {
-        return 0.0;
+        return _heartRate;
     }
 }
 
 - (ORKStepResult *)result {
     ORKStepResult *result = [super result];
     
-    NSMutableArray *results = [result.results mutableCopy];
+    NSMutableArray *results = [result.results mutableCopy] ? : [NSMutableArray new];
     
     if (_heartRate > 0) {
         ORKNumericQuestionResult *heartRateResult = [[ORKNumericQuestionResult alloc] initWithIdentifier:ORKWorkoutResultIdentifierHeartRate];
@@ -168,15 +168,23 @@
 
 - (void)updateHeartRateWithQuantity:(HKQuantitySample *)quantity unit:(HKUnit *)unit {
     [super updateHeartRateWithQuantity:quantity unit:unit];
-    if (!quantity) {
+    
+    // Only include valid heart rate measurements
+    double bpm = [quantity.quantity doubleValueForUnit:[HKUnit bpmUnit]];
+    if (bpm < 40) {
         return;
     }
     
-    // Check if we can continue
+    // Add sample to the array
     if (!_heartRateSamples) {
         _heartRateSamples = [NSMutableArray new];
     }
-    [_heartRateSamples addObject:quantity];
+    [_heartRateSamples addObject:@(bpm)];
+    
+    // check the heart rate
+    if ((_heartRate <= 0) || [self captureStep].beforeWorkout) {
+        _heartRate = [self calculateHeartRate];
+    }
     
     [self continueIfReady];
 }
@@ -190,13 +198,15 @@
         // Continue if we have enough data
         HKQuantitySample *sample = [samples lastObject];
         _hasWatchSample = (sample.device != nil);
+        
         [self continueIfReady];
     }
 }
 
+
 #pragma mark - ORKHeartRateCameraRecorderDelegate
 
-- (void)heartRateDidUpdate:(ORKHeartRateCameraRecorder *)recorder sample:(HKQuantitySample *)sample {
+- (void)heartRateRecorder:(ORKHeartRateCameraRecorder*)recorder didUpdateSample:(HKQuantitySample *)sample {
     [self updateHeartRateWithQuantity:sample unit:[HKUnit bpmUnit]];
 }
 

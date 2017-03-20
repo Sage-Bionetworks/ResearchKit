@@ -39,12 +39,20 @@
 @implementation CMPedometerData (ORKJSONDictionary)
 
 - (NSDictionary *)ork_JSONDictionary {
-    NSMutableDictionary *dictionary = [@{@"startDate": ORKStringFromDateISO8601(self.startDate),
+    return [self ork_JSONDictionaryWithOffset:0];
+}
+
+- (NSDictionary *)ork_JSONDictionaryWithOffset:(NSTimeInterval)offset {
+    
+    NSTimeInterval timestamp = [self.endDate timeIntervalSinceDate:self.startDate] + offset;
+    NSMutableDictionary *dictionary = [@{@"timestamp": [NSDecimalNumber numberWithDouble:timestamp],
+                                         @"startDate": ORKStringFromDateISO8601(self.startDate),
                                          @"endDate": ORKStringFromDateISO8601(self.endDate)
                                          } mutableCopy];
     for (NSString *key in @[@"numberOfSteps", @"distance", @"floorsAscended", @"floorsDescended"]) {
         [dictionary setValue:[self valueForKey:key] forKey:key];
     }
+    
     return dictionary;
 }
 

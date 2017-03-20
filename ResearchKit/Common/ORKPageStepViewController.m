@@ -232,6 +232,10 @@
     return viewController;
 }
 
+- (void)stepViewControllerWillAppear:(ORKStepViewController *)stepViewController {
+    // Do nothing - subclasses can override
+}
+
 - (void)stepViewControllerDidAppear:(ORKStepViewController *)stepViewController {
     // Do Nothing - subclasses can override
 }
@@ -260,6 +264,8 @@
     
     // unregister ScrollView to clear hairline
     [self.taskViewController setRegisteredScrollView:nil];
+    
+    [self stepViewControllerWillAppear:stepViewController];
     
     [self.pageViewController setViewControllers:@[stepViewController] direction:direction animated:animated completion:^(BOOL finished) {
         if (finished) {
