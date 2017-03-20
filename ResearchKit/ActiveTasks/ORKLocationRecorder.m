@@ -143,15 +143,17 @@ const CLLocationAccuracy ORKLocationRequiredAccuracy = 20;
                     timestamp = [NSDecimalNumber numberWithDouble:(uptimeDelta + timeInterval)];
                 }
                 
-                // Only include total distance traveled if the user is not *suppose* to be standing still
+                // Only include total distance traveled if the user is not supposed to be standing still
                 // and the horizontal accuracy indicates that the user is outdoors
                 if (!self.isStandingStill && (obj.horizontalAccuracy > 0) && (obj.horizontalAccuracy <= ORKLocationRequiredAccuracy)) {
                     if (timeInterval > 0) {
-                        // If the time is after the start time, then add the distance traveled to the total distance
+                        // If the time is after the start time, then add the distance traveled to the total distance.
+                        // This is a rough measurement and does not (at this time) include any spline drawing to measure the
+                        // actual curve of the distance traveled.
                         _totalDistance += [_locationData.lastObject distanceFromLocation:obj];
                     }
                     if (timeInterval > -60.0) {
-                        // Save the accurate data objects to an array for calculating the distance traveled
+                        // Save the accurate data objects to an array for calculating the distance traveled.
                         [_locationData addObject:obj];
                     }
                 }

@@ -153,7 +153,7 @@
 - (ORKStepResult *)result {
     ORKStepResult *result = [super result];
     
-    NSMutableArray *results = [result.results mutableCopy] ? : @[];
+    NSMutableArray *results = [result.results mutableCopy] ? : [NSMutableArray new];
     
     if (_heartRate > 0) {
         ORKNumericQuestionResult *heartRateResult = [[ORKNumericQuestionResult alloc] initWithIdentifier:ORKWorkoutResultIdentifierHeartRate];
@@ -170,7 +170,7 @@
     [super updateHeartRateWithQuantity:quantity unit:unit];
     
     // Only include valid heart rate measurements
-    double bpm = [quantity.quantity doubleValueForUnit:unit];
+    double bpm = [quantity.quantity doubleValueForUnit:[HKUnit bpmUnit]];
     if (bpm < 40) {
         return;
     }

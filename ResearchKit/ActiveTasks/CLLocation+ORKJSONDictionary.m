@@ -36,7 +36,7 @@
 
 
 double DegreesToRadians(double degrees) {return degrees * M_PI / 180.0;};
-double RadiansToDegrees(double radians) {return radians * 180.0/M_PI;};
+double RadiansToDegrees(double radians) {return radians * 180.0 / M_PI;};
 
 @implementation CLLocation (ORKJSONDictionary)
 
@@ -102,7 +102,7 @@ double RadiansToDegrees(double radians) {return radians * 180.0/M_PI;};
     double x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dLon);
     double radiansBearing = atan2(y, x);
     
-    if(radiansBearing < 0.0) {
+    if (radiansBearing < 0.0) {
         radiansBearing += 2 * M_PI;
     }
 

@@ -343,7 +343,7 @@ ORK_CLASS_AVAILABLE
 @property (nonatomic, assign) BOOL relativeDistanceOnly;
 
 /**
- Is the user expected to be standing (or sitting) still while recording. This is used in calculating
+ Whether or not the user is expected to be standing (or sitting) still while recording. This is used in calculating
  the `distanceTraveled`.
  */
 @property (nonatomic, assign, getter=isStandingStill) BOOL standingStill;

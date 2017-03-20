@@ -56,7 +56,7 @@ ORK_EXTERN ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierHeartRate;
 
 /**
  Maps to an `ORKFileResult` with the consolidated data for the workout. This includes a consolidated
- data for the motion, location, heart rate and watch sensors with normalized timestamps.
+ data for the motion, location, and heart rate with normalized timestamps.
  */
 ORK_EXTERN ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierWorkoutData;
 
