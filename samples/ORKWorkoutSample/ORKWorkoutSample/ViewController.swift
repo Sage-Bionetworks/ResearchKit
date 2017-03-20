@@ -63,7 +63,7 @@ class ViewController: UIViewController, ORKTaskViewControllerDelegate {
                                                   walkDuration: 2 * 60,
                                                   restDuration: 30,
                                                   relativeDistanceOnly: false,
-                                                  options: [.excludeAccelerometer, .excludeDeviceMotion])
+                                                  options: [])
         if (workoutOnly) {
             let workoutSteps = task.steps.filter({ $0 is ORKWorkoutStep })
             task = ORKOrderedTask(identifier: "workoutOnly", steps: workoutSteps)
