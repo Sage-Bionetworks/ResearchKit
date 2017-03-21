@@ -355,6 +355,32 @@ typedef NS_ENUM(NSInteger, ORKMeasurementSystem) {
 
 
 /**
+ Frequency with which the mood question is asked.
+ 
+ Used by `ORKMoodQuestionStep` to setup the question.
+ */
+typedef NS_ENUM(NSUInteger, ORKMoodSurveyFrequency) {
+    ORKMoodSurveyFrequencyDaily,
+    ORKMoodSurveyFrequencyWeekly,
+} ORK_ENUM_AVAILABLE;
+
+
+/**
+ Type of mood survey question.
+ 
+ Used by `ORKMoodScaleAnswerFormat` to setup the choices
+ */
+typedef NS_ENUM(NSUInteger, ORKMoodQuestionType) {
+    ORKMoodQuestionTypeCustom,
+    ORKMoodQuestionTypeClarity,
+    ORKMoodQuestionTypeOverall,
+    ORKMoodQuestionTypePain,
+    ORKMoodQuestionTypeSleep,
+    ORKMoodQuestionTypeExcercise
+} ORK_ENUM_AVAILABLE;
+
+
+/**
  Trailmaking Type Identifiers for supported trailmaking types.
  */
 typedef NSString * ORKTrailMakingTypeIdentifier NS_STRING_ENUM;

@@ -193,6 +193,18 @@ ORK_CLASS_AVAILABLE
 
 
 /**
+ The `ORKMoodScaleQuestionResult` class represents the result of an ORKMoodScaleAnswerFormat`
+ question.
+ */
+ORK_CLASS_AVAILABLE
+@interface ORKMoodScaleQuestionResult : ORKChoiceQuestionResult
+
+@property (nonatomic, copy, nullable) NSNumber *scaleAnswer;
+
+@end
+
+
+/**
  The `ORKMultipleComponentQuestionResult` class represents the choice
  answers from a multiple-component picker-style choice-based answer format.
  
