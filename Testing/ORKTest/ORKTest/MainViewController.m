@@ -593,8 +593,8 @@ static const CGFloat HeaderSideLayoutMargin = 16.0;
                                                  timeoutSound:0
                                                  failureSound:0
                                                       options:0];
-    } else if ([identifier isEqualToString:GoNoGoTasIdentifier]) {
-        return [ORKOrderedTask gonogoTaskWithIdentifier:GoNoGoTasIdentifier
+    } else if ([identifier isEqualToString:GoNoGoTaskIdentifier]) {
+        return [ORKOrderedTask gonogoTaskWithIdentifier:GoNoGoTaskIdentifier
                                  intendedUseDescription:nil
                                 maximumStimulusInterval:8
                                 minimumStimulusInterval:4
@@ -2824,10 +2824,6 @@ static const CGFloat HeaderSideLayoutMargin = 16.0;
 
 - (void)reactionTimeTaskButtonTapped:(id)sender {
     [self beginTaskWithIdentifier:ReactionTimeTaskIdentifier];
-}
-
-- (void)goNoGoTaskButtonTapped:(id)sender {
-    [self beginTaskWithIdentifier:GoNoGoTasIdentifier];
 }
 
 - (void)towerOfHanoiTaskButtonTapped:(id)sender {

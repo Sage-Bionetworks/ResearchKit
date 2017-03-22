@@ -846,6 +846,7 @@ ORK_MAKE_TEST_INIT(CLCircularRegion, (^{
                                        
                                        // For a specific class
                                        @"ORKHeightAnswerFormat.useMetricSystem",
+                                       @"ORKMoodScaleQuestionResult.scaleAnswer",
                                        @"ORKNavigablePageStep.steps",
                                        @"ORKPageStep.steps",
                                        @"ORKResult.saveable",
