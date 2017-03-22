@@ -75,6 +75,7 @@ DefineStringKey(AuxillaryImageTaskIdentifier);
 DefineStringKey(FitnessTaskIdentifier);
 DefineStringKey(FootnoteTaskIdentifier);
 DefineStringKey(GaitTaskIdentifier);
+DefineStringKey(GoNoGoTaskIdentifier);
 DefineStringKey(IconImageTaskIdentifier);
 DefineStringKey(HolePegTestTaskIdentifier);
 DefineStringKey(MemoryTaskIdentifier);
@@ -365,6 +366,7 @@ static const CGFloat HeaderSideLayoutMargin = 16.0;
                            @"Audio Task",
                            @"Fitness Task",
                            @"GAIT Task",
+                           @"Go No Go Task",
                            @"Hole Peg Test Task",
                            @"Memory Game Task",
                            @"PSAT Task",
@@ -531,6 +533,18 @@ static const CGFloat HeaderSideLayoutMargin = 16.0;
                                        numberOfStepsPerLeg:20
                                               restDuration:30
                                                    options:ORKPredefinedTaskOptionNone];
+    } else if ([identifier isEqualToString:GoNoGoTaskIdentifier]) {
+        return [ORKOrderedTask gonogoTaskWithIdentifier:GoNoGoTaskIdentifier
+                                 intendedUseDescription:nil
+                                maximumStimulusInterval:8
+                                minimumStimulusInterval:4
+                                  thresholdAcceleration:0.5
+                                       numberOfAttempts:9
+                                                timeout:10
+                                           successSound:0
+                                           timeoutSound:0
+                                           failureSound:0
+                                                options:0];
     } else if ([identifier isEqualToString:MemoryTaskIdentifier]) {
         return [ORKOrderedTask spatialSpanMemoryTaskWithIdentifier:MemoryTaskIdentifier
                                             intendedUseDescription:nil
@@ -2761,6 +2775,10 @@ static const CGFloat HeaderSideLayoutMargin = 16.0;
 
 - (void)gaitTaskButtonTapped:(id)sender {
     [self beginTaskWithIdentifier:GaitTaskIdentifier];
+}
+
+- (void)goNoGoTaskButtonTapped:(id)sender {
+    [self beginTaskWithIdentifier:GoNoGoTaskIdentifier];
 }
 
 - (void)memoryGameTaskButtonTapped:(id)sender {
