@@ -591,6 +591,8 @@
 		FF5E3CCC1D23444400ECE4B7 /* ORKPageStepViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FF5E3CCA1D23444400ECE4B7 /* ORKPageStepViewController.m */; };
 		FF75E8911E8250C600C2344F /* ORKPermissionsValidator.h in Headers */ = {isa = PBXBuildFile; fileRef = FF75E88F1E8250C600C2344F /* ORKPermissionsValidator.h */; };
 		FF75E8921E8250C600C2344F /* ORKPermissionsValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = FF75E8901E8250C600C2344F /* ORKPermissionsValidator.m */; };
+		FF77B6C21E831C77007B8C9E /* ORKOrderedTask+ORKPredefinedSurvey.h in Headers */ = {isa = PBXBuildFile; fileRef = FF77B6C01E831C77007B8C9E /* ORKOrderedTask+ORKPredefinedSurvey.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FF77B6C31E831C77007B8C9E /* ORKOrderedTask+ORKPredefinedSurvey.m in Sources */ = {isa = PBXBuildFile; fileRef = FF77B6C11E831C77007B8C9E /* ORKOrderedTask+ORKPredefinedSurvey.m */; };
 		FF919A221E81A56F005C2A1E /* ORKTappingIntervalResult.h in Headers */ = {isa = PBXBuildFile; fileRef = FF919A201E81A56F005C2A1E /* ORKTappingIntervalResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FF919A231E81A56F005C2A1E /* ORKTappingIntervalResult.m in Sources */ = {isa = PBXBuildFile; fileRef = FF919A211E81A56F005C2A1E /* ORKTappingIntervalResult.m */; };
 		FF919A271E81A87B005C2A1E /* ORKActiveTaskResult.h in Headers */ = {isa = PBXBuildFile; fileRef = FF919A261E81A87B005C2A1E /* ORKActiveTaskResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1270,6 +1272,8 @@
 		FF5E3CCA1D23444400ECE4B7 /* ORKPageStepViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORKPageStepViewController.m; sourceTree = "<group>"; };
 		FF75E88F1E8250C600C2344F /* ORKPermissionsValidator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORKPermissionsValidator.h; sourceTree = "<group>"; };
 		FF75E8901E8250C600C2344F /* ORKPermissionsValidator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORKPermissionsValidator.m; sourceTree = "<group>"; };
+		FF77B6C01E831C77007B8C9E /* ORKOrderedTask+ORKPredefinedSurvey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ORKOrderedTask+ORKPredefinedSurvey.h"; sourceTree = "<group>"; };
+		FF77B6C11E831C77007B8C9E /* ORKOrderedTask+ORKPredefinedSurvey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ORKOrderedTask+ORKPredefinedSurvey.m"; sourceTree = "<group>"; };
 		FF919A201E81A56F005C2A1E /* ORKTappingIntervalResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORKTappingIntervalResult.h; sourceTree = "<group>"; };
 		FF919A211E81A56F005C2A1E /* ORKTappingIntervalResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORKTappingIntervalResult.m; sourceTree = "<group>"; };
 		FF919A261E81A87B005C2A1E /* ORKActiveTaskResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORKActiveTaskResult.h; sourceTree = "<group>"; };
@@ -1949,6 +1953,8 @@
 				86C40B9E1A8D7C5C00081FAC /* ORKOrderedTask.m */,
 				FF154FB21E82EF5E004ED908 /* ORKOrderedTask+ORKPredefinedActiveTask.h */,
 				FF154FB31E82EF5E004ED908 /* ORKOrderedTask+ORKPredefinedActiveTask.m */,
+				FF77B6C01E831C77007B8C9E /* ORKOrderedTask+ORKPredefinedSurvey.h */,
+				FF77B6C11E831C77007B8C9E /* ORKOrderedTask+ORKPredefinedSurvey.m */,
 				10FF9AD91B7BA78400ECB5B4 /* ORKOrderedTask_Private.h */,
 				86C40BD71A8D7C5C00081FAC /* ORKTaskViewController.h */,
 				86C40BD81A8D7C5C00081FAC /* ORKTaskViewController.m */,
@@ -2836,6 +2842,7 @@
 				86C40C7A1A8D7C5C00081FAC /* ORKAccelerometerRecorder.h in Headers */,
 				242C9E051BBDFDAC0088B7F4 /* ORKVerificationStep.h in Headers */,
 				86C40D141A8D7C5C00081FAC /* ORKHelpers_Private.h in Headers */,
+				FF77B6C21E831C77007B8C9E /* ORKOrderedTask+ORKPredefinedSurvey.h in Headers */,
 				FF919A2E1E81AAD0005C2A1E /* ORKTowerOfHanoiResult.h in Headers */,
 				86C40CA81A8D7C5C00081FAC /* ORKPedometerRecorder.h in Headers */,
 				FF75E8911E8250C600C2344F /* ORKPermissionsValidator.h in Headers */,
@@ -3351,6 +3358,7 @@
 				10864CA31B27146B000F4158 /* ORKPSATContentView.m in Sources */,
 				6146D0A41B84A91E0068491D /* ORKLineGraphAccessibilityElement.m in Sources */,
 				D42FEFB91AF7557000A124F8 /* ORKImageCaptureView.m in Sources */,
+				FF77B6C31E831C77007B8C9E /* ORKOrderedTask+ORKPredefinedSurvey.m in Sources */,
 				86C40C401A8D7C5C00081FAC /* ORKSpatialSpanMemoryContentView.m in Sources */,
 				BCB6E6671B7D535F000D5B34 /* ORKXAxisView.m in Sources */,
 				FF919A3C1E81AF1D005C2A1E /* ORKFileResult.m in Sources */,
