@@ -44,14 +44,21 @@
 #import "ORKTaskViewController_Internal.h"
 #import "ORKRecorder_Internal.h"
 
+#import "ORKHealthQuantityTypeRecorder_Internal.h"
+
 #import "ORKActiveStep_Internal.h"
 #import "ORKCollectionResult_Private.h"
 #import "ORKResult.h"
 #import "ORKTask.h"
+#import "ORKWorkoutStep_Private.h"
 
 #import "ORKAccessibility.h"
+#import "ORKCodingObjects.h"
 #import "ORKHelpers_Internal.h"
 #import "ORKSkin.h"
+
+
+NSString * const ORKConsolidatedRecorderId = @"recorder_data";
 
 
 @interface ORKActiveStepViewController () {
@@ -238,6 +245,21 @@
     }
     NSMutableArray *recorders = [NSMutableArray array];
     
+    // Setup the consolidated recorder that the other recorders will point at
+    ORKDataLogRecorder *sharedRecorder = nil;
+    if ([self activeStep].shouldConsolidateRecorders) {
+        sharedRecorder = [[ORKDataLogRecorder alloc] initWithIdentifier:ORKConsolidatedRecorderId
+                                                                   step:self.step
+                                                        outputDirectory:self.outputDirectory];
+        sharedRecorder.delegate = self;
+        NSError *error = nil;
+        sharedRecorder.logger = [sharedRecorder makeJSONDataLoggerWithError:&error];
+        if (error) {
+            [self recorder:sharedRecorder didFailWithError:error];
+            return;
+        }
+    }
+    
     for (ORKRecorderConfiguration * provider in self.activeStep.recorderConfigurations) {
         // If the outputDirectory is nil, recorders which require one will generate an error.
         // We start them anyway, because we don't know which recorders will require an outputDirectory.
@@ -246,11 +268,29 @@
         recorder.configuration = provider;
         recorder.delegate = self;
         
+        // Not all the recorders support using a consolidated log file but the ones that don't
+        // will ignore this property.
+        recorder.sharedLogger = sharedRecorder.logger;
+        
         [recorders addObject:recorder];
     }
+    
+    // Add the shared recorder last so that it is stopped last.
+    if (sharedRecorder) {
+        [recorders addObject:sharedRecorder];
+    }
+    
     self.recorders = recorders;
     
     [self recordersDidChange];
+}
+
+- (void)removeRecorder:(ORKRecorder *)recorder {
+    recorder.delegate = nil;
+    [recorder stop];
+    NSMutableArray *recorders = [self.recorders mutableCopy];
+    [recorders removeObject:recorder];
+    self.recorders = [recorders copy];
 }
 
 - (void)setOutputDirectory:(NSURL *)outputDirectory {
@@ -284,7 +324,9 @@
 - (void)startRecorders {
     [self recordersWillStart];
     // Start recorders
+    NSTimeInterval referenceUptime = [self activeStep].shouldConsolidateRecorders ? [NSProcessInfo processInfo].systemUptime : 0;
     for (ORKRecorder *recorder in self.recorders) {
+        recorder.referenceUptime = referenceUptime;
         [recorder viewController:self willStartStepWithView:self.customViewContainer];
         [recorder start];
     }
@@ -379,6 +421,7 @@
             [self goForward];
         }
     }
+    
     [self stepDidFinish];
 }
 
@@ -391,6 +434,10 @@
 
 #pragma mark - timers
 
+- (NSTimeInterval)stepDuration {
+    return self.activeStep.stepDuration;
+}
+
 - (void)resetTimer {
     [_activeStepTimer reset];
     _activeStepTimer = nil;
@@ -399,7 +446,7 @@
 - (void)startTimer {
     [self resetTimer];
     
-    NSTimeInterval stepDuration = self.activeStep.stepDuration;
+    NSTimeInterval stepDuration = self.stepDuration;
     
     if (stepDuration > 0) {
         ORKWeakTypeOf(self) weakSelf = self;
@@ -456,6 +503,10 @@
     return _activeStepTimer.duration - _activeStepTimer.runtime;
 }
 
+- (NSTimeInterval)timePassed {
+    return _activeStepTimer.runtime;
+}
+
 #pragma mark - action handlers
 
 - (void)stepDidFinish {
@@ -501,6 +552,38 @@ static NSString *const _ORKRecorderResultsRestoreKey = @"recorderResults";
     
     self.finished = [coder decodeBoolForKey:_ORKFinishedRestoreKey];
     _recorderResults = [coder decodeObjectOfClass:[NSArray class] forKey:_ORKRecorderResultsRestoreKey];
+}
+
+#pragma mark - Watch Connectivity
+
+- (void)didReceiveWatchMessage:(ORKWorkoutMessage *)message {
+    
+    // If this is a change of state message then call the state change
+    if (message.workoutState) {
+        [self workoutStateChanged:message.workoutState];
+    }
+    
+    if ([message isKindOfClass:[ORKSamplesWorkoutMessage class]]) {
+        ORKSamplesWorkoutMessage *samplesMessage = (ORKSamplesWorkoutMessage *)message;
+        [self addHeathRecorderQuantitySamples: samplesMessage.samples
+                       quantityTypeIdentifier: samplesMessage.quantityTypeIdentifier];
+    }
+}
+
+- (void)workoutStateChanged:(ORKWorkoutState)workoutState {
+    // do nothing
+}
+
+- (void)addHeathRecorderQuantitySamples:(NSArray<HKQuantitySample *> *)samples quantityTypeIdentifier:(NSString *)quantityTypeIdentifier {
+    for (ORKRecorder *recorder in self.recorders) {
+        if ([recorder isKindOfClass:[ORKHealthQuantityTypeRecorder class]]) {
+            ORKHealthQuantityTypeRecorder *rec1 = (ORKHealthQuantityTypeRecorder *)recorder;
+            if ([rec1.quantityType.identifier isEqualToString:quantityTypeIdentifier]) {
+                [rec1 addQuantitySamples:samples];
+                break;
+            }
+        }
+    }
 }
 
 @end

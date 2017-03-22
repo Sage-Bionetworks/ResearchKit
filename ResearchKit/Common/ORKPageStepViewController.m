@@ -29,30 +29,12 @@
  */
 
 
-#import "ORKPageStepViewController.h"
+#import "ORKPageStepViewController_Internal.h"
 #import <ResearchKit/ResearchKit_Private.h>
 #import "ORKStepViewController_Internal.h"
 #import "UIBarButtonItem+ORKBarButtonItem.h"
 #import "ORKHelpers_Internal.h"
 #import "ORKTaskViewController_Internal.h"
-#import "ORKResult_Private.h"
-#import "ORKStep_Private.h"
-
-typedef NS_ENUM(NSInteger, ORKPageNavigationDirection) {
-    ORKPageNavigationDirectionNone = 0,
-    ORKPageNavigationDirectionForward = 1,
-    ORKPageNavigationDirectionReverse = -1
-} ORK_ENUM_AVAILABLE;
-
-@interface  ORKPageStepViewController () <UIPageViewControllerDelegate, ORKStepViewControllerDelegate>
-
-@property (nonatomic, readonly) ORKPageResult *initialResult;
-@property (nonatomic, readonly) ORKPageResult *pageResult;
-@property (nonatomic, readonly) UIPageViewController *pageViewController;
-@property (nonatomic, copy, readonly, nullable) NSString *currentStepIdentifier;
-@property (nonatomic, readonly) ORKStepViewController *currentStepViewController;
-
-@end
 
 @implementation ORKPageStepViewController
 
@@ -173,7 +155,6 @@ typedef NS_ENUM(NSInteger, ORKPageNavigationDirection) {
     return result;
 }
 
-
 #pragma mark ORKStepViewControllerDelegate
 
 - (void)stepViewController:(ORKStepViewController *)stepViewController didFinishWithNavigationDirection:(ORKStepViewControllerNavigationDirection)direction {
@@ -251,6 +232,14 @@ typedef NS_ENUM(NSInteger, ORKPageNavigationDirection) {
     return viewController;
 }
 
+- (void)stepViewControllerWillAppear:(ORKStepViewController *)stepViewController {
+    // Do nothing - subclasses can override
+}
+
+- (void)stepViewControllerDidAppear:(ORKStepViewController *)stepViewController {
+    // Do Nothing - subclasses can override
+}
+
 - (void)goToStep:(ORKStep *)step direction:(UIPageViewControllerNavigationDirection)direction animated:(BOOL)animated {
     ORKStepViewController *stepViewController = [self stepViewControllerForStep:step];
     
@@ -276,11 +265,14 @@ typedef NS_ENUM(NSInteger, ORKPageNavigationDirection) {
     // unregister ScrollView to clear hairline
     [self.taskViewController setRegisteredScrollView:nil];
     
+    [self stepViewControllerWillAppear:stepViewController];
+    
     [self.pageViewController setViewControllers:@[stepViewController] direction:direction animated:animated completion:^(BOOL finished) {
         if (finished) {
             ORKStrongTypeOf(weakSelf) strongSelf = weakSelf;
             [strongSelf updateNavLeftBarButtonItem];
             UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, strongSelf.navigationItem.leftBarButtonItem);
+            [strongSelf stepViewControllerDidAppear:stepViewController];
         }
     }];
 }

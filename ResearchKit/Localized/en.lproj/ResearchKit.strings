@@ -232,14 +232,79 @@
 "CAPTURE_BUTTON_STOP_CAPTURE_VIDEO" = "Stop Recording";
 "CAPTURE_BUTTON_RECAPTURE_VIDEO" = "Recapture Video";
 
+/* Heart Rate Monitor Step */
+"HEARTRATE_MONITOR_CAMERA_INSTRUCTION_TITLE" = "Use your phone to measure your heart rate";
+"HEARTRATE_MONITOR_CAMERA_INSTRUCTION_TEXT" = "You will need to place your finger over the camera and flash on the back of your phone to capture your heart rate.";
+"HEARTRATE_MONITOR_CAMERA_INSTRUCTION_BUTTON_LEFT" = "Capture";
+"HEARTRATE_MONITOR_CAMERA_INSTRUCTION_BUTTON_RIGHT" = "Heart Rate";
+"HEARTRATE_MONITOR_CAMERA_INSTRUCTION_BUTTON_USE_WATCH" = "Use my Apple Watch";
+"HEARTRATE_MONITOR_CAMERA_STAND_STILL_TITLE" = "Stand still";
+"HEARTRATE_MONITOR_CAMERA_STAND_STILL_WATCH" = "Stand still while your heart rate is measured.";
+"HEARTRATE_MONITOR_CAMERA_INITIAL_TEXT" = "Gently cover the camera and flash on the back of your phone with your finger.";
+"HEARTRATE_MONITOR_CAMERA_SPOKEN" = "Stand still. Then gently cover the camera and flash of your phone with your finger.";
+"HEARTRATE_MONITOR_CAMERA_CONTINUE_SPOKEN" = "Keep standing still with your finger covering the camera and flash of your phone.";
+"HEARTRATE_MONITOR_CAMERA_CONTINUE_TEXT" = "Keep your finger still, almost done.";
+"HEARTRATE_MONITOR_DEVICE_TEXT_FORMAT_%@" = "Please wait. Capturing your heart rate from the %@.";
+"HEARTRATE_MONITOR_COMPLETION_CAMERA_BEFORE" = "Great job, your starting heart rate is currently at";
+"HEARTRATE_MONITOR_COMPLETION_DEVICE_BEFORE" = "Great, your starting heart rate is currently at";
+"HEARTRATE_MONITOR_COMPLETION_AFTER" = "Great, your final heart rate is currently at";
+"HEARTRATE_MONITOR_COMPLETION_UNKNOWN" = "Great, your heart rate is currently at";
+"HEARTRATE_MONITOR_DEVICE_APPLE_WATCH" = "Apple Watch";
+"HEARTRATE_MONITOR_DEVICE_NOT_FOUND_TITLE_%@" = "Could not connect to your %@";
+"HEARTRATE_MONITOR_DEVICE_NOT_FOUND_TEXT_%@" = "Please check that you are wearing the device, that it is unlocked, and that you have given this app permission to access your heart rate.";
+"HEARTRATE_MONITOR_DEVICE_NOT_FOUND_TRY_AGAIN_%@" = "Try again to connect to your %@";
+"HEARTRATE_BPM_FORMAT_%@" = "%@ BPM";
+
+/* Task Detail */
+"TASK_INTRO_DURATION_TITLE" = "Average Duration";
+"TASK_INTRO_ABOUT_TITLE" = "About";
+"TASK_INTRO_WHY_TITLE" = "Why";
+
+/* Cardio Challenge */
+"CARDIO_WATCH_SUMMARY_TITLE" = "Workout";
+"CARDIO_WALK_INSTRUCTION_TITLE" = "Please walk with your phone";
+"CARDIO_WALK_INSTRUCTION_TEXT" = "When you are ready, tap the Next button and put the phone in a pocket or hold in your hand while you walk. The phone will count down from 5 to begin your session.";
+"CARDIO_INTRO_TITLE" = "Cardio Challenge";
+"CARDIO_INTRO_ABOUT_TEXT" = "In this activity, we will measure how your heart rate changes in response to mild excercise.";
+"CARDIO_HEART_RISK_TITLE" = "Potential heart risk";
+"CARDIO_HEART_RISK_TEXT" = "Do not attempt this test if you have experienced unstable angina or a myocardial infarction (heart attack) during the previous month or need supplemental oxygen to walk.\n\nPlease stop immediately and seek assistance if you experience any of the following: chest pain, difficulty breathing, leg cramps, unstable balance or dizziness, excessive sweating, or a cold, clammy feeling.";
+"CARDIO_SAFETY_TITLE" = "Please note";
+"CARDIO_SAFETY_TEXT" = "Do not attempt this test if you feel that being on your feet for %@ will be a challenge for you. If you are unsure if you can walk for %@ without stopping, please have another person with you that can help if you need it.";
+"CARDIO_INSTRUCTIONS_1_TITLE" = "Walking Instructions";
+"CARDIO_INSTRUCTIONS_1_TEXT" = "For this test you will need a flat and uncrowded area outdoors where you can walk for %@ at a comfortable pace without interruption. Your goal is to walk as far as you can in %@, but you should not run or jog during this session.";
+"CARDIO_INSTRUCTIONS_2_TITLE" = "Start by standing still";
+"CARDIO_INSTRUCTIONS_2_TEXT" = "You should have a place to stand and complete a quick health check-in before and after walking to allow your heart rate to come to rest.";
+"CARDIO_INSTRUCTIONS_2_DETAIL" = "If you have an Apple Watch, please make sure that you are wearing it for this activity.";
+"CARDIO_POST_SURVEY_PROMPT" = "What, if anything, kept you from walking farther?";
+"CARDIO_POST_SURVEY_CHOICE_BEST_EFFORT" = "Nothing, was my best effort";
+"CARDIO_POST_SURVEY_CHOICE_FEELING_TIRED" = "Feeling tired";
+"CARDIO_POST_SURVEY_CHOICE_PAIN" = "Pain or physical discomfort";
+"CARDIO_POST_SURVEY_CHOICE_INTERRUPTED" = "Interrupted";
+"CARDIO_OUTDOOR_INSTRUCTION_TITLE" = "Please move outdoors";
+"CARDIO_OUTDOOR_INSTRUCTION_TEXT" = "Your phone GPS indicates that you are currently indoors. Please step outdoors to before continuing.";
+"CARDIO_OUTDOOR_ALREADY_OUTSIDE" = "I am already outdoors.";
+"CARDIO_OUTDOOR_CONTINUE" = "I have moved outdoors and I am ready to continue.";
+
+/* Watch Connectivity */
+"WATCH_SESSION_ERROR_DESCRIPTION_NOT_SUPPORTED" = "The Apple Watch is not supported by this iOS device.";
+"WATCH_SESSION_ERROR_DESCRIPTION_NOT_ACTIVATED" = "The Apple Watch could not be activated. Check that you are wearing the device and that it is unlocked.";
+"WATCH_SESSION_ERROR_DESCRIPTION_NOT_PAIRED" = "The Apple Watch has not been paired to this iOS device.";
+"WATCH_SESSION_ERROR_DESCRIPTION_NOT_INSTALLED" = "The Apple Watch app that runs this workout on your watch is not installed.";
+"WATCH_SESSION_ERROR_DESCRIPTION_NOT_REACHABLE" = "Could not connect to the Apple Watch or the connection was lost.";
+
 /* Fitness active task. */
 "FITNESS_TASK_TITLE" = "Fitness";
 "FITNESS_DISTANCE_TITLE_FORMAT" = "Distance (%@)";
 "FITNESS_HEARTRATE_TITLE" = "Heart Rate (bpm)";
 "FITNESS_SIT_INSTRUCTION_FORMAT" = "Sit comfortably for %@.";
+"FITNESS_SIT_INSTRUCTION_WATCH" = "Sit comfortably.";
 "FITNESS_WALK_INSTRUCTION_FORMAT" = "Walk as fast as you can for %@.";
+"FITNESS_WALK_INSTRUCTION_WATCH" = "Walk as fast as you can.";
+"FITNESS_STAND_INSTRUCTION_FORMAT" = "Stand still for %@.";
+"FITNESS_STAND_INSTRUCTION_WATCH" = "Stand still.";
 "FITNESS_INTRO_TEXT_FORMAT" = "This activity monitors your heart rate and measures how far you can walk in %1$@.";
 "FITNESS_INTRO_2_TEXT_FORMAT" = "Walk outdoors at your fastest possible pace for %1$@. When you're done, sit and rest comfortably for %2$@. To begin, tap Get Started.";
+"FITNESS_INTRO_2_STAND_TEXT_FORMAT" = "Walk outdoors at your fastest possible pace for %1$@. When you're done, stand still and rest comfortably for %2$@. To begin, tap Get Started.";
 
 /* Short walk active task. */
 "WALK_TASK_TITLE" = "Gait and Balance";
@@ -467,6 +532,22 @@
 "MOOD_EXERCISE_AVERAGE" = "mild exercise (some effort)";
 "MOOD_EXERCISE_BAD" = "minimal exercise (no effort)";
 "MOOD_EXERCISE_TERRIBLE" = "no exercise";
+"MOOD_BREATHING_AFTER_EXCERCISE_PROMPT" = "Now, how hard is it for you to breathe?";
+"MOOD_BREATHING_DAILY_PROMPT" = "Today, how hard is it for you to breathe?";
+"MOOD_BREATHING_WEEKLY_PROMPT" = "This week, how hard has it been for you to breathe?";
+"MOOD_BREATHING_GREAT" = "no issues with breathing";
+"MOOD_BREATHING_GOOD" = "mild difficulty in breathing";
+"MOOD_BREATHING_AVERAGE" = "moderate difficulty in breathing";
+"MOOD_BREATHING_BAD" = "severe difficulty in breathing";
+"MOOD_BREATHING_TERRIBLE" = "horrible difficulty in breathing";
+"MOOD_TIRED_AFTER_EXCERCISE_PROMPT" = "Now, how tired are you?";
+"MOOD_TIRED_DAILY_PROMPT" = "Today, how tired are you?";
+"MOOD_TIRED_WEEKLY_PROMPT" = "This week, how tired have you been?";
+"MOOD_TIRED_GREAT" = "not tired";
+"MOOD_TIRED_GOOD" = "mildly tired";
+"MOOD_TIRED_AVERAGE" = "moderately tired";
+"MOOD_TIRED_BAD" = "very tired";
+"MOOD_TIRED_TERRIBLE" = "extremely tired";
 
 /* Tremor test active task. */
 "TREMOR_TEST_TITLE" = "Tremor Activity";

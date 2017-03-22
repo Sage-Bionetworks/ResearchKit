@@ -28,9 +28,12 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <ResearchKit/ResearchKit.h>
+#import <ResearchKit/ORKStepViewController.h>
 
 NS_ASSUME_NONNULL_BEGIN
+
+@class ORKPageStep;
+@protocol ORKTaskResultSource;
 
 ORK_CLASS_AVAILABLE
 @interface ORKPageStepViewController : ORKStepViewController

@@ -42,3 +42,4 @@
 #import <ResearchKit/ORKToneAudiometryResult.h>
 #import <ResearchKit/ORKTowerOfHanoiResult.h>
 #import <ResearchKit/ORKTrailmakingResult.h>
+#import <ResearchKit/ORKWorkoutResult.h>

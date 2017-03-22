@@ -337,6 +337,17 @@ ORK_CLASS_AVAILABLE
  */
 - (instancetype)initWithCoder:(NSCoder *)aDecoder NS_DESIGNATED_INITIALIZER;
 
+/**
+ Record the relative distance rather than the coordinates
+ */
+@property (nonatomic, assign) BOOL relativeDistanceOnly;
+
+/**
+ Whether or not the user is expected to be standing (or sitting) still while recording. This is used in calculating
+ the `distanceTraveled`.
+ */
+@property (nonatomic, assign, getter=isStandingStill) BOOL standingStill;
+
 @end
 
 
@@ -388,6 +399,48 @@ ORK_CLASS_AVAILABLE
  The unit in which to serialize the data from HealthKit. (read-only)
  */
 @property (nonatomic, readonly, copy) HKUnit *unit;
+
+@end
+
+/**
+ The `ORKHeartRateCameraRecorderConfiguration` class represents a configuration
+ that records heart rate using the phone camera during an active step.
+ 
+ Heart rate data consists of information about the processed bpm provided by filtering the 
+ color changes of a human finger when placed over the camera and flash. It includes both 
+ the hue values and the processed bpm.
+ 
+ Heart rate data is serialized to JSON and returned as an `ORKFileResult` object.
+ 
+ To use a recorder, include its configuration in the `recorderConfigurations` property
+ of an `ORKActiveStep` object, include that step in a task, and present it with
+ a task view controller.
+ */
+ORK_CLASS_AVAILABLE
+@interface ORKHeartRateCameraRecorderConfiguration : ORKRecorderConfiguration
+
+/**
+ Returns an initialized heart rate recorder configuration.
+ 
+ The recorder instantiates a `AVCaptureSession` object, so no additional parameters besides
+ the identifier are required.
+ 
+ This method is the designated initializer.
+ 
+ @param identifier   The unique identifier of the recorder configuration.
+ 
+ @return An initialized heart rate recorder configuration.
+ */
+- (instancetype)initWithIdentifier:(NSString *)identifier NS_DESIGNATED_INITIALIZER;
+
+/**
+ Returns a new heart rate recorder configuration initialized from data in the given unarchiver.
+ 
+ @param aDecoder    Coder from which to initialize the heart rate recorder configuration.
+ 
+ @return A new heart rate recorder configuration.
+ */
+- (instancetype)initWithCoder:(NSCoder *)aDecoder NS_DESIGNATED_INITIALIZER;
 
 @end
 

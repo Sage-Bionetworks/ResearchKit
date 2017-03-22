@@ -46,6 +46,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy, nullable) NSDate *startDate;
 
+@property (nonatomic, strong, nullable) ORKDataLogger *sharedLogger;
+
+@property (nonatomic, copy, nullable) NSString *prefix;
+
+@property (nonatomic) NSTimeInterval referenceUptime;
+
 - (NSString *)recorderType;
 
 - (nullable ORKDataLogger *)makeJSONDataLoggerWithError:(NSError * _Nullable *)error NS_REQUIRES_SUPER;
@@ -57,5 +63,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable NSURL *)recordingDirectoryURL;
 
 @end
+
 
 NS_ASSUME_NONNULL_END

@@ -40,6 +40,40 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ORKOrderedTask (ORKPredefinedActiveTask)
 
+/**
+ Returns a predefined task that consists of a cardio heart rate measuring task.
+ 
+ In a cardio challenge task, the participant is asked to walk for a specified duration
+ (typically several minutes). During this period, various sensor data are collected and returned by
+ the task view controller's delegate. Sensor data can include accelerometer, device motion,
+ pedometer, location, and heart rate data where available.
+ 
+ At the conclusion of the walk, the participant is asked to sit down and rest for a period.
+ Data collection continues during this period.
+ 
+ By default, the task includes an instruction step that explains what the user needs to do during
+ the task, but this can be excluded with `ORKPredefinedTaskOptionExcludeInstructions`.
+ 
+ Data collected from this task can be used to compute measures of general fitness.
+ 
+ @param identifier              The task identifier to use for this task, appropriate to the study.
+ @param intendedUseDescription  A localized string describing the intended use of the data
+ collected. If the value of this parameter is `nil`, the default
+ localized text is displayed.
+ @param walkDuration            The duration of the walk (the maximum is 10 minutes).
+ @param restDuration            The duration of the post walk rest period.
+ @param relativeDistanceOnly    Should latitude/longitude coordinates be recorded or only save relative distance
+ @param options                 Options that affect the features of the predefined task.
+ 
+ @return An active fitness check task that can be presented with an `ORKTaskViewController` object.
+ */
++ (ORKOrderedTask *)cardioChallengeTaskWithIdentifier:(NSString *)identifier
+                               intendedUseDescription:(nullable NSString *)intendedUseDescription
+                                         walkDuration:(NSTimeInterval)walkDuration
+                                         restDuration:(NSTimeInterval)restDuration
+                                 relativeDistanceOnly:(BOOL)relativeDistanceOnly
+                                              options:(ORKPredefinedTaskOption)options HK_AVAILABLE_IOS_ONLY(10_0);
+
 
 /**
  Returns a predefined task that measures the upper extremity function.

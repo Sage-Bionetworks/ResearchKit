@@ -33,8 +33,44 @@
 
 #import "ORKFitnessStepViewController.h"
 
+#import "ORKCodingObjects.h"
+#import "ORKDefines.h"
+#import "ORKHelpers_Internal.h"
+#import "ORKOrderedTask_Private.h"
+#import "ORKRecorder.h"
+#import "ORKStep_Private.h"
 
 @implementation ORKFitnessStep
+
++ (NSArray *)recorderConfigurationsWithOptions:(ORKPredefinedRecorderOption)options
+                          relativeDistanceOnly:(BOOL)relativeDistanceOnly
+                                 standingStill:(BOOL)standingStill {
+    NSMutableArray *recorderConfigurations = [NSMutableArray arrayWithCapacity:5];
+    if (!(ORKPredefinedRecorderOptionExcludePedometer & options)) {
+        [recorderConfigurations addObject:[[ORKPedometerRecorderConfiguration alloc] initWithIdentifier:ORKPedometerRecorderIdentifier]];
+    }
+    if (!(ORKPredefinedRecorderOptionExcludeAccelerometer & options)) {
+        [recorderConfigurations addObject:[[ORKAccelerometerRecorderConfiguration alloc] initWithIdentifier:ORKAccelerometerRecorderIdentifier
+                                                                                                  frequency:100]];
+    }
+    if (!(ORKPredefinedRecorderOptionExcludeDeviceMotion & options)) {
+        [recorderConfigurations addObject:[[ORKDeviceMotionRecorderConfiguration alloc] initWithIdentifier:ORKDeviceMotionRecorderIdentifier
+                                                                                                 frequency:100]];
+    }
+    if (!(ORKPredefinedRecorderOptionExcludeLocation & options)) {
+        ORKLocationRecorderConfiguration *locationConfig = [[ORKLocationRecorderConfiguration alloc] initWithIdentifier:ORKLocationRecorderIdentifier];
+        locationConfig.relativeDistanceOnly = relativeDistanceOnly;
+        locationConfig.standingStill = standingStill;
+        [recorderConfigurations addObject:locationConfig];
+    }
+    if (!(ORKPredefinedRecorderOptionExcludeHeartRate & options)) {
+        HKUnit *bpmUnit = [HKUnit bpmUnit];
+        HKQuantityType *heartRateType = [HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeartRate];
+        [recorderConfigurations addObject:[[ORKHealthQuantityTypeRecorderConfiguration alloc] initWithIdentifier:ORKHeartRateRecorderIdentifier
+                                                                                              healthQuantityType:heartRateType unit:bpmUnit]];
+    }
+    return recorderConfigurations;
+}
 
 + (Class)stepViewControllerClass {
     return [ORKFitnessStepViewController class];
@@ -48,8 +84,12 @@
     return self;
 }
 
-- (void)validateParameters {
+- (void)ork_superValidateParameters {
     [super validateParameters];
+}
+
+- (void)validateParameters {
+    [self ork_superValidateParameters];
     
     NSTimeInterval const ORKFitnessStepMinimumDuration = 5.0;
     
@@ -60,7 +100,35 @@
 
 - (instancetype)copyWithZone:(NSZone *)zone {
     ORKFitnessStep *step = [super copyWithZone:zone];
+    step.standingStill = self.standingStill;
     return step;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    self = [super initWithCoder:aDecoder];
+    ORK_DECODE_BOOL(aDecoder, standingStill);
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    [super encodeWithCoder:aCoder];
+    ORK_ENCODE_BOOL(aCoder, standingStill);
+}
+
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
+- (NSUInteger)hash {
+    return super.hash ^ self.standingStill;
+}
+
+- (BOOL)isEqual:(id)object {
+    BOOL isParentSame = [super isEqual:object];
+    
+    __typeof(self) castObject = object;
+    return isParentSame &&
+    (self.standingStill == castObject.standingStill);
 }
 
 - (BOOL)startsFinished {

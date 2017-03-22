@@ -297,17 +297,39 @@
         NSArray <NSString *> *stepIdentifiers = [step.steps valueForKey:@"identifier"];
         NSMutableArray *results = [NSMutableArray new];
         for (NSString *identifier in stepIdentifiers) {
+            
+            // Look for a marker identifier
+            NSString *markerIdentifier = [NSString stringWithFormat:@"step.%@", identifier];
+            ORKResult *markerResult = [result resultForIdentifier:markerIdentifier];
+            
+            // Look for existing subresults
             NSString *prefix = [NSString stringWithFormat:@"%@.", identifier];
             NSPredicate *predicate = [NSPredicate predicateWithFormat:@"identifier BEGINSWITH %@", prefix];
             NSArray *filteredResults = [result.results filteredArrayUsingPredicate:predicate];
-            if (filteredResults.count > 0) {
+            
+            // If either filtered results or a marker result are found then add a step result for them
+            if (markerResult || (filteredResults.count > 0)) {
+                
+                // Create the step result
+                ORKStepResult *stepResult = [[ORKStepResult alloc] initWithStepIdentifier:identifier results:nil];
+                
+                // Set the start/end date if and only if there is a marker result
+                if (markerResult) {
+                    stepResult.startDate = markerResult.startDate;
+                    stepResult.endDate = markerResult.endDate;
+                }
+                
+                // Add subresults
                 NSMutableArray *subresults = [NSMutableArray new];
                 for (ORKResult *subresult in filteredResults) {
                     ORKResult *copy = [subresult copy];
                     copy.identifier = [subresult.identifier substringFromIndex:prefix.length];
                     [subresults addObject:copy];
                 }
-                [results addObject:[[ORKStepResult alloc] initWithStepIdentifier:identifier results:subresults]];
+                stepResult.results = subresults;
+                
+                // Add the step result
+                [results addObject:stepResult];
             }
         }
         self.results = results;
@@ -354,17 +376,20 @@
     for (ORKResult *result in self.results) {
         if ([result isKindOfClass:[ORKStepResult class]]) {
             ORKStepResult *stepResult = (ORKStepResult *)result;
-            if (stepResult.results.count > 0) {
-                // For each subresult in this step, append the step identifier onto the result
-                for (ORKResult *result in stepResult.results) {
-                    ORKResult *copy = [result copy];
-                    NSString *subIdentifier = result.identifier ?: [NSString stringWithFormat:@"%@", @(result.hash)];
-                    copy.identifier = [NSString stringWithFormat:@"%@.%@", stepResult.identifier, subIdentifier];
-                    [results addObject:copy];
-                }
-            } else {
-                // If this is an empty step result then add a base class instance with this identifier
-                [results addObject:[[ORKResult alloc] initWithIdentifier:stepResult.identifier]];
+            
+            // Add a result with the
+            NSString *markerIdentifier = [NSString stringWithFormat:@"step.%@", stepResult.identifier];
+            ORKResult *markerResult = [[ORKResult alloc] initWithIdentifier:markerIdentifier];
+            markerResult.startDate = stepResult.startDate;
+            markerResult.endDate = stepResult.endDate;
+            [results addObject:markerResult];
+            
+            // For each subresult in this step, append the step identifier onto the result
+            for (ORKResult *result in stepResult.results) {
+                ORKResult *copy = [result copy];
+                NSString *subIdentifier = result.identifier ?: [NSString stringWithFormat:@"%@", @(result.hash)];
+                copy.identifier = [NSString stringWithFormat:@"%@.%@", stepResult.identifier, subIdentifier];
+                [results addObject:copy];
             }
         } else {
             // If this is *not* a step result then just add it as-is

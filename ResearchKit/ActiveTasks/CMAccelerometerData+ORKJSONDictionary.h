@@ -1,5 +1,6 @@
 /*
  Copyright (c) 2015, Apple Inc. All rights reserved.
+ Copyright (c) 2017, Sage Bionetworks.
  
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
@@ -30,6 +31,7 @@
 
 
 @import CoreMotion;
+#import <ResearchKit/ORKTypes.h>
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -37,6 +39,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CMAccelerometerData (ORKJSONDictionary)
 
 - (NSDictionary *)ork_JSONDictionary;
+
+- (NSDictionary *)ork_JSONDictionaryWithTimestamp:(NSTimeInterval)timestamp consolidated:(BOOL)consolidated;
 
 @end
 

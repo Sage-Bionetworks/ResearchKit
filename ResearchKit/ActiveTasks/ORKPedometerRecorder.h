@@ -30,7 +30,7 @@
 
 
 @import UIKit;
-#import <ResearchKit/ORKRecorder.h>
+#import <ResearchKit/ORKRecorder_Private.h>
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -52,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
  background using UIApplication's background task support.
  */
 ORK_CLASS_AVAILABLE
-@interface ORKPedometerRecorder : ORKRecorder
+@interface ORKPedometerRecorder : ORKDataLogRecorder
 
 @property (nonatomic, readonly, nullable) NSDate *lastUpdateDate;
 

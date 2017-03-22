@@ -85,6 +85,7 @@ enum TaskListRow: Int, CustomStringConvertible {
     case login
     case passcode
     case audio
+    case cardio
     case fitness
     case gonogoTest
     case holePegTest
@@ -156,6 +157,7 @@ enum TaskListRow: Int, CustomStringConvertible {
             TaskListRowSection(title: "Active Tasks", rows:
                 [
                     .audio,
+                    .cardio,
                     .fitness,
                     .gonogoTest,
                     .holePegTest,
@@ -265,6 +267,9 @@ enum TaskListRow: Int, CustomStringConvertible {
             
         case .audio:
             return NSLocalizedString("Audio", comment: "")
+            
+        case .cardio:
+            return NSLocalizedString("Cardio Challenge", comment: "")
             
         case .fitness:
             return NSLocalizedString("Fitness Check", comment: "")
@@ -466,6 +471,7 @@ enum TaskListRow: Int, CustomStringConvertible {
 
         // Active tasks.
         case audioTask
+        case cardioTask
         case fitnessTask
 		case gonogoTest
         case holePegTestTask
@@ -573,6 +579,9 @@ enum TaskListRow: Int, CustomStringConvertible {
             
         case .audio:
             return audioTask
+            
+        case .cardio:
+            return cardioTask
 
         case .fitness:
             return fitnessTask
@@ -1300,6 +1309,15 @@ enum TaskListRow: Int, CustomStringConvertible {
     /// This task presents the Audio pre-defined active task.
     private var audioTask: ORKTask {
         return ORKOrderedTask.audioTask(withIdentifier: String(describing:Identifier.audioTask), intendedUseDescription: exampleDescription, speechInstruction: exampleSpeechInstruction, shortSpeechInstruction: exampleSpeechInstruction, duration: 20, recordingSettings: nil,  checkAudioLevel: true, options: [])
+    }
+    
+    /// This task presents a 6-minute walk with heart rate measurement using the Apple Watch (if available) and phone camera
+    private var cardioTask: ORKTask {
+        if #available(iOS 10.0, *) {
+            return ORKOrderedTask.cardioChallenge(withIdentifier: String(describing:Identifier.cardioTask), intendedUseDescription: exampleDescription, walkDuration: 60, restDuration: 30, relativeDistanceOnly:false, options: [])
+        } else {
+            return fitnessTask
+        }
     }
 
     /**

@@ -2853,6 +2853,24 @@ static NSString *const formattedAddressLinesKey = @"FormattedAddressLines";
                             ORKLocalizedString(@"MOOD_EXERCISE_TERRIBLE", nil)];
         } break;
             
+        case ORKMoodQuestionTypeBreathing: {
+            imageName = @"MoodSurveyMood";
+            textChoices = @[ORKLocalizedString(@"MOOD_BREATHING_GREAT", nil),
+                            ORKLocalizedString(@"MOOD_BREATHING_GOOD", nil),
+                            ORKLocalizedString(@"MOOD_BREATHING_AVERAGE", nil),
+                            ORKLocalizedString(@"MOOD_BREATHING_BAD", nil),
+                            ORKLocalizedString(@"MOOD_BREATHING_TERRIBLE", nil)];
+        } break;
+            
+        case ORKMoodQuestionTypeTired: {
+            imageName = @"MoodSurveyMood";
+            textChoices = @[ORKLocalizedString(@"MOOD_TIRED_GREAT", nil),
+                            ORKLocalizedString(@"MOOD_TIRED_GOOD", nil),
+                            ORKLocalizedString(@"MOOD_TIRED_AVERAGE", nil),
+                            ORKLocalizedString(@"MOOD_TIRED_BAD", nil),
+                            ORKLocalizedString(@"MOOD_TIRED_TERRIBLE", nil)];
+        } break;
+    
         default: {
             imageName = @"MoodSurveyCustom";
             textChoices = @[ORKLocalizedString(@"MOOD_CUSTOM_GREAT", nil),

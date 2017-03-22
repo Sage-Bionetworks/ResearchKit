@@ -1,5 +1,6 @@
 /*
  Copyright (c) 2015, Apple Inc. All rights reserved.
+ Copyright (c) 2017, Sage Bionetworks.
  
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
@@ -31,14 +32,22 @@
 
 #import "CMAccelerometerData+ORKJSONDictionary.h"
 
+#import "ORKHelpers_Internal.h"
+
 
 @implementation CMAccelerometerData (ORKJSONDictionary)
 
 - (NSDictionary *)ork_JSONDictionary {
-    NSDictionary *dictionary = @{@"timestamp": [NSDecimalNumber numberWithDouble:self.timestamp],
-                                 @"x": [NSDecimalNumber numberWithDouble:self.acceleration.x],
-                                 @"y": [NSDecimalNumber numberWithDouble:self.acceleration.y],
-                                 @"z": [NSDecimalNumber numberWithDouble:self.acceleration.z]
+    return [self ork_JSONDictionaryWithTimestamp:self.timestamp consolidated:NO];
+}
+
+- (NSDictionary *)ork_JSONDictionaryWithTimestamp:(NSTimeInterval)timestamp consolidated:(BOOL)consolidated {
+    
+    NSString *format = consolidated ? @"acceleration_%@" : @"%@";
+    NSDictionary *dictionary = @{@"timestamp": [NSDecimalNumber numberWithDouble:timestamp],
+                                 [NSString stringWithFormat:format, @"x"]: [NSDecimalNumber numberWithDouble:self.acceleration.x],
+                                 [NSString stringWithFormat:format, @"y"]: [NSDecimalNumber numberWithDouble:self.acceleration.y],
+                                 [NSString stringWithFormat:format, @"z"]: [NSDecimalNumber numberWithDouble:self.acceleration.z]
                                  };
     return dictionary;
 }

@@ -1,5 +1,6 @@
 /*
  Copyright (c) 2015, Apple Inc. All rights reserved.
+ Copyright (c) 2017, Sage Bionetworks.
  
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
@@ -30,13 +31,35 @@
 
 
 @import CoreLocation;
+#import <ResearchKit/ORKTypes.h>
 
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CLLocation (ORKJSONDictionary)
 
-- (NSDictionary *)ork_JSONDictionary;
+/**
+ Convert the location to a json coding object.
+ 
+ @return    JSON object
+ */
+- (NSDictionary<NSString *, id> *)ork_JSONDictionary;
+
+/**
+ Convert the location to a json coding object.
+ 
+ @param     relativeDistanceOnly    Encode the distance and bearing rather than the latitude and longitude
+ @param     previous                Previous location
+ @param     timestamp               If not nil, this value will be recorded for the timestamp. Otherwise, the "timestamp" key will map to an ISO-8601 formatted date.
+ 
+ @return    JSON object
+ */
+- (NSDictionary<NSString *, id> *)ork_JSONDictionaryWithRelativeDistanceOnly:(BOOL)relativeDistanceOnly previous:(nullable CLLocation *)previous timestamp:(nullable id)timestamp;
+
+/**
+ The direction of travel (in degrees) between two locations
+ */
+- (CLLocationDirection)bearingFromLocation:(CLLocation *)previousLocation;
 
 @end
 

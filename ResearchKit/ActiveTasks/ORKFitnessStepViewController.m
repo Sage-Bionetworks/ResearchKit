@@ -29,7 +29,7 @@
  */
 
 
-#import "ORKFitnessStepViewController.h"
+#import "ORKFitnessStepViewController_Internal.h"
 
 #import "ORKActiveStepTimer.h"
 #import "ORKActiveStepView.h"
@@ -37,26 +37,25 @@
 #import "ORKVerticalContainerView.h"
 
 #import "ORKStepViewController_Internal.h"
-#import "ORKHealthQuantityTypeRecorder.h"
-#import "ORKPedometerRecorder.h"
 
 #import "ORKActiveStepViewController_Internal.h"
+#import "ORKCollectionResult.h"
 #import "ORKFitnessStep.h"
+#import "ORKLocationRecorder.h"
+#import "ORKQuestionResult.h"
+#import "ORKResult.h"
 #import "ORKStep_Private.h"
+#import "ORKWorkoutStep_Private.h"
+
 
 #import "ORKHelpers_Internal.h"
 
-
-@interface ORKFitnessStepViewController () <ORKHealthQuantityTypeRecorderDelegate,ORKPedometerRecorderDelegate> {
+@implementation ORKFitnessStepViewController {
     NSInteger _intendedSteps;
     ORKFitnessContentView *_contentView;
     NSNumberFormatter *_hrFormatter;
+    BOOL _userEndedWorkout;
 }
-
-@end
-
-
-@implementation ORKFitnessStepViewController
 
 - (instancetype)initWithStep:(ORKStep *)step {    
     self = [super initWithStep:step];
@@ -68,6 +67,36 @@
 
 - (ORKFitnessStep *)fitnessStep {
     return (ORKFitnessStep *)self.step;
+}
+
+- (ORKStepResult *)result {
+    ORKStepResult *sResult = [super result];
+    
+    NSMutableArray *results = [sResult.results mutableCopy] ? : [NSMutableArray new];
+
+    if (_userEndedWorkout) {
+        ORKBooleanQuestionResult *boolResult = [[ORKBooleanQuestionResult alloc] initWithIdentifier:ORKWorkoutResultIdentifierUserEnded];
+        boolResult.booleanAnswer = @YES;
+        [results addObject:boolResult];
+    }
+    
+    CLLocation *location = self.locationRecorder.mostRecentLocation;
+    if (location) {
+        ORKNumericQuestionResult *speedResult = [[ORKNumericQuestionResult alloc] initWithIdentifier:ORKWorkoutResultIdentifierSpeed];
+        speedResult.numericAnswer = [NSDecimalNumber numberWithDouble:location.speed];
+        [results addObject:speedResult];
+        
+        ORKBooleanQuestionResult *outdoorsResult = [[ORKBooleanQuestionResult alloc] initWithIdentifier:ORKWorkoutResultIdentifierIsOutdoors];
+        outdoorsResult.booleanAnswer = @([self.locationRecorder isOutdoors]);
+        [results addObject:outdoorsResult];
+        
+        ORKNumericQuestionResult *distanceResult = [[ORKNumericQuestionResult alloc] initWithIdentifier:ORKWorkoutResultIdentifierDistanceTraveled];
+        distanceResult.numericAnswer = [NSDecimalNumber numberWithDouble:[self.locationRecorder distanceTraveled]];
+        [results addObject:distanceResult];
+    }
+    
+    sResult.results = results;
+    return sResult;
 }
 
 - (void)stepDidChange {
@@ -92,8 +121,9 @@
     if (quantity != nil) {
         _contentView.hasHeartRate = YES;
     }
-    if (quantity) {
-        _contentView.heartRate = [_hrFormatter stringFromNumber:@([quantity.quantity doubleValueForUnit:unit])];
+    double bpm = [quantity.quantity doubleValueForUnit:unit];
+    if (bpm > 0) {
+        _contentView.heartRate = [_hrFormatter stringFromNumber:@(bpm)];
     } else {
         _contentView.heartRate = @"--";
     }
@@ -102,7 +132,6 @@
 - (void)updateDistance:(double)distanceInMeters {
     _contentView.hasDistance = YES;
     _contentView.distanceInMeters = distanceInMeters;
-    
 }
 
 - (void)recordersDidChange {
@@ -118,10 +147,12 @@
             if ([[[rec1 quantityType] identifier] isEqualToString:HKQuantityTypeIdentifierHeartRate]) {
                 heartRateRecorder = (ORKHealthQuantityTypeRecorder *)recorder;
             }
+        } else if ([recorder isKindOfClass:[ORKLocationRecorder class]]) {
+            _locationRecorder = (ORKLocationRecorder *)recorder;
         }
     }
     
-    if (heartRateRecorder == nil) {
+    if ((heartRateRecorder == nil) && !self.usesCamera) {
         _contentView.hasHeartRate = NO;
     }
     _contentView.heartRate = @"--";
@@ -135,10 +166,19 @@
     [super countDownTimerFired:timer finished:finished];
 }
 
+- (void)workoutStateChanged:(ORKWorkoutState)workoutState {
+    [super workoutStateChanged:workoutState];
+    if ([workoutState isEqualToString:ORKWorkoutStateEnded]) {
+        // Workout has been ended from the watch
+        _userEndedWorkout = YES;
+        [self finish];
+    }
+}
+
 #pragma mark - ORKHealthQuantityTypeRecorderDelegate
 
 - (void)healthQuantityTypeRecorderDidUpdate:(ORKHealthQuantityTypeRecorder *)healthQuantityTypeRecorder {
-    if ([[healthQuantityTypeRecorder.quantityType identifier] isEqualToString:HKQuantityTypeIdentifierHeartRate]) {
+    if (!self.usesCamera && [[healthQuantityTypeRecorder.quantityType identifier] isEqualToString:HKQuantityTypeIdentifierHeartRate]) {
         [self updateHeartRateWithQuantity:healthQuantityTypeRecorder.lastSample unit:healthQuantityTypeRecorder.unit];
     }
 }

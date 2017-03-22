@@ -50,10 +50,11 @@
 #import "ORKCompletionStep.h"
 #import "ORKCountdownStep.h"
 #import "ORKGoNoGoStep.h"
+#import "ORKHeartRateCaptureStep.h"
 #import "ORKHolePegTestPlaceStep.h"
 #import "ORKHolePegTestRemoveStep.h"
 #import "ORKTouchAnywhereStep.h"
-#import "ORKFitnessStep.h"
+#import "ORKFitnessStep_Internal.h"
 #import "ORKFormStep.h"
 #import "ORKNavigableOrderedTask.h"
 #import "ORKPSATStep.h"
@@ -72,6 +73,7 @@
 #import "ORKShoulderRangeOfMotionStep.h"
 #import "ORKWaitStep.h"
 #import "ORKWalkingTaskStep.h"
+#import "ORKWorkoutStep_Private.h"
 #import "ORKResultPredicate.h"
 
 #import "ORKHelpers_Internal.h"
@@ -153,6 +155,186 @@ void ORKStepArrayAddStep(NSMutableArray *array, ORKStep *step) {
 
 
 @implementation ORKOrderedTask (ORKPredefinedActiveTask)
+
+#pragma mark - cardioChallengeTask
+
+NSString *const ORKWorkoutStepIdentifier = @"workout";
+NSString *const ORKWorkoutPostActivitySurveyQuestionStepIdentifier = @"survey.after";
+NSString *const ORKWorkoutBreathingBeforeQuestionStepIdentifier = @"breathing.before";
+NSString *const ORKWorkoutBreathingAfterQuestionStepIdentifier = @"breathing.after";
+NSString *const ORKWorkoutTiredBeforeQuestionStepIdentifier = @"tired.before";
+NSString *const ORKWorkoutTiredAfterQuestionStepIdentifier = @"tired.after";
+
++ (ORKOrderedTask *)cardioChallengeTaskWithIdentifier:(NSString *)identifier
+                               intendedUseDescription:(nullable NSString *)intendedUseDescription
+                                         walkDuration:(NSTimeInterval)walkDuration
+                                         restDuration:(NSTimeInterval)restDuration
+                                 relativeDistanceOnly:(BOOL)relativeDistanceOnly
+                                              options:(ORKPredefinedTaskOption)options {
+    
+    NSDateComponentsFormatter *formatter = [self textTimeFormatter];
+    NSString *durationString = [formatter stringFromTimeInterval:walkDuration];
+    
+    NSMutableArray *steps = [NSMutableArray array];
+    if (!(options & ORKPredefinedTaskOptionExcludeInstructions)) {
+        {
+            ORKInstructionStep *step = [[ORKInstructionStep alloc] initWithIdentifier:ORKInstruction0StepIdentifier];
+            step.title = ORKLocalizedString(@"CARDIO_INTRO_TITLE", nil);
+            step.text = ORKLocalizedString(@"CARDIO_INTRO_ABOUT_TEXT", nil);
+            step.detailText = intendedUseDescription;
+            step.image = [UIImage imageNamed:@"heartbeat" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
+            step.shouldTintImages = YES;
+            
+            ORKStepArrayAddStep(steps, step);
+        }
+        
+        {
+            ORKInstructionStep *step = [[ORKInstructionStep alloc] initWithIdentifier:ORKInstruction1StepIdentifier];
+            step.title = ORKLocalizedString(@"CARDIO_HEART_RISK_TITLE", nil);
+            step.text = ORKLocalizedString(@"CARDIO_HEART_RISK_TEXT", nil);
+            
+            ORKStepArrayAddStep(steps, step);
+        }
+        
+        {
+            ORKInstructionStep *step = [[ORKInstructionStep alloc] initWithIdentifier:ORKInstruction2StepIdentifier];
+            step.title = ORKLocalizedString(@"CARDIO_SAFETY_TITLE", nil);
+            step.text = [NSString localizedStringWithFormat:ORKLocalizedString(@"CARDIO_SAFETY_TEXT", nil), durationString, durationString];
+            
+            ORKStepArrayAddStep(steps, step);
+        }
+        
+        {
+            ORKInstructionStep *step = [[ORKInstructionStep alloc] initWithIdentifier:ORKInstruction3StepIdentifier];
+            step.title = ORKLocalizedString(@"CARDIO_INSTRUCTIONS_1_TITLE", nil);
+            step.text = [NSString localizedStringWithFormat:ORKLocalizedString(@"CARDIO_INSTRUCTIONS_1_TEXT", nil), durationString, durationString];
+            
+            ORKStepArrayAddStep(steps, step);
+        }
+        
+        {
+            ORKInstructionStep *step = [[ORKInstructionStep alloc] initWithIdentifier:ORKInstruction4StepIdentifier];
+            step.title = ORKLocalizedString(@"CARDIO_INSTRUCTIONS_2_TITLE", nil);
+            step.text = ORKLocalizedString(@"CARDIO_INSTRUCTIONS_2_TEXT", nil);
+            step.detailText = ORKLocalizedString(@"CARDIO_INSTRUCTIONS_2_DETAIL", nil);
+            
+            ORKStepArrayAddStep(steps, step);
+        }
+    }
+    
+    {   // breathing - before
+        NSString *prompt = ORKLocalizedString(@"MOOD_BREATHING_DAILY_PROMPT", nil);
+        
+        ORKAnswerFormat *format = [[ORKMoodScaleAnswerFormat alloc] initWithMoodQuestionType:ORKMoodQuestionTypeBreathing];
+        ORKQuestionStep *step = [ORKQuestionStep questionStepWithIdentifier:ORKWorkoutBreathingBeforeQuestionStepIdentifier
+                                                                      title:prompt
+                                                                     answer:format];
+        step.optional = NO;
+        
+        ORKStepArrayAddStep(steps, step);
+    }
+    
+    {   // tired - before
+        NSString *prompt = ORKLocalizedString(@"MOOD_TIRED_DAILY_PROMPT", nil);
+        
+        ORKAnswerFormat *format = [[ORKMoodScaleAnswerFormat alloc] initWithMoodQuestionType:ORKMoodQuestionTypeTired];
+        ORKQuestionStep *step = [ORKQuestionStep questionStepWithIdentifier:ORKWorkoutTiredBeforeQuestionStepIdentifier
+                                                                      title:prompt
+                                                                     answer:format];
+        step.optional = NO;
+        
+        ORKStepArrayAddStep(steps, step);
+    }
+    
+    {
+        ORKInstructionStep *pocketStep = [[ORKInstructionStep alloc] initWithIdentifier:ORKInstruction1StepIdentifier];
+        pocketStep.title = ORKLocalizedString(@"CARDIO_WALK_INSTRUCTION_TITLE", nil);
+        pocketStep.text = ORKLocalizedString(@"CARDIO_WALK_INSTRUCTION_TEXT", nil);
+        pocketStep.image = [UIImage imageNamed:@"pocket" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
+        pocketStep.shouldTintImages = YES;
+        
+        ORKCountdownStep *countdownStep = [[ORKCountdownStep alloc] initWithIdentifier:ORKCountdownStepIdentifier];
+        countdownStep.stepDuration = 5.0;
+        
+        ORKFitnessStep *fitnessStep = [[ORKFitnessStep alloc] initWithIdentifier:ORKFitnessWalkStepIdentifier];
+        fitnessStep.stepDuration = walkDuration;
+        fitnessStep.title = [NSString stringWithFormat:ORKLocalizedString(@"FITNESS_WALK_INSTRUCTION_FORMAT", nil), [formatter stringFromTimeInterval:walkDuration]];
+        fitnessStep.spokenInstruction = fitnessStep.title;
+        fitnessStep.recorderConfigurations = [ORKFitnessStep recorderConfigurationsWithOptions:(ORKPredefinedRecorderOption)options relativeDistanceOnly:relativeDistanceOnly standingStill:NO];
+        fitnessStep.shouldContinueOnFinish = YES;
+        fitnessStep.optional = NO;
+        fitnessStep.shouldStartTimerAutomatically = YES;
+        fitnessStep.shouldTintImages = YES;
+        fitnessStep.image = [UIImage imageNamed:@"walkingman" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
+        fitnessStep.shouldVibrateOnStart = YES;
+        fitnessStep.shouldPlaySoundOnStart = YES;
+        fitnessStep.watchInstruction = ORKLocalizedString(@"FITNESS_WALK_INSTRUCTION_WATCH", nil);
+        fitnessStep.beginCommand = ORKWorkoutCommandStartMoving;
+        fitnessStep.shouldConsolidateRecorders = YES;
+        
+        ORKHeartRateCaptureStep *restStep = [[ORKHeartRateCaptureStep alloc] initWithIdentifier:ORKWorkoutAfterStepIdentifier];
+        restStep.stepDuration = restDuration;
+        restStep.minimumDuration = restDuration;
+        
+        ORKWorkoutStep *step = [[ORKWorkoutStep alloc] initWithIdentifier:ORKWorkoutStepIdentifier
+                                                              motionSteps:@[pocketStep, countdownStep, fitnessStep]
+                                                                 restStep:restStep
+                                                     relativeDistanceOnly:relativeDistanceOnly
+                                                                  options:(ORKPredefinedRecorderOption)options];
+        
+        ORKStepArrayAddStep(steps, step);
+    }
+    
+    {
+        ORKTextChoice *choice1 = [ORKTextChoice choiceWithText:ORKLocalizedString(@"CARDIO_POST_SURVEY_CHOICE_BEST_EFFORT", nil) value:@"best effort"];
+        ORKTextChoice *choice2 = [ORKTextChoice choiceWithText:ORKLocalizedString(@"CARDIO_POST_SURVEY_CHOICE_FEELING_TIRED", nil) value:@"feeling tired"];
+        ORKTextChoice *choice3 = [ORKTextChoice choiceWithText:ORKLocalizedString(@"CARDIO_POST_SURVEY_CHOICE_PAIN", nil) value:@"pain or discomfort"];
+        ORKTextChoice *choice4 = [ORKTextChoice choiceWithText:ORKLocalizedString(@"CARDIO_POST_SURVEY_CHOICE_INTERRUPTED", nil) value:@"interrupted"];
+        
+        ORKTextChoiceAnswerFormat *format = [[ORKTextChoiceAnswerFormat alloc] initWithStyle:ORKChoiceAnswerStyleSingleChoice
+                                                                                 textChoices:@[choice1, choice2, choice3, choice4]];
+        ORKQuestionStep *step = [ORKQuestionStep questionStepWithIdentifier:ORKWorkoutPostActivitySurveyQuestionStepIdentifier
+                                                                      title:nil
+                                                                       text:ORKLocalizedString(@"CARDIO_POST_SURVEY_PROMPT", nil)
+                                                                     answer:format];
+        step.optional = NO;
+        
+        ORKStepArrayAddStep(steps, step);
+    }
+    
+    {   // breathing - after
+        NSString *prompt = ORKLocalizedString(@"MOOD_BREATHING_AFTER_EXCERCISE_PROMPT", nil);
+        
+        ORKAnswerFormat *format = [[ORKMoodScaleAnswerFormat alloc] initWithMoodQuestionType:ORKMoodQuestionTypeBreathing];
+        ORKQuestionStep *step = [ORKQuestionStep questionStepWithIdentifier:ORKWorkoutBreathingAfterQuestionStepIdentifier
+                                                                      title:prompt
+                                                                     answer:format];
+        step.optional = NO;
+        
+        ORKStepArrayAddStep(steps, step);
+    }
+    
+    {   // tired - after
+        NSString *prompt = ORKLocalizedString(@"MOOD_TIRED_AFTER_EXCERCISE_PROMPT", nil);
+        
+        ORKAnswerFormat *format = [[ORKMoodScaleAnswerFormat alloc] initWithMoodQuestionType:ORKMoodQuestionTypeTired];
+        ORKQuestionStep *step = [ORKQuestionStep questionStepWithIdentifier:ORKWorkoutTiredAfterQuestionStepIdentifier
+                                                                      title:prompt
+                                                                     answer:format];
+        step.optional = NO;
+        
+        ORKStepArrayAddStep(steps, step);
+    }
+    
+    if (!(options & ORKPredefinedTaskOptionExcludeConclusion)) {
+        ORKInstructionStep *step = [self makeCompletionStep];
+        ORKStepArrayAddStep(steps, step);
+    }
+    
+    ORKOrderedTask *task = [[ORKOrderedTask alloc] initWithIdentifier:identifier steps:steps];
+    
+    return task;
+}
 
 
 #pragma mark - holePegTestTask

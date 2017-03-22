@@ -31,7 +31,7 @@
 
 #import "ORKTaskViewController.h"
 
-#import "ORKActiveStepViewController.h"
+#import "ORKActiveStepViewController_Internal.h"
 #import "ORKInstructionStepViewController_Internal.h"
 #import "ORKFormStepViewController.h"
 #import "ORKQuestionStepViewController.h"
