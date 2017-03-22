@@ -56,8 +56,18 @@
     BOOL _validResult;
     BOOL _timedOut;
     BOOL _shouldIndicateFailure;
+    BOOL _testActive;
+    BOOL _testEnded;
     NSMutableArray<NSNumber*>* tests;
     BOOL go;
+}
+
+- (instancetype)initWithStep:(ORKStep *)step {
+    self = [super initWithStep:step];
+    if (self) {
+        self.suspendIfInactive = YES;
+    }
+    return self;
 }
 
 static const NSTimeInterval OutcomeAnimationDuration = 0.3;
@@ -71,7 +81,8 @@ static const NSTimeInterval OutcomeAnimationDuration = 0.3;
     _results = [NSMutableArray new];
     _samples = [NSMutableArray new];
     go = true;
-    UIColor* color = self.view.tintColor;
+    
+    arc4random_stir();
     
     // Generate the type of tests we are going to display
     // Always do go first, and make sure there is at least 1 no-go
@@ -87,7 +98,7 @@ static const NSTimeInterval OutcomeAnimationDuration = 0.3;
     // If none of the test are a 'no go', put a 'no go' in the array in a random position
     // unless the array is size 1 since we always want the first test to be a 'go'
     if (!hasNoGo && tests.count > 1) {
-        [tests setObject:@NO atIndexedSubscript:arc4random_uniform(tests.count - 1) + 1];
+        [tests setObject:@NO atIndexedSubscript:arc4random_uniform((uint32_t)tests.count - 1) + 1];
     }
     
     go = [self getNextTestType];
@@ -101,13 +112,26 @@ static const NSTimeInterval OutcomeAnimationDuration = 0.3;
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [self start];
-    _shouldIndicateFailure = YES;
+    if (!_testEnded) {
+        [self start];
+        _shouldIndicateFailure = YES;
+        _testActive = YES;
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    _testEnded = YES;
     _shouldIndicateFailure = NO;
+    _testActive = NO;
+    
+    [self stopRecorders];
+    [_stimulusTimer invalidate];
+    _stimulusTimer = nil;
+    [_timeoutTimer invalidate];
+    _timeoutTimer = nil;
+    
+    [_gonogoContentView cancelReset];
 }
 
 #pragma mark - ORKActiveStepViewController
@@ -136,14 +160,22 @@ static const NSTimeInterval OutcomeAnimationDuration = 0.3;
 
 - (void)applicationWillResignActive:(NSNotification *)notification {
     [super applicationWillResignActive:notification];
+    _testActive = NO;
     _validResult = NO;
     [_stimulusTimer invalidate];
+    _stimulusTimer = nil;
     [_timeoutTimer invalidate];
+    _timeoutTimer = nil;
+    [self stopRecorders];
+    [_gonogoContentView cancelReset];
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
     [super applicationDidBecomeActive:notification];
-    [self resetAfterDelay:0];
+    if (!_testEnded) {
+        _testActive = YES;
+        [self resetAfterDelay:0];
+    }
 }
 
 #pragma mark - ORKRecorderDelegate
@@ -219,9 +251,15 @@ static const NSTimeInterval OutcomeAnimationDuration = 0.3;
         }
         
         if (successCount == [self gonogoTimeStep].numberOfAttempts) {
+            _testEnded = YES;
             [self finish];
         } else {
-            [self resetAfterDelay:2];
+            // If the user cancels the test, there may be animations active,
+            // and the animation complete block will start the next test
+            // after we've already tried to cancel. Don't let that happen
+            if (_testActive) {
+                [self resetAfterDelay:2];
+            }
         }
     };
     
@@ -234,7 +272,9 @@ static const NSTimeInterval OutcomeAnimationDuration = 0.3;
     _validResult = NO;
     _timedOut = NO;
     [_stimulusTimer invalidate];
+    _stimulusTimer = nil;
     [_timeoutTimer invalidate];
+    _timeoutTimer = nil;
 }
 
 - (void)indicateResultIncorrect:(BOOL)incorrect completion:(void(^)(void))completion {
@@ -303,10 +343,14 @@ static const NSTimeInterval OutcomeAnimationDuration = 0.3;
 }
 
 - (void)startStimulusTimer {
+    if (_stimulusTimer != nil) {
+        [_stimulusTimer invalidate];
+    }
     _stimulusTimer = [NSTimer scheduledTimerWithTimeInterval:[self stimulusInterval] target:self selector:@selector(stimulusTimerDidFire) userInfo:nil repeats:NO];
 }
 
 - (void)stimulusTimerDidFire {
+    _stimulusTimer = nil;
     _stimulusTimestamp = [NSProcessInfo processInfo].systemUptime;
     [_gonogoContentView setStimulusHidden:NO];
     _validResult = YES;
@@ -316,11 +360,15 @@ static const NSTimeInterval OutcomeAnimationDuration = 0.3;
 - (void)startTimeoutTimer {
     NSTimeInterval timeout = [self gonogoTimeStep].timeout;
     if (timeout > 0) {
+        if (_timeoutTimer != nil) {
+            [_timeoutTimer invalidate];
+        }
         _timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:timeout target:self selector:@selector(timeoutTimerDidFire) userInfo:nil repeats:NO];
     }
 }
 
 - (void)timeoutTimerDidFire {
+    _timeoutTimer = nil;
     _validResult = NO;
     _timedOut = YES;
     [self stopRecorders];

@@ -132,7 +132,7 @@
 		789FA3F81E37BD9900A5F2F8 /* ORKGoNoGoStep.m in Sources */ = {isa = PBXBuildFile; fileRef = 789FA3F01E37BD9900A5F2F8 /* ORKGoNoGoStep.m */; };
 		789FA3F91E37BD9900A5F2F8 /* ORKGoNoGoStimulusView.h in Headers */ = {isa = PBXBuildFile; fileRef = 789FA3F11E37BD9900A5F2F8 /* ORKGoNoGoStimulusView.h */; };
 		789FA3FA1E37BD9900A5F2F8 /* ORKGoNoGoStimulusView.m in Sources */ = {isa = PBXBuildFile; fileRef = 789FA3F21E37BD9900A5F2F8 /* ORKGoNoGoStimulusView.m */; };
-		789FA3FB1E37BD9900A5F2F8 /* ORKGoNoGoViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 789FA3F31E37BD9900A5F2F8 /* ORKGoNoGoViewController.h */; };
+		789FA3FB1E37BD9900A5F2F8 /* ORKGoNoGoViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 789FA3F31E37BD9900A5F2F8 /* ORKGoNoGoViewController.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		789FA3FC1E37BD9900A5F2F8 /* ORKGoNoGoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 789FA3F41E37BD9900A5F2F8 /* ORKGoNoGoViewController.m */; };
 		781D54101DF886AB00223305 /* ORKTrailmakingContentView.h in Headers */ = {isa = PBXBuildFile; fileRef = 781D540A1DF886AB00223305 /* ORKTrailmakingContentView.h */; };
 		781D54111DF886AB00223305 /* ORKTrailmakingContentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 781D540B1DF886AB00223305 /* ORKTrailmakingContentView.m */; };

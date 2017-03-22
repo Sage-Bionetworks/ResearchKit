@@ -32,7 +32,7 @@ import UIKit
 import ResearchKit
 
 enum Activity: Int {
-    case survey, microphone, tapping, gonogo, trailmaking
+    case gonogo, survey, microphone, tapping, trailmaking
     
     static var allValues: [Activity] {
         var index = 0
@@ -47,6 +47,8 @@ enum Activity: Int {
     
     var title: String {
         switch self {
+            case .gonogo:
+                return "Go No Go"
             case .survey:
                 return "Survey"
             case .microphone:
@@ -62,6 +64,8 @@ enum Activity: Int {
     
     var subtitle: String {
         switch self {
+            case .gonogo:
+                return "Test reaction and impulsiveness"
             case .survey:
                 return "Answer 6 short questions"
             case .microphone:
@@ -103,6 +107,10 @@ class ActivityViewController: UITableViewController {
         
         let taskViewController: ORKTaskViewController
         switch activity {
+            case .gonogo:
+                taskViewController = ORKTaskViewController(task: StudyTasks.gonogoTask, taskRun: NSUUID() as UUID)
+                taskViewController.outputDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            
             case .survey:
                 taskViewController = ORKTaskViewController(task: StudyTasks.surveyTask, taskRun: NSUUID() as UUID)
             
