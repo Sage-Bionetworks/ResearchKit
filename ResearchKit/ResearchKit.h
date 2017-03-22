@@ -63,6 +63,13 @@
 #import <ResearchKit/ORKHealthAnswerFormat.h>
 
 #import <ResearchKit/ORKResult.h>
+#import <ResearchKit/ORKActiveTaskResult.h>
+#import <ResearchKit/ORKCollectionResult.h>
+#import <ResearchKit/ORKConsentSignatureResult.h>
+#import <ResearchKit/ORKPasscodeResult.h>
+#import <ResearchKit/ORKQuestionResult.h>
+#import <ResearchKit/ORKSignatureResult.h>
+#import <ResearchKit/ORKVideoInstructionStepResult.h>
 #import <ResearchKit/ORKResultPredicate.h>
 
 #import <ResearchKit/ORKTextButton.h>
