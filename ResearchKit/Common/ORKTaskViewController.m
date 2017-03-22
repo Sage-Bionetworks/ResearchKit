@@ -46,6 +46,7 @@
 #import "ORKFormStep.h"
 #import "ORKInstructionStep.h"
 #import "ORKOrderedTask.h"
+#import "ORKPermissionsValidator.h"
 #import "ORKQuestionStep.h"
 #import "ORKResult_Private.h"
 #import "ORKReviewStep_Internal.h"
@@ -472,6 +473,13 @@ static NSString *const _ChildNavigationControllerRestorationKey = @"childNavigat
     }
     
     ORKPermissionMask permissions = [self desiredPermissions];
+    
+    // Validate permissions
+    NSError *error;
+    if (![ORKPermissionsValidator validatePermissions:permissions writeTypes:writeTypes readTypes:readTypes error:&error]) {
+        ORK_Log_Error(@"%@: %@", [error localizedFailureReason], [error localizedDescription]);
+        NSAssert(NO, [error description]);
+    }
     
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     

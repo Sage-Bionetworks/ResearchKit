@@ -589,6 +589,8 @@
 		FF5CA61C1D2C6453001660A3 /* ORKSignatureStep.m in Sources */ = {isa = PBXBuildFile; fileRef = FF5CA61A1D2C6453001660A3 /* ORKSignatureStep.m */; };
 		FF5E3CCB1D23444400ECE4B7 /* ORKPageStepViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = FF5E3CC91D23444400ECE4B7 /* ORKPageStepViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FF5E3CCC1D23444400ECE4B7 /* ORKPageStepViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FF5E3CCA1D23444400ECE4B7 /* ORKPageStepViewController.m */; };
+		FF75E8911E8250C600C2344F /* ORKPermissionsValidator.h in Headers */ = {isa = PBXBuildFile; fileRef = FF75E88F1E8250C600C2344F /* ORKPermissionsValidator.h */; };
+		FF75E8921E8250C600C2344F /* ORKPermissionsValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = FF75E8901E8250C600C2344F /* ORKPermissionsValidator.m */; };
 		FF919A221E81A56F005C2A1E /* ORKTappingIntervalResult.h in Headers */ = {isa = PBXBuildFile; fileRef = FF919A201E81A56F005C2A1E /* ORKTappingIntervalResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FF919A231E81A56F005C2A1E /* ORKTappingIntervalResult.m in Sources */ = {isa = PBXBuildFile; fileRef = FF919A211E81A56F005C2A1E /* ORKTappingIntervalResult.m */; };
 		FF919A271E81A87B005C2A1E /* ORKActiveTaskResult.h in Headers */ = {isa = PBXBuildFile; fileRef = FF919A261E81A87B005C2A1E /* ORKActiveTaskResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1266,6 +1268,8 @@
 		FF5CA61A1D2C6453001660A3 /* ORKSignatureStep.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORKSignatureStep.m; sourceTree = "<group>"; };
 		FF5E3CC91D23444400ECE4B7 /* ORKPageStepViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORKPageStepViewController.h; sourceTree = "<group>"; };
 		FF5E3CCA1D23444400ECE4B7 /* ORKPageStepViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORKPageStepViewController.m; sourceTree = "<group>"; };
+		FF75E88F1E8250C600C2344F /* ORKPermissionsValidator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORKPermissionsValidator.h; sourceTree = "<group>"; };
+		FF75E8901E8250C600C2344F /* ORKPermissionsValidator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORKPermissionsValidator.m; sourceTree = "<group>"; };
 		FF919A201E81A56F005C2A1E /* ORKTappingIntervalResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORKTappingIntervalResult.h; sourceTree = "<group>"; };
 		FF919A211E81A56F005C2A1E /* ORKTappingIntervalResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORKTappingIntervalResult.m; sourceTree = "<group>"; };
 		FF919A261E81A87B005C2A1E /* ORKActiveTaskResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORKActiveTaskResult.h; sourceTree = "<group>"; };
@@ -1507,6 +1511,8 @@
 				86C40B8C1A8D7C5C00081FAC /* ORKHelpers_Internal.h */,
 				86C40B7C1A8D7C5C00081FAC /* ORKHelpers_Private.h */,
 				86C40B8D1A8D7C5C00081FAC /* ORKHelpers.m */,
+				FF75E88F1E8250C600C2344F /* ORKPermissionsValidator.h */,
+				FF75E8901E8250C600C2344F /* ORKPermissionsValidator.m */,
 			);
 			name = Utilities;
 			sourceTree = "<group>";
@@ -2832,6 +2838,7 @@
 				86C40D141A8D7C5C00081FAC /* ORKHelpers_Private.h in Headers */,
 				FF919A2E1E81AAD0005C2A1E /* ORKTowerOfHanoiResult.h in Headers */,
 				86C40CA81A8D7C5C00081FAC /* ORKPedometerRecorder.h in Headers */,
+				FF75E8911E8250C600C2344F /* ORKPermissionsValidator.h in Headers */,
 				86C40CD01A8D7C5C00081FAC /* ORKInstructionStepView.h in Headers */,
 				86C40E021A8D7C5C00081FAC /* ORKConsentDocument_Internal.h in Headers */,
 				86C40E181A8D7C5C00081FAC /* ORKConsentSection.h in Headers */,
@@ -3370,6 +3377,7 @@
 				BC41942A1AE8453A00073D6B /* ORKObserver.m in Sources */,
 				86C40C681A8D7C5C00081FAC /* CMAccelerometerData+ORKJSONDictionary.m in Sources */,
 				86C40C701A8D7C5C00081FAC /* CMMotionActivity+ORKJSONDictionary.m in Sources */,
+				FF75E8921E8250C600C2344F /* ORKPermissionsValidator.m in Sources */,
 				147503B01AEE8071004B17F3 /* ORKAudioGenerator.m in Sources */,
 				86C40D7E1A8D7C5C00081FAC /* ORKScaleValueLabel.m in Sources */,
 				B12EA01A1B0D76AD00F9F554 /* ORKToneAudiometryPracticeStepViewController.m in Sources */,
