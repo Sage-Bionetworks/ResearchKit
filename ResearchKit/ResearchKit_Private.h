@@ -33,6 +33,9 @@
 
 #import <ResearchKit/ORKHelpers_Private.h>
 
+// Only include the types and defines for other OS types.
+#if TARGET_OS_IOS
+
 // Active step support
 #import <ResearchKit/ORKDataLogger.h>
 #import <ResearchKit/ORKErrors.h>
@@ -103,3 +106,6 @@
 
 // For custom steps
 #import <ResearchKit/ORKCustomStepView.h>
+
+#endif
+

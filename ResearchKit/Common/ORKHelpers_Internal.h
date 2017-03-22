@@ -29,11 +29,18 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
+#if TARGET_OS_IOS
 @import UIKit;
+#else
+@import WatchKit;
+#endif
+
 #import "ORKHelpers_Private.h"
 #import "ORKTypes.h"
+
+#if TARGET_OS_IOS
 #import "ORKErrors.h"
+#endif
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -165,13 +172,17 @@ NSURL *ORKCreateRandomBaseURL();
 // Marked extern so it is accessible to unit tests
 ORK_EXTERN NSString *ORKFileProtectionFromMode(ORKFileProtectionMode mode);
 
+#if TARGET_OS_IOS
 CGFloat ORKExpectedLabelHeight(UILabel *label);
 void ORKAdjustHeightForLabel(UILabel *label);
+#endif
 
 // build a image with color
 UIImage *ORKImageWithColor(UIColor *color);
 
+#if TARGET_OS_IOS
 void ORKEnableAutoLayoutForViews(NSArray *views);
+#endif
 
 NSDateComponentsFormatter *ORKTimeIntervalLabelFormatter();
 NSDateComponentsFormatter *ORKDurationStringFormatter();
@@ -184,10 +195,12 @@ NSDate *ORKTimeOfDayDateFromComponents(NSDateComponents *dateComponents);
 
 BOOL ORKCurrentLocalePresentsFamilyNameFirst();
 
+#if TARGET_OS_IOS
 UIFont *ORKTimeFontForSize(CGFloat size);
 UIFontDescriptor *ORKFontDescriptorForLightStylisticAlternative(UIFontDescriptor *descriptor);
 
 CGFloat ORKFloorToViewScale(CGFloat value, UIView *view);
+#endif
 
 ORK_INLINE bool
 ORKEqualObjects(id o1, id o2) {
@@ -231,9 +244,11 @@ PerformCall; \
 _Pragma("clang diagnostic pop") \
 } while (0)
 
+#if TARGET_OS_IOS
 UIFont *ORKThinFontWithSize(CGFloat size);
 UIFont *ORKLightFontWithSize(CGFloat size);
 UIFont *ORKMediumFontWithSize(CGFloat size);
+#endif
 
 NSURL *ORKURLFromBookmarkData(NSData *data);
 NSData *ORKBookmarkDataFromURL(NSURL *url);
@@ -259,13 +274,17 @@ ORKCGFloatNearlyEqualToFloat(CGFloat f1, CGFloat f2) {
 
 void ORKValidateArrayForObjectsOfClass(NSArray *array, Class expectedObjectClass, NSString *exceptionReason);
 
+#if TARGET_OS_IOS
 void ORKRemoveConstraintsForRemovedViews(NSMutableArray *constraints, NSArray *removedViews);
+#endif
 
 extern const double ORKDoubleInvalidValue;
 
 extern const CGFloat ORKCGFloatInvalidValue;
 
+#if TARGET_OS_IOS
 void ORKAdjustPageViewControllerNavigationDirectionForRTL(UIPageViewControllerNavigationDirection *direction);
+#endif
 
 NSString *ORKPaddingWithNumberOfSpaces(NSUInteger numberOfPaddingSpaces);
 

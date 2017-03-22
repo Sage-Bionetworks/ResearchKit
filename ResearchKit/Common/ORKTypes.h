@@ -30,10 +30,15 @@
 
 
 @import Foundation;
+@import HealthKit;
 #import <ResearchKit/ORKDefines.h>
 
 
 NS_ASSUME_NONNULL_BEGIN
+
+ORK_CLASS_AVAILABLE
+@interface ORKTypes : NSObject
+@end
 
 /**
  An enumeration of values that identify the different types of questions that the ResearchKit

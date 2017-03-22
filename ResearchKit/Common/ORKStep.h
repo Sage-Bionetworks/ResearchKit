@@ -199,7 +199,7 @@ ORK_CLASS_AVAILABLE
  Returns the class that the task view controller should instantiate to display
  this step.
  */
-- (Class)stepViewControllerClass;
+- (Class)stepViewControllerClass NS_AVAILABLE_IOS(7_0);
 
 /**
  Instantiates a step view controller for this class.
@@ -216,7 +216,7 @@ ORK_CLASS_AVAILABLE
  
  @return A newly initialized step view controller.
  */
-- (ORKStepViewController *)instantiateStepViewControllerWithResult:(ORKResult *)result;
+- (ORKStepViewController *)instantiateStepViewControllerWithResult:(ORKResult *)result NS_AVAILABLE_IOS(7_0);
 
 /**
  Is this an instruction step? By default, this method will return `YES` if and only if this is 

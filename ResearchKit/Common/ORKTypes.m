@@ -33,3 +33,14 @@
 
 ORKTrailMakingTypeIdentifier const ORKTrailMakingTypeIdentifierA = @"A";
 ORKTrailMakingTypeIdentifier const ORKTrailMakingTypeIdentifierB = @"B";
+
+@implementation ORKTypes 
+@end
+
+@implementation  HKUnit (ORKUnitExtension)
+
++ (HKUnit *)bpmUnit {
+    return [[HKUnit countUnit] unitDividedByUnit:[HKUnit minuteUnit]];
+}
+
+@end

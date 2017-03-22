@@ -32,12 +32,13 @@
 #import "ORKStep.h"
 #import "ORKStep_Private.h"
 
-#import "ORKStepViewController.h"
-
 #import "ORKOrderedTask.h"
-#import "ORKStepViewController_Internal.h"
 
 #import "ORKHelpers_Internal.h"
+
+#if TARGET_OS_IOS
+#import "ORKStepViewController_Internal.h"
+#endif
 
 
 @implementation ORKStep
@@ -59,6 +60,8 @@
     return self;
 }
 
+#if TARGET_OS_IOS
+
 + (Class)stepViewControllerClass {
     return [ORKStepViewController class];
 }
@@ -78,6 +81,8 @@
     
     return stepViewController;
 }
+
+#endif
 
 - (instancetype)copyWithIdentifier:(NSString *)identifier {
     ORKThrowInvalidArgumentExceptionIfNil(identifier)

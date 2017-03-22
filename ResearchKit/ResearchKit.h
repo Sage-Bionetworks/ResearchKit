@@ -31,6 +31,9 @@
 
 #import <ResearchKit/ORKTypes.h>
 
+// Only include the types and defines for other OS types.
+#if TARGET_OS_IOS
+
 #import <ResearchKit/ORKStep.h>
 #import <ResearchKit/ORKActiveStep.h>
 #import <ResearchKit/ORKConsentReviewStep.h>
@@ -108,4 +111,6 @@
 
 #import <ResearchKit/ORKDataCollectionManager.h>
 #import <ResearchKit/ORKCollector.h>
+
+#endif
 
