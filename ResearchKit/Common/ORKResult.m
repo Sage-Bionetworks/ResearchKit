@@ -250,6 +250,7 @@ const NSUInteger NumberOfPaddingSpacesForIndentationLevel = 4;
 
 @end
 
+
 @implementation ORKRangeOfMotionResult
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
@@ -295,6 +296,7 @@ const NSUInteger NumberOfPaddingSpacesForIndentationLevel = 4;
 }
 
 @end
+
 
 @implementation ORKTowerOfHanoiResult
 
@@ -1559,6 +1561,7 @@ const NSUInteger NumberOfPaddingSpacesForIndentationLevel = 4;
 
 @end
 
+
 @implementation ORKMultipleComponentQuestionResult
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
@@ -1571,7 +1574,7 @@ const NSUInteger NumberOfPaddingSpacesForIndentationLevel = 4;
     self = [super initWithCoder:aDecoder];
     if (self) {
         ORK_DECODE_OBJ_ARRAY(aDecoder, componentsAnswer, NSObject);
-        ORK_DECODE_OBJ(aDecoder, separator);
+        ORK_DECODE_OBJ_CLASS(aDecoder, separator, NSString);
     }
     return self;
 }
@@ -2404,7 +2407,6 @@ static NSString *const RegionIdentifierKey = @"region.identifier";
 @end
 
 
-
 @implementation ORKVideoInstructionStepResult
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
@@ -2448,7 +2450,6 @@ static NSString *const RegionIdentifierKey = @"region.identifier";
 }
 
 @end
-
 
 
 @implementation ORKPageResult

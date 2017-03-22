@@ -2,6 +2,7 @@
  Copyright (c) 2015, Apple Inc. All rights reserved.
  Copyright (c) 2015, Bruce Duncan.
  Copyright (c) 2016, Ricardo Sánchez-Sáez.
+ Copyright (c) 2017, Macro Yau.
  Copyright (c) 2017, Sage Bionetworks.
  
  Redistribution and use in source and binary forms, with or without modification,
@@ -116,6 +117,9 @@ ORK_CLASS_AVAILABLE
 
 + (ORKBooleanAnswerFormat *)booleanAnswerFormat;
 
++ (ORKBooleanAnswerFormat *)booleanAnswerFormatWithYesString:(NSString *)yes
+                                                    noString:(NSString *)no;
+
 + (ORKValuePickerAnswerFormat *)valuePickerAnswerFormatWithTextChoices:(NSArray<ORKTextChoice *> *)textChoices;
 
 + (ORKMultipleValuePickerAnswerFormat *)multipleValuePickerAnswerFormatWithValuePickers:(NSArray<ORKValuePickerAnswerFormat *> *)valuePickers;
@@ -177,7 +181,7 @@ ORK_CLASS_AVAILABLE
  a subclass to return a different answer format for use in defining the UI/UX for
  the answer format type. For example, a Boolean answer format is presented in the 
  same way as a single-choice answer format with the choices Yes and No mapping to 
- `@(YES)` and `@(NO)`, respectively, so it's `impliedAnswerFormat` is an 
+ `@(YES)` and `@(NO)`, respectively, so its `impliedAnswerFormat` is an 
  `ORKTextChoiceAnswerFormat` with those options.
 */
 - (ORKAnswerFormat *)impliedAnswerFormat;
@@ -649,6 +653,7 @@ ORK_CLASS_AVAILABLE
 
 @end
 
+
 /**
  The `ORKNumberPickerAnswerFormat` class represents an answer format that lets participants use a
  value picker to choose from a fixed set of number choices.
@@ -688,6 +693,7 @@ ORK_CLASS_AVAILABLE
 @property (copy, readonly) NSArray<ORKTextChoice *> *textChoices;
 
 @end
+
 
 /**
  The `ORKMultipleValuePickerAnswerFormat` class represents an answer format that lets participants use a
@@ -731,7 +737,7 @@ ORK_CLASS_AVAILABLE
 @property (copy, readonly) NSArray<ORKValuePickerAnswerFormat *> *valuePickers;
 
 /**
- A string used to define the seperator for the format of the string. Default = " ".
+ A string used to define the separator for the format of the string. Default = " ".
  */
 @property (copy, readonly) NSString *separator;
 
@@ -827,6 +833,26 @@ ORK_CLASS_AVAILABLE
  */
 ORK_CLASS_AVAILABLE
 @interface ORKBooleanAnswerFormat : ORKAnswerFormat
+
+/**
+ Returns an initialized Boolean answer format using the specified strings for Yes and No answers.
+ 
+ @param yes         A string that describes the Yes answer.
+ @param no          A string that describes the No answer.
+ 
+ @return An initialized Boolean answer format.
+ */
+- (instancetype)initWithYesString:(NSString *)yes noString:(NSString *)no;
+
+/**
+ The string to describe the Yes answer. (read-only)
+ */
+@property (copy, readonly) NSString *yes;
+
+/**
+ The string to describe the No answer. (read-only)
+ */
+@property (copy, readonly) NSString *no;
 
 @end
 

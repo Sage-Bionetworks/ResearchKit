@@ -28,6 +28,7 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 #import "ORKMultipleValuePicker.h"
 
 #import "ORKAnswerFormat_Internal.h"
@@ -42,6 +43,7 @@
 @property (nonatomic, strong) NSArray <ORKChoiceAnswerFormatHelper *> *helpers;
 
 @end
+
 
 @implementation ORKMultipleValuePicker {
     UIPickerView *_pickerView;
@@ -118,7 +120,7 @@
 
 - (NSUInteger)convertFromPickerViewComponent:(NSUInteger)component {
     if (_shouldShowSeparator) {
-        if (component%2 == 0) {
+        if (component % 2 == 0) {
             return component / 2;
         } else {
             return NSNotFound;
@@ -205,6 +207,7 @@
     }
 }
 
+
 #pragma mark - Accessibility
 
 - (void)accessibilityFocusOnPickerElement {
@@ -217,6 +220,7 @@
         });
     }
 }
+
 
 #pragma mark - UIPickerViewDataSource
 
