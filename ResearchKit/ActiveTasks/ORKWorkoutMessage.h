@@ -33,14 +33,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-
 /**
  String enum for the watch's workout session state.
  */
 typedef NSString * ORKWorkoutState NS_STRING_ENUM;
 
 ORK_EXTERN ORKWorkoutState const ORKWorkoutStateNotStarted;
+ORK_EXTERN ORKWorkoutState const ORKWorkoutStateStarting;
 ORK_EXTERN ORKWorkoutState const ORKWorkoutStateRunning;
+ORK_EXTERN ORKWorkoutState const ORKWorkoutStateStopping;
 ORK_EXTERN ORKWorkoutState const ORKWorkoutStateEnded;
 ORK_EXTERN ORKWorkoutState const ORKWorkoutStatePaused;
 

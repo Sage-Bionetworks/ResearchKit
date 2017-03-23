@@ -591,6 +591,7 @@
 		FF5051F01D66908C0065E677 /* ORKNavigablePageStep.h in Headers */ = {isa = PBXBuildFile; fileRef = FF5051EE1D66908C0065E677 /* ORKNavigablePageStep.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FF5051F11D66908C0065E677 /* ORKNavigablePageStep.m in Sources */ = {isa = PBXBuildFile; fileRef = FF5051EF1D66908C0065E677 /* ORKNavigablePageStep.m */; };
 		FF5424531DF1513B00A86918 /* ORKHealthAnswerFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5424521DF1513B00A86918 /* ORKHealthAnswerFormat.swift */; };
+		FF56B1401E846EF300E5D474 /* ORKPhoneConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF56B13F1E846EF300E5D474 /* ORKPhoneConnector.swift */; };
 		FF5CA6121D2C2670001660A3 /* ORKTableStep.h in Headers */ = {isa = PBXBuildFile; fileRef = FF5CA6101D2C2670001660A3 /* ORKTableStep.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FF5CA6131D2C2670001660A3 /* ORKTableStep.m in Sources */ = {isa = PBXBuildFile; fileRef = FF5CA6111D2C2670001660A3 /* ORKTableStep.m */; };
 		FF5CA61B1D2C6453001660A3 /* ORKSignatureStep.h in Headers */ = {isa = PBXBuildFile; fileRef = FF5CA6191D2C6453001660A3 /* ORKSignatureStep.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1345,6 +1346,7 @@
 		FF5051EE1D66908C0065E677 /* ORKNavigablePageStep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORKNavigablePageStep.h; sourceTree = "<group>"; };
 		FF5051EF1D66908C0065E677 /* ORKNavigablePageStep.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORKNavigablePageStep.m; sourceTree = "<group>"; };
 		FF5424521DF1513B00A86918 /* ORKHealthAnswerFormat.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ORKHealthAnswerFormat.swift; sourceTree = "<group>"; };
+		FF56B13F1E846EF300E5D474 /* ORKPhoneConnector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ORKPhoneConnector.swift; sourceTree = "<group>"; };
 		FF5CA6101D2C2670001660A3 /* ORKTableStep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORKTableStep.h; sourceTree = "<group>"; };
 		FF5CA6111D2C2670001660A3 /* ORKTableStep.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORKTableStep.m; sourceTree = "<group>"; };
 		FF5CA6191D2C6453001660A3 /* ORKSignatureStep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORKSignatureStep.h; sourceTree = "<group>"; };
@@ -2834,6 +2836,7 @@
 			isa = PBXGroup;
 			children = (
 				FFEED69E1E660594005C92B4 /* ORKCardioWorkoutInterfaceController.swift */,
+				FF56B13F1E846EF300E5D474 /* ORKPhoneConnector.swift */,
 				FF70B76E1E67776900395640 /* ORKStartInterfaceController.swift */,
 				FFEED6AA1E660CD4005C92B4 /* ORKSummaryInterfaceController.swift */,
 				FF405E3C1E5395DF00002C19 /* ORKWorkoutUtilities.swift */,
@@ -3281,7 +3284,6 @@
 			files = (
 				FFEED6A61E660751005C92B4 /* ORKHelpers_Internal.h in Headers */,
 				FF405E381E5394E500002C19 /* ORKDefines.h in Headers */,
-				FF77B6C81E833A6E007B8C9E /* ORKStep_Private.h in Headers */,
 				FFEED6A81E660768005C92B4 /* ResearchKit_Private.h in Headers */,
 				FFA0F1861E68EA410082BBB1 /* HKQuantitySample+JSONCodingObject.h in Headers */,
 				FFA0F1741E68E2D20082BBB1 /* NSError+JSONCodingObject.h in Headers */,
@@ -3843,7 +3845,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF77B6C91E833DD5007B8C9E /* ORKStep.m in Sources */,
 				FFA0F1881E68EA410082BBB1 /* HKQuantitySample+JSONCodingObject.m in Sources */,
 				FF405E411E539CAA00002C19 /* ORKTypes.m in Sources */,
 				FF405E471E53AE5600002C19 /* SequenceType+Utilities.swift in Sources */,
@@ -3853,6 +3854,7 @@
 				FFA0F1761E68E2D20082BBB1 /* NSError+JSONCodingObject.m in Sources */,
 				FFEED6801E5F579B005C92B4 /* ORKWorkoutMessage.m in Sources */,
 				FF8945DF1E54F4670042F82C /* Array+Utilities.swift in Sources */,
+				FF56B1401E846EF300E5D474 /* ORKPhoneConnector.swift in Sources */,
 				FF77B6C61E833651007B8C9E /* ORKWorkoutUtilities.swift in Sources */,
 				FFA0F18E1E68EB210082BBB1 /* HKWorkoutConfiguration+JSONCodingObject.m in Sources */,
 				FFA0F1821E68E9430082BBB1 /* HKDevice+JSONCodingObject.m in Sources */,
@@ -4164,6 +4166,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_SWIFT_FLAGS = "-D DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = org.researchkit.ResearchKit.watchOS;
 				PRODUCT_NAME = ResearchKit;
 				SDKROOT = watchos;
@@ -4199,6 +4202,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = org.researchkit.ResearchKit.watchOS;
 				PRODUCT_NAME = ResearchKit;
 				SDKROOT = watchos;

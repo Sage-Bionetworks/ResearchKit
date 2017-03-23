@@ -41,7 +41,8 @@ open class ORKCardioWorkoutInterfaceController: WKInterfaceController, ORKWorkou
     
     public var summaryControllerName = ORKSummaryInterfaceController.name
     
-    public var walkingDuration: TimeInterval = 6 * 60
+    public var walkingDuration: TimeInterval = 2 * 60 // DO NOT COMMIT!!! 6 * 60
+    public var isInitialState: Bool = true;
     
     // MARK: IBOutlets
     
@@ -80,6 +81,7 @@ open class ORKCardioWorkoutInterfaceController: WKInterfaceController, ORKWorkou
             workoutConfiguration.locationType = .outdoor
             
             // Start the workout
+            isInitialState = true
             connector.startWorkout(with: workoutConfiguration)
         }
     }
@@ -115,7 +117,8 @@ open class ORKCardioWorkoutInterfaceController: WKInterfaceController, ORKWorkou
     }
     
     open func workoutConnector(_ workoutConnector: ORKWorkoutConnector, didUpdateHeartRate heartRate:HKQuantity) {
-        if (!connector.startedFromPhone && (connector.workoutDuration == 0)) {
+        if (!connector.startedFromPhone && isInitialState) {
+            isInitialState = false
             titleLabel?.setText(formatter.localizedString(withKey: "FITNESS_WALK_INSTRUCTION_WATCH"))
             connector.workoutDuration = walkingDuration
             durationTimer?.setDate(Date(timeIntervalSinceNow: connector.workoutDuration))

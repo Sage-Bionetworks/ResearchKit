@@ -469,7 +469,7 @@ NSString * const ORKWorkoutWatchHeartRateKey = @"bpm_watch";
 - (void)session:(WCSession *)session didReceiveMessage:(NSDictionary<NSString *, id> *)message replyHandler:(void(^)(NSDictionary<NSString *, id> *replyMessage))replyHandler {
     ORKWeakTypeOf(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSDictionary *reply = [weakSelf forwardWatchMessage:message];
+        NSDictionary *reply = [weakSelf forwardWatchMessage:message] ? : @{};
         replyHandler(reply);
     });
 }

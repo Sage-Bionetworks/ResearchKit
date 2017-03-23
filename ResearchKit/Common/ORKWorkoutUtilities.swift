@@ -28,6 +28,7 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 import Foundation
 import HealthKit
 
@@ -211,6 +212,12 @@ public final class ORKWorkoutUtilities: NSObject {
         
         return duration
     }
+}
+
+func debug_print(_ message: String) {
+    #if DEBUG
+        print(message)
+    #endif
 }
 
 public extension HKWorkoutActivityType {

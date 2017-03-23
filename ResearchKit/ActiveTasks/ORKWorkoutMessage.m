@@ -34,7 +34,9 @@
 #import "ORKHelpers_Internal.h"
 
 ORKWorkoutState const ORKWorkoutStateNotStarted = @"notStarted";
+ORKWorkoutState const ORKWorkoutStateStarting = @"starting";
 ORKWorkoutState const ORKWorkoutStateRunning = @"running";
+ORKWorkoutState const ORKWorkoutStateStopping = @"stopping";
 ORKWorkoutState const ORKWorkoutStateEnded = @"ended";
 ORKWorkoutState const ORKWorkoutStatePaused = @"paused";
 

@@ -28,6 +28,7 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 import WatchConnectivity
 import WatchKit
 import HealthKit
@@ -113,6 +114,7 @@ public protocol ORKWorkoutConnectorDelegate: class, NSObjectProtocol {
     optional func workoutConnector(_ workoutConnector: ORKWorkoutConnector, didUpdateHeartRate heartRate:HKQuantity)
 }
 
+
 /**
  The `ORKWorkoutConnector` can be used to run a workout as well as to communicate with the paired
  phone. To use this, create a watch app and use this to run a workout and optionally to communicate
@@ -120,7 +122,7 @@ public protocol ORKWorkoutConnectorDelegate: class, NSObjectProtocol {
  */
 @objc
 @available(watchOS 3.0, *)
-open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDelegate {
+open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate {
     
     /**
      The callback delegate.
@@ -143,13 +145,21 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
     fileprivate var _workoutSession : HKWorkoutSession?
     
     /**
-     Watch Connectivity Session
+     Workout state for tracking startup/shutdown
     */
-    public var connectivitySession: WCSession? {
-        return _connectivitySession
+    public var workoutState: ORKWorkoutState {
+        guard let sessionState = self.workoutSession?.state else { return ORKWorkoutState.notStarted }
+        switch sessionState {
+        case .notStarted, .running:
+            return _workoutState
+        case .ended:
+            return .ended
+        case .paused:
+            return .paused
+        }
     }
-    fileprivate var _connectivitySession: WCSession?
-    
+    fileprivate var _workoutState: ORKWorkoutState = .notStarted
+
     /**
      Should the connector send messages to the phone?
      */
@@ -160,8 +170,10 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
      */
     public var workoutDuration: TimeInterval = 15.0 * 60.0 {
         didSet {
-            if workoutDuration > 0 && timer == nil && _workoutSession != nil {
+            if workoutDuration > 0 {
                 startTimer()
+            } else {
+                stopTimer()
             }
         }
     }
@@ -183,14 +195,6 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
     fileprivate var _workoutEndDate : Date?
     
     /**
-     Whether or not the current workout is paused
-     */
-    public var isPaused: Bool {
-        return _isPaused
-    }
-    fileprivate var _isPaused = false
-    
-    /**
      List of query identifiers for this workout session. By default, these are set during
      `start()` to the list returned by the function `queryIdentifiers(for activityType:HKWorkoutActivityType)`
      */
@@ -208,6 +212,7 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
         return nil
     }
     
+    
     // MARK: Internal tracking
     
     fileprivate var totalEnergyBurned = HKQuantity(unit: HKUnit.kilocalorie(), doubleValue: 0)
@@ -218,6 +223,7 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
     fileprivate var workoutEvents = [HKWorkoutEvent]()
     fileprivate var timer: Timer?
     
+    
     // MARK: Workout session handling - override these methods to implement custom handling
     
     /**
@@ -225,11 +231,11 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
      
      @param workoutConfiguration    The configuration for the workout
      */
-    open func startWorkout(with workoutConfiguration:HKWorkoutConfiguration) {
+    public func startWorkout(with workoutConfiguration:HKWorkoutConfiguration) {
         guard _workoutSession == nil else { return }
         
-        _connectivitySession = WCSession.default()
-        _connectivitySession?.delegate = self
+        _workoutState = .starting
+        ORKPhoneConnector.shared.workoutConnector = self
         
         // Update the query identifiers (but only if they are not already set up
         if queryIdentifiers.count == 0 {
@@ -267,8 +273,11 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
     /**
      Stop the workout.
      */
-    open func stopWorkout() {
+    public func stopWorkout() {
         guard let session = _workoutSession, session.state != .ended else { return }
+        
+        debug_print("CALLED: stopWorkout()")
+        _workoutState = .stopping
         
         // End the Workout Session
         _workoutEndDate = Date()
@@ -276,6 +285,10 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
     }
     
     private func createAndSaveWorkout(_ session: HKWorkoutSession) {
+        
+        debug_print("CALLED: createAndSaveWorkout(\(session))")
+
+        _workoutState = .ended
         
         // Create and save a workout sample
         let configuration = session.workoutConfiguration
@@ -289,26 +302,30 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
                                 totalDistance: totalDistance,
                                 metadata: [HKMetadataKeyIndoorWorkout:isIndoor]);
         
-        healthStore.save(workout) { success, _ in
+        healthStore.save(workout) { (success, error) in
             if success, let samples = self.workoutSamples {
                 self.healthStore.add(samples, to: workout) { (_, _) in
-                    DispatchQueue.main.async {
-                        self.send(message: ORKWorkoutMessage(workoutState: .ended),
-                                  replyHandler: { (_) in
-                                    self.cleanupAfterMessageSend(workout: workout)
-                        },
-                                  errorHandler: { (_) in
-                                    self.cleanupAfterMessageSend(workout: workout)
-                        })
-                    }
+                    self.sendFinishedMessage(with: workout)
                 }
+            } else {
+                if (error != nil) {
+                    print("Failed to save workout: \(error)")
+                }
+                self.sendFinishedMessage(with: workout)
             }
         }
     }
     
-    private func cleanupAfterMessageSend(workout: HKWorkout) {
+    private func sendFinishedMessage(with workout: HKWorkout) {
+        
+        debug_print("CALLED: sendFinishedMessage(workout: \(workout))")
+        
+        _workoutState = .notStarted
+        ORKPhoneConnector.shared.workoutConnector = nil
+        ORKPhoneConnector.shared.send(message: ORKWorkoutMessage(workoutState: .ended))
+
         DispatchQueue.main.async {
-            self.messagesToSend.removeAll()
+            self._workoutSession = nil
             self.delegate?.workoutConnector(self, didEndWorkout: workout)
         }
     }
@@ -337,9 +354,7 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
     }
     
     private func handleError(_ error: Error) {
-        #if DEBUG
         print("ERROR: Workout session did fail with error: \(error)")
-        #endif
         
         // Send error message back to the phone
         send(message: ORKErrorWorkoutMessage(error: error as NSError))
@@ -431,20 +446,6 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
         stopTimer()
     }
     
-    private func pauseAccumulatingData() {
-        DispatchQueue.main.async {
-            self._isPaused = true
-            self.delegate?.workoutConnectorDidPause?(self)
-        }
-    }
-    
-    private func resumeAccumulatingData() {
-        DispatchQueue.main.async {
-            self._isPaused = false
-            self.delegate?.workoutConnectorDidResume?(self)
-        }
-    }
-    
     private func startQuery(quantityTypeIdentifier: HKQuantityTypeIdentifier) {
         let datePredicate = HKQuery.predicateForSamples(withStart: workoutStartDate, end: nil, options: .strictStartDate)
         let devicePredicate = HKQuery.predicateForObjects(from: [HKDevice.local()])
@@ -467,7 +468,7 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
     
     private func handleQueryResponse(samples: [HKSample]?, quantityTypeIdentifier: HKQuantityTypeIdentifier) {
         DispatchQueue.main.async { [weak self] in
-            guard let strongSelf = self, !strongSelf.isPaused, let querySamples = samples else { return }
+            guard let strongSelf = self, let querySamples = samples else { return }
             strongSelf.process(samples: querySamples, quantityTypeIdentifier: quantityTypeIdentifier)
         }
         checkWorkoutDuration()
@@ -476,13 +477,18 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
     
     // MARK: Duration timer
     
+    fileprivate var startTime = ProcessInfo().systemUptime
+    
     func startTimer() {
-        timer?.invalidate()
-        timer = Timer.scheduledTimer(timeInterval: 5,
-                                     target: self,
-                                     selector: #selector(timerDidFire),
-                                     userInfo: nil,
-                                     repeats: true)
+        startTime = ProcessInfo().systemUptime
+        DispatchQueue.main.async {
+            self.timer?.invalidate()
+            self.timer = Timer.scheduledTimer(timeInterval: 1,
+                                         target: self,
+                                         selector: #selector(self.timerDidFire),
+                                         userInfo: nil,
+                                         repeats: true)
+        }
     }
     
     func timerDidFire(timer: Timer) {
@@ -490,18 +496,19 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
     }
     
     func checkWorkoutDuration() {
-        guard workoutDuration > 0 && _workoutSession != nil else { return }
         DispatchQueue.main.async {
-            let duration = ORKWorkoutUtilities.computeDurationOfWorkout(withEvents: self.workoutEvents, startDate: self.workoutStartDate, endDate: nil)
-            if duration > self.workoutDuration {
+            let duration = ProcessInfo().systemUptime - self.startTime
+            if (self.workoutState == .running) && (self.workoutDuration > 0) && (duration > self.workoutDuration) {
                 self.stopWorkout()
             }
         }
     }
     
     func stopTimer() {
-        timer?.invalidate()
-        timer = nil
+        DispatchQueue.main.async {
+            self.timer?.invalidate()
+            self.timer = nil
+        }
     }
     
 
@@ -525,17 +532,9 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
                              date: Date) {
         switch toState {
         case .running:
+            _workoutState = .running
             send(message: ORKWorkoutMessage(workoutState: .running))
-            if fromState == .notStarted {
-                startAccumulatingData(startDate: workoutStartDate)
-            } else {
-                resumeAccumulatingData()
-            }
-            
-        case .paused:
-            send(message: ORKWorkoutMessage(workoutState: .paused))
-            pauseAccumulatingData()
-            break
+            startAccumulatingData(startDate: workoutStartDate)
             
         case .ended:
             stopAccumulatingData()
@@ -546,53 +545,24 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
             break
         }
     }
-
     
-    // MARK: Watch connectivity handling
     
-    private var messagesToSend = [MessageHandler]()
+    // MARK: Message communication with phone.
     
-    /**
-     Send a message to the phone.
-     
-     @param message         The dictionary with the message.
-     @param replyHandler    The reply handler (or nil)
-     @param errorHandler    The error handler (or nil)
-    */
-    open func send(message: ORKWorkoutMessage, replyHandler: (([String : Any]) -> Swift.Void)? = nil, errorHandler: ((Error) -> Swift.Void)? = nil) {
-        
-        #if DEBUG
-            let errHandler: ((Error) -> Swift.Void)? = { (error) in
-                print("Failed to send message: \(fullMessage) error: \(error)")
-                errorHandler?(error)
-            }
-        #else
-            let errHandler = errorHandler
-        #endif
-        
-        if let wcSession = self.connectivitySession, wcSession.activationState == .activated, wcSession.isReachable {
-            DispatchQueue.main.async {
-                wcSession.sendMessage(message.dictionaryRepresentation(), replyHandler: replyHandler, errorHandler: errHandler)
-            }
-        } else {
-            DispatchQueue.main.async {
-                self.messagesToSend.append(MessageHandler(message: message, replyHandler: replyHandler, errorHandler: errHandler))
-            }
-            let session = WCSession.default()
-            session.delegate = self
-            session.activate()
-        }
+    func send(message: ORKWorkoutMessage) {
+        ORKPhoneConnector.shared.workoutConnector = self
+        ORKPhoneConnector.shared.send(message: message)
     }
-    
-    private func messageReceived(message: [String: Any], replyHandler: (([String : Any]) -> Swift.Void)? = nil) {
+
+    func messageReceived(message: [String: Any], replyHandler: (([String : Any]) -> Swift.Void)? = nil) {
         guard let workoutMessage = ORKWorkoutMessage(message: message), workoutMessage.timestamp > workoutStartDate
-        else {
-            // If the timestamp is from before the workout started then ignore it.
-            #if DEBUG
-                print("Old message received: \(message)")
-            #endif
-            replyHandler?([:])
-            return;
+            else {
+                // If the timestamp is from before the workout started then ignore it.
+                #if DEBUG
+                    print("Old message received: \(message)")
+                #endif
+                replyHandler?([:])
+                return;
         }
         
         // Check if this is a command message and respond to the command (if applicable)
@@ -626,78 +596,10 @@ open class ORKWorkoutConnector: NSObject, HKWorkoutSessionDelegate, WCSessionDel
         
         // Send reply
         let replyMessage = ORKWorkoutMessage(identifier: workoutMessage.identifier)
-        replyMessage.workoutState = {
-            guard let sessionState = self.workoutSession?.state else { return ORKWorkoutState.notStarted }
-            switch sessionState {
-            case .notStarted:
-                return .notStarted
-            case .ended:
-                return .ended
-            case .running:
-                return .running
-            case .paused:
-                return .paused
-            }
-        }()
+        replyMessage.workoutState = self.workoutState
         replyHandler?(replyMessage.dictionaryRepresentation())
     }
-    
-    private func sendPending() {
-        DispatchQueue.main.async {
-            if let wcSession = self.connectivitySession, wcSession.isReachable {
-                for message in self.messagesToSend {
-                    wcSession.sendMessage(message.message.dictionaryRepresentation(),
-                                          replyHandler: message.replyHandler, errorHandler: message.errorHandler)
-                }
-                self.messagesToSend.removeAll()
-            }
-        }
-    }
-    
-    // MARK : WCSessionDelegate
-    
-    public func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-        if activationState == .activated {
-            _connectivitySession = session
-            sendPending()
-        } else {
-            #if DEBUG
-            print("Watch connector \(session): activationDidCompleteWith: \(activationState) error: \(error)")
-            #endif
-        }
-    }
-    
-    public func sessionReachabilityDidChange(_ session: WCSession) {
-        #if DEBUG
-        print("Watch connector \(session): sessionReachabilityDidChange")
-        #endif
-    }
-    
-    public func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
-        DispatchQueue.main.async {
-            self.messageReceived(message: message)
-        }
-    }
-    
-    public func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Swift.Void) {
-        DispatchQueue.main.async {
-            self.messageReceived(message: message, replyHandler: replyHandler)
-        }
-    }
-}
 
-fileprivate class MessageHandler: NSObject {
-    
-    let message: ORKWorkoutMessage
-    let replyHandler: (([String : Any]) -> Swift.Void)?
-    let errorHandler: ((Error) -> Swift.Void)?
-    
-    init(message: ORKWorkoutMessage, replyHandler: (([String : Any]) -> Swift.Void)?, errorHandler: ((Error) -> Swift.Void)?) {
-        self.message = message
-        self.replyHandler = replyHandler
-        self.errorHandler = errorHandler
-        super.init()
-    }
 }
 
 extension ORKWorkoutMessage {
