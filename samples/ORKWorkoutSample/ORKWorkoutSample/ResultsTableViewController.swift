@@ -59,7 +59,10 @@ class ResultsTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier) ?? UITableViewCell(style: .subtitle, reuseIdentifier: reuseIdentifier)
         let result = self.result(at: indexPath)
         cell.textLabel?.text = result.identifier
-        if let questionResult = result as? ORKQuestionResult {
+        if let choiceResult = result as? ORKChoiceQuestionResult, choiceResult.questionType == .singleChoice {
+            cell.detailTextLabel?.text = "\(choiceResult.choiceAnswers?.first ?? "--")"
+        }
+        else if let questionResult = result as? ORKQuestionResult {
             cell.detailTextLabel?.text = "\(questionResult.answer ?? "--")"
         }
         else {

@@ -581,6 +581,8 @@
 		FF405E461E53AE5600002C19 /* SequenceType+Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF405E451E53AE5600002C19 /* SequenceType+Utilities.swift */; };
 		FF405E471E53AE5600002C19 /* SequenceType+Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF405E451E53AE5600002C19 /* SequenceType+Utilities.swift */; };
 		FF405E481E53C1D900002C19 /* ResearchKit.h in Headers */ = {isa = PBXBuildFile; fileRef = B1C1DE4F196F541F00F75544 /* ResearchKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FF4E8B3B1E8387A300ED6EA0 /* ORKHelpers+UIKit.h in Headers */ = {isa = PBXBuildFile; fileRef = FF4E8B391E8387A300ED6EA0 /* ORKHelpers+UIKit.h */; };
+		FF4E8B3C1E8387A300ED6EA0 /* ORKHelpers+UIKit.m in Sources */ = {isa = PBXBuildFile; fileRef = FF4E8B3A1E8387A300ED6EA0 /* ORKHelpers+UIKit.m */; };
 		FF5016781E78FC11007422DA /* CLLocation+ORKJSONDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = FF5016761E78FC11007422DA /* CLLocation+ORKJSONDictionary.m */; };
 		FF5016791E78FC11007422DA /* CLLocation+ORKJSONDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = FF5016771E78FC11007422DA /* CLLocation+ORKJSONDictionary.h */; };
 		FF50167C1E78FE39007422DA /* CMAccelerometerData+ORKJSONDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = FF50167A1E78FE39007422DA /* CMAccelerometerData+ORKJSONDictionary.h */; };
@@ -604,11 +606,6 @@
 		FF75E8961E825CFE00C2344F /* ORKWorkoutResult.m in Sources */ = {isa = PBXBuildFile; fileRef = FF75E8941E825CFE00C2344F /* ORKWorkoutResult.m */; };
 		FF77B6C21E831C77007B8C9E /* ORKOrderedTask+ORKPredefinedSurvey.h in Headers */ = {isa = PBXBuildFile; fileRef = FF77B6C01E831C77007B8C9E /* ORKOrderedTask+ORKPredefinedSurvey.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FF77B6C31E831C77007B8C9E /* ORKOrderedTask+ORKPredefinedSurvey.m in Sources */ = {isa = PBXBuildFile; fileRef = FF77B6C11E831C77007B8C9E /* ORKOrderedTask+ORKPredefinedSurvey.m */; };
-		FF77B6CA1E834018007B8C9E /* ResearchKit.h in Headers */ = {isa = PBXBuildFile; fileRef = B1C1DE4F196F541F00F75544 /* ResearchKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		FF77B6CB1E83401F007B8C9E /* ResearchKit_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = B1B894391A00345200C5CF2D /* ResearchKit_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		FF77B6CC1E83403B007B8C9E /* ORKHelpers_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 86C40B8C1A8D7C5C00081FAC /* ORKHelpers_Internal.h */; };
-		FF77B6CD1E83403F007B8C9E /* ORKHelpers_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 86C40B7C1A8D7C5C00081FAC /* ORKHelpers_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		FF77B6CE1E834047007B8C9E /* ORKHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 86C40B8D1A8D7C5C00081FAC /* ORKHelpers.m */; };
 		FF77B6C41E8335F2007B8C9E /* ORKOrderedTask+ORKPredefinedActiveTask.h in Headers */ = {isa = PBXBuildFile; fileRef = FF154FB21E82EF5E004ED908 /* ORKOrderedTask+ORKPredefinedActiveTask.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FF77B6C51E833650007B8C9E /* ORKWorkoutUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF405E3C1E5395DF00002C19 /* ORKWorkoutUtilities.swift */; };
 		FF77B6C61E833651007B8C9E /* ORKWorkoutUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF405E3C1E5395DF00002C19 /* ORKWorkoutUtilities.swift */; };
@@ -1338,6 +1335,8 @@
 		FF405E3F1E539CAA00002C19 /* ORKTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORKTypes.m; sourceTree = "<group>"; };
 		FF405E431E53A86C00002C19 /* ORKWorkoutConnector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ORKWorkoutConnector.swift; sourceTree = "<group>"; };
 		FF405E451E53AE5600002C19 /* SequenceType+Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "SequenceType+Utilities.swift"; path = "../ActiveTasks/SequenceType+Utilities.swift"; sourceTree = "<group>"; };
+		FF4E8B391E8387A300ED6EA0 /* ORKHelpers+UIKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ORKHelpers+UIKit.h"; sourceTree = "<group>"; };
+		FF4E8B3A1E8387A300ED6EA0 /* ORKHelpers+UIKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ORKHelpers+UIKit.m"; sourceTree = "<group>"; };
 		FF5016761E78FC11007422DA /* CLLocation+ORKJSONDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CLLocation+ORKJSONDictionary.m"; sourceTree = "<group>"; };
 		FF5016771E78FC11007422DA /* CLLocation+ORKJSONDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CLLocation+ORKJSONDictionary.h"; sourceTree = "<group>"; };
 		FF50167A1E78FE39007422DA /* CMAccelerometerData+ORKJSONDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CMAccelerometerData+ORKJSONDictionary.h"; sourceTree = "<group>"; };
@@ -1649,6 +1648,8 @@
 				86C40B8C1A8D7C5C00081FAC /* ORKHelpers_Internal.h */,
 				86C40B7C1A8D7C5C00081FAC /* ORKHelpers_Private.h */,
 				86C40B8D1A8D7C5C00081FAC /* ORKHelpers.m */,
+				FF4E8B391E8387A300ED6EA0 /* ORKHelpers+UIKit.h */,
+				FF4E8B3A1E8387A300ED6EA0 /* ORKHelpers+UIKit.m */,
 				FF75E88F1E8250C600C2344F /* ORKPermissionsValidator.h */,
 				FF75E8901E8250C600C2344F /* ORKPermissionsValidator.m */,
 			);
@@ -3116,6 +3117,7 @@
 				86C40D7C1A8D7C5C00081FAC /* ORKScaleValueLabel.h in Headers */,
 				250F94081B4C5AA400FA23EB /* ORKTowerOfHanoiStepViewController.h in Headers */,
 				86C40E2C1A8D7C5C00081FAC /* ORKVisualConsentStep.h in Headers */,
+				FF4E8B3B1E8387A300ED6EA0 /* ORKHelpers+UIKit.h in Headers */,
 				257FCE1F1B4D14E50001EF06 /* ORKTowerOfHanoiTowerView.h in Headers */,
 				24A4DA181B8D13FE009C797A /* ORKPasscodeStepViewController.h in Headers */,
 				86C40CB81A8D7C5C00081FAC /* ORKVoiceEngine.h in Headers */,
@@ -3730,6 +3732,7 @@
 				86C40DAC1A8D7C5C00081FAC /* ORKSurveyAnswerCellForNumber.m in Sources */,
 				86C40C541A8D7C5C00081FAC /* ORKTappingIntervalStep.m in Sources */,
 				86C40D6C1A8D7C5C00081FAC /* ORKResult.m in Sources */,
+				FF4E8B3C1E8387A300ED6EA0 /* ORKHelpers+UIKit.m in Sources */,
 				781D54151DF886AB00223305 /* ORKTrailmakingStepViewController.m in Sources */,
 				86C40CD21A8D7C5C00081FAC /* ORKInstructionStepView.m in Sources */,
 				10FF9AD81B7A045E00ECB5B4 /* ORKSeparatorView.m in Sources */,

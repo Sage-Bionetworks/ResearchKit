@@ -31,17 +31,6 @@
 
 #import "ORKHelpers_Internal.h"
 
-#import "ORKTypes.h"
-
-#if TARGET_OS_IOS
-
-#import "ORKSkin.h"
-
-#import <CoreText/CoreText.h>
-
-#endif
-
-
 NSURL *ORKCreateRandomBaseURL() {
     return [NSURL URLWithString:[NSString stringWithFormat:@"http://researchkit.%@/", [NSUUID UUID].UUIDString]];
 }
@@ -54,39 +43,6 @@ NSBundle *ORKAssetsBundle(void) {
     });
     return bundle;
 }
-
-#if TARGET_OS_IOS
-
-ORK_INLINE CGFloat ORKCGFloor(CGFloat value) {
-    if (sizeof(value) == sizeof(float)) {
-        return (CGFloat)floorf((float)value);
-    } else {
-        return (CGFloat)floor((double)value);
-    }
-}
-
-ORK_INLINE CGFloat ORKAdjustToScale(CGFloat (adjustFunction)(CGFloat), CGFloat value, CGFloat scale) {
-    if (scale == 0) {
-        static CGFloat screenScale = 1.0;
-        static dispatch_once_t onceToken;
-        dispatch_once(&onceToken, ^{
-            screenScale = [UIScreen mainScreen].scale;
-        });
-        scale = screenScale;
-    }
-    if (scale == 1.0) {
-        return adjustFunction(value);
-    } else {
-        return adjustFunction(value * scale) / scale;
-    }
-}
-#endif
-
-#if TARGET_OS_IOS
-CGFloat ORKFloorToViewScale(CGFloat value, UIView *view) {
-    return ORKAdjustToScale(ORKCGFloor, value, view.contentScaleFactor);
-}
-#endif
 
 id findInArrayByKey(NSArray * array, NSString *key, id value) {
     NSPredicate *pred = [NSPredicate predicateWithFormat:@"%K == %@", key, value];
@@ -138,24 +94,6 @@ UIColor *ORKRGB(uint32_t x) {
     return ORKRGBA(x, 1.0f);
 }
 
-#if TARGET_OS_IOS
-UIFontDescriptor *ORKFontDescriptorForLightStylisticAlternative(UIFontDescriptor *descriptor) {
-    UIFontDescriptor *fontDescriptor = [descriptor
-                      fontDescriptorByAddingAttributes:
-                      @{ UIFontDescriptorFeatureSettingsAttribute: @[
-                                 @{ UIFontFeatureTypeIdentifierKey: @(kCharacterAlternativesType),
-                                    UIFontFeatureSelectorIdentifierKey: @(1) }]}];
-    return fontDescriptor;
-}
-
-UIFont *ORKTimeFontForSize(CGFloat size) {
-    UIFontDescriptor *fontDescriptor = [ORKLightFontWithSize(size) fontDescriptor];
-    fontDescriptor = ORKFontDescriptorForLightStylisticAlternative(fontDescriptor);
-    UIFont *font = [UIFont fontWithDescriptor:fontDescriptor size:0];
-    return font;
-}
-#endif
-
 NSString *ORKFileProtectionFromMode(ORKFileProtectionMode mode) {
     switch (mode) {
         case ORKFileProtectionComplete:
@@ -171,22 +109,6 @@ NSString *ORKFileProtectionFromMode(ORKFileProtectionMode mode) {
     return NSFileProtectionNone;
 }
 
-#if TARGET_OS_IOS
-CGFloat ORKExpectedLabelHeight(UILabel *label) {
-    CGSize expectedLabelSize = [label.text boundingRectWithSize:CGSizeMake(label.frame.size.width, CGFLOAT_MAX)
-                                                        options:NSStringDrawingUsesLineFragmentOrigin
-                                                     attributes:@{ NSFontAttributeName : label.font }
-                                                        context:nil].size;
-    return expectedLabelSize.height;
-}
-
-void ORKAdjustHeightForLabel(UILabel *label) {
-    CGRect rect = label.frame;
-    rect.size.height = ORKExpectedLabelHeight(label);
-    label.frame = rect;
-}
-#endif
-
 UIImage *ORKImageWithColor(UIColor *color) {
     CGRect rect = CGRectMake(0.0f, 0.0f, 1.0f, 1.0f);
     UIGraphicsBeginImageContext(rect.size);
@@ -200,14 +122,6 @@ UIImage *ORKImageWithColor(UIColor *color) {
     
     return image;
 }
-
-#if TARGET_OS_IOS
-void ORKEnableAutoLayoutForViews(NSArray *views) {
-    [views enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        [(UIView *)obj setTranslatesAutoresizingMaskIntoConstraints:NO];
-    }];
-}
-#endif
 
 NSDateFormatter *ORKResultDateTimeFormatter() {
     static NSDateFormatter *dateTimeformatter = nil;
@@ -354,81 +268,6 @@ BOOL ORKCurrentLocalePresentsFamilyNameFirst() {
     return (language != nil) && [familyNameFirstLanguages containsObject:language];
 }
 
-#if TARGET_OS_IOS
-BOOL ORKWantsWideContentMargins(UIScreen *screen) {
-    
-    if (screen != [UIScreen mainScreen]) {
-        return NO;
-    }
-   
-    // If our screen's minimum dimension is bigger than a fixed threshold,
-    // decide to use wide content margins. This is less restrictive than UIKit,
-    // but a good enough approximation.
-    CGRect screenRect = screen.bounds;
-    CGFloat minDimension = MIN(screenRect.size.width, screenRect.size.height);
-    BOOL isWideScreenFormat = (minDimension > 375.);
-    
-    return isWideScreenFormat;
-}
-
-#define ORK_LAYOUT_MARGIN_WIDTH_THIN_BEZEL_REGULAR 20.0
-#define ORK_LAYOUT_MARGIN_WIDTH_THIN_BEZEL_COMPACT 16.0
-#define ORK_LAYOUT_MARGIN_WIDTH_REGULAR_BEZEL 15.0
-
-CGFloat ORKTableViewLeftMargin(UITableView *tableView) {
-    if (ORKWantsWideContentMargins(tableView.window.screen)) {
-        if (CGRectGetWidth(tableView.frame) > 320.0) {
-            return ORK_LAYOUT_MARGIN_WIDTH_THIN_BEZEL_REGULAR;
-            
-        } else {
-            return ORK_LAYOUT_MARGIN_WIDTH_THIN_BEZEL_COMPACT;
-        }
-    } else {
-        // Probably should be ORK_LAYOUT_MARGIN_WIDTH_REGULAR_BEZEL
-        return ORK_LAYOUT_MARGIN_WIDTH_THIN_BEZEL_COMPACT;
-    }
-}
-
-UIFont *ORKThinFontWithSize(CGFloat size) {
-    UIFont *font = nil;
-    if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){.majorVersion = 8, .minorVersion = 2, .patchVersion = 0}]) {
-        font = [UIFont systemFontOfSize:size weight:UIFontWeightThin];
-    } else {
-        font = [UIFont fontWithName:@".HelveticaNeueInterface-Thin" size:size];
-        if (!font) {
-            font = [UIFont systemFontOfSize:size];
-        }
-    }
-    return font;
-}
-
-UIFont *ORKMediumFontWithSize(CGFloat size) {
-    UIFont *font = nil;
-    if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){.majorVersion = 8, .minorVersion = 2, .patchVersion = 0}]) {
-        font = [UIFont systemFontOfSize:size weight:UIFontWeightMedium];
-    } else {
-        font = [UIFont fontWithName:@"HelveticaNeue-Medium" size:size];
-        if (!font) {
-            font = [UIFont systemFontOfSize:size];
-        }
-    }
-    return font;
-}
-
-UIFont *ORKLightFontWithSize(CGFloat size) {
-    UIFont *font = nil;
-    if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){.majorVersion = 8, .minorVersion = 2, .patchVersion = 0}]) {
-        font = [UIFont systemFontOfSize:size weight:UIFontWeightLight];
-    } else {
-        font = [UIFont fontWithName:@".HelveticaNeueInterface-Light" size:size];
-        if (!font) {
-            font = [UIFont systemFontOfSize:size];
-        }
-    }
-    return font;
-}
-#endif
-
 NSURL *ORKURLFromBookmarkData(NSData *data) {
     if (data == nil) {
         return nil;
@@ -533,28 +372,6 @@ void ORKValidateArrayForObjectsOfClass(NSArray *array, Class expectedObjectClass
         }
     }
 }
-
-#if TARGET_OS_IOS
-void ORKRemoveConstraintsForRemovedViews(NSMutableArray *constraints, NSArray *removedViews) {
-    for (NSLayoutConstraint *constraint in [constraints copy]) {
-        for (UIView *view in removedViews) {
-            if (constraint.firstItem == view || constraint.secondItem == view) {
-                [constraints removeObject:constraint];
-            }
-        }
-    }
-}
-
-const double ORKDoubleInvalidValue = DBL_MAX;
-
-const CGFloat ORKCGFloatInvalidValue = CGFLOAT_MAX;
-
-void ORKAdjustPageViewControllerNavigationDirectionForRTL(UIPageViewControllerNavigationDirection *direction) {
-    if ([UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft) {
-        *direction = (*direction == UIPageViewControllerNavigationDirectionForward) ? UIPageViewControllerNavigationDirectionReverse : UIPageViewControllerNavigationDirectionForward;
-    }
-}
-#endif
 
 NSString *ORKPaddingWithNumberOfSpaces(NSUInteger numberOfPaddingSpaces) {
     return [@"" stringByPaddingToLength:numberOfPaddingSpaces withString:@" " startingAtIndex:0];
