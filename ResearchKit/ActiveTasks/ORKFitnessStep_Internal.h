@@ -32,7 +32,7 @@
 
 @interface ORKFitnessStep ()
 
-+ (NSArray *)recorderConfigurationsWithOptions:(ORKPredefinedRecorderOption)options
++ (NSArray *)recorderConfigurationsWithOptions:(ORKPredefinedTaskOption)options
                           relativeDistanceOnly:(BOOL)relativeDistanceOnly
                                  standingStill:(BOOL)standingStill;
 

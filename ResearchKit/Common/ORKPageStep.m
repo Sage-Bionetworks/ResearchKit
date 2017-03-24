@@ -86,6 +86,13 @@
     return nil;
 }
 
+- (NSSet<HKObjectType *> *)requestedHealthKitTypesForWriting {
+    if ([self.pageTask respondsToSelector:@selector(requestedHealthKitTypesForWriting)]) {
+        return [self.pageTask requestedHealthKitTypesForWriting];
+    }
+    return nil;
+}
+
 #pragma mark - NSCopying
 
 - (instancetype)copyWithZone:(NSZone *)zone {

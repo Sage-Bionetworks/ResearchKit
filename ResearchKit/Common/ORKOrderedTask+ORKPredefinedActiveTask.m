@@ -260,7 +260,7 @@ NSString *const ORKWorkoutTiredAfterQuestionStepIdentifier = @"tired.after";
         fitnessStep.stepDuration = walkDuration;
         fitnessStep.title = [NSString stringWithFormat:ORKLocalizedString(@"FITNESS_WALK_INSTRUCTION_FORMAT", nil), [formatter stringFromTimeInterval:walkDuration]];
         fitnessStep.spokenInstruction = fitnessStep.title;
-        fitnessStep.recorderConfigurations = [ORKFitnessStep recorderConfigurationsWithOptions:(ORKPredefinedRecorderOption)options relativeDistanceOnly:relativeDistanceOnly standingStill:NO];
+        fitnessStep.recorderConfigurations = [ORKFitnessStep recorderConfigurationsWithOptions:options relativeDistanceOnly:relativeDistanceOnly standingStill:NO];
         fitnessStep.shouldContinueOnFinish = YES;
         fitnessStep.optional = NO;
         fitnessStep.shouldStartTimerAutomatically = YES;
@@ -280,7 +280,7 @@ NSString *const ORKWorkoutTiredAfterQuestionStepIdentifier = @"tired.after";
                                                               motionSteps:@[pocketStep, countdownStep, fitnessStep]
                                                                  restStep:restStep
                                                      relativeDistanceOnly:relativeDistanceOnly
-                                                                  options:(ORKPredefinedRecorderOption)options];
+                                                                  options:options];
         
         ORKStepArrayAddStep(steps, step);
     }

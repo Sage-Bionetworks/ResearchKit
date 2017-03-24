@@ -83,7 +83,7 @@ ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierDistanceTraveled = @"
                        motionSteps:(NSArray<ORKStep *> *)motionSteps
                           restStep:(nullable ORKHeartRateCaptureStep *)restStep
               relativeDistanceOnly:(BOOL)relativeDistanceOnly
-                           options:(ORKPredefinedRecorderOption)options {
+                           options:(ORKPredefinedTaskOption)options {
     
     // Add step for the camera instruction
     ORKHeartRateCameraInstructionStep *instructionStep = [[ORKHeartRateCameraInstructionStep alloc] initWithIdentifier:ORKWorkoutCameraInstructionStepIdentifier];
@@ -136,7 +136,7 @@ ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierDistanceTraveled = @"
     
     self = [super initWithIdentifier:identifier steps:steps];
     if (self) {
-        
+
         // default workout is outdoor walking
         _workoutConfiguration = [[HKWorkoutConfiguration alloc] init];
         _workoutConfiguration.activityType = HKWorkoutActivityTypeWalking;
@@ -255,21 +255,22 @@ ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierDistanceTraveled = @"
     return mask;
 }
 
-- (NSSet<HKObjectType *> *)requestedHealthKitTypesForReading {
-    NSMutableSet<HKObjectType *> *set = [[super requestedHealthKitTypesForReading] mutableCopy] ? : [NSMutableSet new];
-    NSArray *queryIds = [ORKWorkoutUtilities queryIdentifiersForWorkoutConfiguration:self.workoutConfiguration];
-    for (NSString *queryId in queryIds) {
-        HKObjectType *quantityType = [HKObjectType quantityTypeForIdentifier:queryId];
-        if (quantityType) {
-            [set addObject:quantityType];
-        }
-    }
-    [set addObject:[HKObjectType workoutType]];
-    return set.count > 0 ? [set copy] : nil;
+- (NSSet *)requestedHealthKitTypesForReading {
+    NSSet *parentSet = [super requestedHealthKitTypesForReading];
+    NSMutableSet *set = [self workoutHealthKitTypes];
+    [set unionSet:parentSet];
+    return [set copy];
 }
 
 - (NSSet *)requestedHealthKitTypesForWriting {
-    NSMutableSet<HKObjectType *> *set = [[super requestedHealthKitTypesForWriting] mutableCopy] ? : [NSMutableSet new];
+    NSSet *parentSet = [super requestedHealthKitTypesForWriting];
+    NSMutableSet *set = [self workoutHealthKitTypes];
+    [set unionSet:parentSet];
+    return [set copy];
+}
+
+- (NSMutableSet *)workoutHealthKitTypes {
+    NSMutableSet *set = [NSMutableSet new];
     NSArray *queryIds = [ORKWorkoutUtilities queryIdentifiersForWorkoutConfiguration:self.workoutConfiguration];
     for (NSString *queryId in queryIds) {
         HKObjectType *quantityType = [HKObjectType quantityTypeForIdentifier:queryId];
@@ -278,7 +279,7 @@ ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierDistanceTraveled = @"
         }
     }
     [set addObject:[HKObjectType workoutType]];
-    return set.count > 0 ? [set copy] : nil;
+    return set;
 }
 
 

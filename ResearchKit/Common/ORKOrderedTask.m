@@ -191,7 +191,14 @@
 }
 
 - (NSSet *)requestedHealthKitTypesForWriting {
-    return nil;
+    NSMutableSet *healthTypes = [NSMutableSet set];
+    for (ORKStep *step in self.steps) {
+        NSSet *stepSet = [step requestedHealthKitTypesForWriting];
+        if (stepSet) {
+            [healthTypes unionSet:stepSet];
+        }
+    }
+    return healthTypes.count ? healthTypes : nil;
 }
 
 - (ORKPermissionMask)requestedPermissions {

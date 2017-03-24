@@ -181,7 +181,7 @@ ORK_CLASS_AVAILABLE
  By default, the property scans the recorders and collates the HealthKit
  types the recorders require. Subclasses may override this implementation.
  */
-@property (nonatomic, readonly, nullable) NSSet<HKObjectType *> *requestedHealthKitTypesForReading;
+@property (nonatomic, copy, readonly, nullable) NSSet<HKObjectType *> *requestedHealthKitTypesForReading;
 
 /**
  The set of HealthKit types the step requests for writing. (read-only)

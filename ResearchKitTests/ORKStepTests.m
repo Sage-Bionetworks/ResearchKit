@@ -30,10 +30,19 @@
 
 
 @import XCTest;
+@import HealthKit;
 @import ResearchKit.Private;
 
 
 @interface ORKStepTests : XCTestCase
+
+@end
+
+@interface TestStep : ORKStep
+
+@property (nonatomic) ORKPermissionMask requestedPermissions;
+@property (nonatomic, copy, nullable) NSSet<HKObjectType *> *requestedHealthKitTypesForReading;
+@property (nonatomic, copy, nullable) NSSet<HKObjectType *> *requestedHealthKitTypesForWriting;
 
 @end
 
@@ -159,6 +168,140 @@
     XCTAssertEqualObjects([pageStep stepWithIdentifier:@"step1"], step1);
     XCTAssertEqualObjects([pageStep stepWithIdentifier:@"step2"], step2);
     XCTAssertEqualObjects([pageStep stepWithIdentifier:@"step3"], step3);
+}
+
+- (void)testPageStep_Permissions {
+    
+    TestStep *step1 = [[TestStep alloc] initWithIdentifier:@"step1"];
+    step1.requestedPermissions = ORKPermissionCamera | ORKPermissionCoreLocation;
+    step1.requestedHealthKitTypesForWriting = [NSSet setWithArray:@[
+                                                                    [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeartRate],
+                                                                    [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierBodyMass]]];
+    
+    TestStep *step2 = [[TestStep alloc] initWithIdentifier:@"step2"];
+    step2.requestedHealthKitTypesForReading = [NSSet setWithArray:@[
+                                                                    [HKObjectType characteristicTypeForIdentifier:HKCharacteristicTypeIdentifierDateOfBirth],
+                                                                    [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeight]]];
+    step2.requestedHealthKitTypesForWriting = [NSSet setWithArray:@[
+                                                                    [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeight],
+                                                                    [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierBodyMass]]];
+    
+    TestStep *step3 = [[TestStep alloc] initWithIdentifier:@"step3"];
+    step3.requestedPermissions = ORKPermissionCoreMotionActivity | ORKPermissionAudioRecording | ORKPermissionCoreLocation;
+    step3.requestedHealthKitTypesForReading = [NSSet setWithArray:@[
+                                                                    [HKObjectType characteristicTypeForIdentifier:HKCharacteristicTypeIdentifierBiologicalSex],
+                                                                    [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeight]]];
+    
+    ORKPageStep *pageStep = [[ORKPageStep alloc] initWithIdentifier:@"pageStep" steps:@[step1, step2, step3]];
+    
+    ORKPermissionMask expectedPermissions = ORKPermissionCamera | ORKPermissionCoreLocation | ORKPermissionCoreMotionActivity | ORKPermissionAudioRecording;
+    XCTAssertEqual(pageStep.requestedPermissions, expectedPermissions);
+    
+    NSSet *expectedReadingTypes = [NSSet setWithArray:@[
+                                                        [HKObjectType characteristicTypeForIdentifier:HKCharacteristicTypeIdentifierDateOfBirth],
+                                                        [HKObjectType characteristicTypeForIdentifier:HKCharacteristicTypeIdentifierBiologicalSex],
+                                                        [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeight]]];
+    XCTAssertEqualObjects(pageStep.requestedHealthKitTypesForReading, expectedReadingTypes);
+    
+    NSSet *expectedWritingTypes = [NSSet setWithArray:@[
+                                                        [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeartRate],
+                                                        [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeight],
+                                                        [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierBodyMass]]];
+    XCTAssertEqualObjects(pageStep.requestedHealthKitTypesForWriting, expectedWritingTypes);
+}
+
+- (void)testWorkoutStep {
+    
+    TestStep *hkStep = [[TestStep alloc] initWithIdentifier:@"hk"];
+    hkStep.requestedHealthKitTypesForReading = [NSSet setWithArray:@[
+                                                                    [HKObjectType characteristicTypeForIdentifier:HKCharacteristicTypeIdentifierDateOfBirth],
+                                                                    [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeight]]];
+    hkStep.requestedHealthKitTypesForWriting = [NSSet setWithArray:@[
+                                                                    [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeight],
+                                                                    [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierBodyMass]]];
+    
+    TestStep *audioStep = [[TestStep alloc] initWithIdentifier:@"audio"];
+    audioStep.requestedPermissions = ORKPermissionAudioRecording;
+    
+    ORKWorkoutStep *workoutStep = [[ORKWorkoutStep alloc] initWithIdentifier:@"test"
+                                                                 motionSteps:@[hkStep, audioStep]
+                                                                    restStep:nil
+                                                        relativeDistanceOnly:YES
+                                                                     options: ORKPredefinedTaskOptionExcludeDeviceMotion | ORKPredefinedTaskOptionExcludeAccelerometer];
+    
+    // Check the defaults
+    XCTAssertEqual(workoutStep.workoutConfiguration.activityType, HKWorkoutActivityTypeWalking);
+    XCTAssertEqual(workoutStep.workoutConfiguration.locationType, HKWorkoutSessionLocationTypeOutdoor);
+    
+    // With the default configuration, check the expected permissions
+    ORKPermissionMask expectedPermissions = ORKPermissionAudioRecording | ORKPermissionCoreMotionActivity | ORKPermissionCamera | ORKPermissionCoreLocation;
+    XCTAssertEqual(workoutStep.requestedPermissions, expectedPermissions);
+    
+    NSSet *expectedReading = [NSSet setWithArray:@[
+                                                   [HKObjectType characteristicTypeForIdentifier:HKCharacteristicTypeIdentifierDateOfBirth],
+                                                   [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeight],
+                                                   [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeartRate],
+                                                   [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierActiveEnergyBurned],
+                                                   [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierDistanceWalkingRunning],
+                                                   [HKObjectType workoutType]]];
+    XCTAssertEqualObjects(workoutStep.requestedHealthKitTypesForReading, expectedReading);
+    
+    NSSet *expectedWriting = [NSSet setWithArray:@[
+                                                 [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeight],
+                                                 [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierBodyMass],
+                                                 [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeartRate],
+                                                 [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierActiveEnergyBurned],
+                                                 [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierDistanceWalkingRunning],
+                                                 [HKObjectType workoutType]]];
+    XCTAssertEqualObjects(workoutStep.requestedHealthKitTypesForWriting, expectedWriting);
+    
+    // Check that the location recorder config uses relative distance only
+    ORKLocationRecorderConfiguration *locationConfig = (ORKLocationRecorderConfiguration *)[[workoutStep.recorderConfigurations filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        return [evaluatedObject isKindOfClass:[ORKLocationRecorderConfiguration class]];
+    }]] firstObject];
+    XCTAssertNotNil(locationConfig);
+    XCTAssertTrue(locationConfig.relativeDistanceOnly);
+    
+    // Check that the pedometer is included
+    ORKPedometerRecorderConfiguration *pedConfig = (ORKPedometerRecorderConfiguration *)[[workoutStep.recorderConfigurations filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        return [evaluatedObject isKindOfClass:[ORKPedometerRecorderConfiguration class]];
+    }]] firstObject];
+    XCTAssertNotNil(pedConfig);
+    
+    // Check that the heart rate capture step is included twice, before and after motion steps
+    ORKHeartRateCaptureStep *beforeStep = (ORKHeartRateCaptureStep *)[workoutStep stepWithIdentifier:ORKWorkoutBeforeStepIdentifier];
+    XCTAssertNotNil(beforeStep);
+    XCTAssertTrue([beforeStep isKindOfClass:[ORKHeartRateCaptureStep class]]);
+    XCTAssertEqual(beforeStep.minimumDuration, 0);
+    XCTAssertEqual(beforeStep.stepDuration, 0);
+    XCTAssertTrue(beforeStep.isBeforeWorkout);
+    
+    ORKStep *motionStep = [workoutStep stepWithIdentifier:@"audio"];
+    XCTAssertNotNil(motionStep);
+    
+    ORKHeartRateCaptureStep *afterStep = (ORKHeartRateCaptureStep *)[workoutStep stepWithIdentifier:ORKWorkoutAfterStepIdentifier];
+    XCTAssertNotNil(afterStep);
+    XCTAssertTrue([afterStep isKindOfClass:[ORKHeartRateCaptureStep class]]);
+    XCTAssertFalse(afterStep.isBeforeWorkout);
+    
+    XCTAssertLessThan([workoutStep.pageTask indexOfStep:beforeStep], [workoutStep.pageTask indexOfStep:motionStep]);
+    XCTAssertLessThan([workoutStep.pageTask indexOfStep:motionStep], [workoutStep.pageTask indexOfStep:afterStep]);
+}
+
+@end
+
+@implementation TestStep
+
+@synthesize requestedPermissions;
+@synthesize requestedHealthKitTypesForReading;
+@synthesize requestedHealthKitTypesForWriting;
+
+- (id)copyWithZone:(NSZone *)zone {
+    __typeof(self) copy = [super copyWithZone:zone];
+    copy.requestedPermissions = self.requestedPermissions;
+    copy.requestedHealthKitTypesForWriting = self.requestedHealthKitTypesForWriting;
+    copy.requestedHealthKitTypesForReading = self.requestedHealthKitTypesForReading;
+    return copy;
 }
 
 @end
