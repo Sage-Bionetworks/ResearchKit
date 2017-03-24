@@ -30,7 +30,7 @@
 
 
 @import UIKit;
-#import <ResearchKit/ORKRecorder.h>
+#import <ResearchKit/ORKRecorder_Private.h>
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -42,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
  background by using the background task support provided by UIApplication.
  */
 ORK_CLASS_AVAILABLE
-@interface ORKAccelerometerRecorder : ORKRecorder
+@interface ORKAccelerometerRecorder : ORKDataLogRecorder
 
 /**
  The frequency of accelerometer data collected from CoreMotion, in hertz (Hz).

@@ -1,5 +1,6 @@
 /*
  Copyright (c) 2015, Apple Inc. All rights reserved.
+ Copyright (c) 2017, Sage Bionetworks.
  
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
@@ -34,23 +35,40 @@
 #import "ORKHelpers_Internal.h"
 
 
+double DegreesToRadians(double degrees) {return degrees * M_PI / 180.0;};
+double RadiansToDegrees(double radians) {return radians * 180.0 / M_PI;};
+
 @implementation CLLocation (ORKJSONDictionary)
 
 - (NSDictionary *)ork_JSONDictionary {
+    return [self ork_JSONDictionaryWithRelativeDistanceOnly:NO previous:nil timestamp:nil];
+}
+
+- (NSDictionary<NSString *, id> *)ork_JSONDictionaryWithRelativeDistanceOnly:(BOOL)relativeDistanceOnly previous:(nullable CLLocation *)previous timestamp:(id)timestamp {
+    
     CLLocationCoordinate2D coord = self.coordinate;
     CLLocationDistance altitude = self.altitude;
     CLLocationAccuracy horizAccuracy = self.horizontalAccuracy;
     CLLocationAccuracy vertAccuracy = self.verticalAccuracy;
     CLLocationDirection course = self.course;
     CLLocationSpeed speed = self.speed;
-    NSDate *timestamp = self.timestamp;
     CLFloor *floor = self.floor;
     
-    NSMutableDictionary *dictionary = [@{@"timestamp": ORKStringFromDateISO8601(timestamp)} mutableCopy];
+    if (!timestamp) {
+        timestamp = ORKStringFromDateISO8601(self.timestamp);
+    }
+    NSMutableDictionary *dictionary = [@{@"timestamp": timestamp} mutableCopy];
     
     if (horizAccuracy >= 0) {
-        dictionary[@"coordinate"] = @{ @"latitude": [NSDecimalNumber numberWithDouble:coord.latitude],
-                                       @"longitude": [NSDecimalNumber numberWithDouble:coord.longitude]};
+        BOOL validPrevious = (previous != nil) && (previous.horizontalAccuracy >= 0);
+        CLLocationDistance relativeDistance = validPrevious ? [self distanceFromLocation:previous] : 0;
+        CLLocationDirection bearing = validPrevious ? [self bearingFromLocation:previous] : 0;
+        dictionary[@"relativeDistance"] = [NSDecimalNumber numberWithDouble:relativeDistance];
+        dictionary[@"relativeBearing"] = [NSDecimalNumber numberWithDouble:bearing];
+        if (!relativeDistanceOnly) {
+            dictionary[@"coordinate"] = @{ @"latitude": [NSDecimalNumber numberWithDouble:coord.latitude],
+                                           @"longitude": [NSDecimalNumber numberWithDouble:coord.longitude]};
+        }
         dictionary[@"horizontalAccuracy"] = [NSDecimalNumber numberWithDouble:horizAccuracy];
     }
     if (vertAccuracy >= 0) {
@@ -70,4 +88,26 @@
     return dictionary;
 }
 
+- (CLLocationDirection)bearingFromLocation:(CLLocation *)previousLocation {
+    
+    double lat1 = DegreesToRadians(previousLocation.coordinate.latitude);
+    double lon1 = DegreesToRadians(previousLocation.coordinate.longitude);
+    
+    double lat2 = DegreesToRadians(self.coordinate.latitude);
+    double lon2 = DegreesToRadians(self.coordinate.longitude);
+    
+    double dLon = lon2 - lon1;
+    
+    double y = sin(dLon) * cos(lat2);
+    double x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dLon);
+    double radiansBearing = atan2(y, x);
+    
+    if (radiansBearing < 0.0) {
+        radiansBearing += 2 * M_PI;
+    }
+
+    return RadiansToDegrees(radiansBearing);
+}
+
 @end
+

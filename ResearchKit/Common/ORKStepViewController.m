@@ -36,8 +36,9 @@
 #import "ORKStepViewController_Internal.h"
 #import "ORKTaskViewController_Internal.h"
 
-#import "ORKResult.h"
+#import "ORKCollectionResult.h"
 #import "ORKReviewStep_Internal.h"
+#import "ORKWorkoutStep.h"
 
 #import "ORKHelpers_Internal.h"
 #import "ORKSkin.h"
@@ -465,6 +466,16 @@ static NSString *const _ORKAddedResultsKey = @"addedResults";
 - (BOOL)accessibilityPerformEscape {
     [self goBackward];
     return YES;
+}
+
+#pragma mark - Watch Connectivity
+
+- (void)didReceiveWatchMessage:(ORKWorkoutMessage *)message {
+    // Do nothing
+}
+
+- (void)didReceiveWatchError:(NSError *)error {
+    // Do nothing
 }
 
 @end

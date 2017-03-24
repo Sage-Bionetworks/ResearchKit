@@ -36,7 +36,7 @@
 @import ResearchKit.Private;
 
 @import MapKit;
-
+@import HealthKit;
 
 static NSString *ORKEStringFromDateISO8601(NSDate *date) {
     static NSDateFormatter *formatter = nil;
@@ -415,6 +415,31 @@ encondingTable =
             PROPERTY(shouldTintImages, NSNumber, NSObject, YES, nil, nil),
             PROPERTY(useSurveyMode, NSNumber, NSObject, YES, nil, nil)
             })),
+   ENTRY(ORKHeartRateCameraInstructionStep,
+         ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
+             return [[ORKHeartRateCameraInstructionStep alloc] initWithIdentifier:GETPROP(dict, identifier)];
+         },
+         (@{
+            })),
+   ENTRY(ORKWorkoutStep,
+         ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
+             ORKWorkoutStep *step = [[ORKWorkoutStep alloc] initWithIdentifier:GETPROP(dict, identifier) pageTask:GETPROP(dict, pageTask)];
+             return step;
+         },
+         (@{
+            PROPERTY(workoutConfiguration, HKWorkoutConfiguration, NSObject, YES,
+                     ^id(id config) { return [config ork_jsonCodingObject]; },
+                     ^id(id dict) { return [HKWorkoutConfiguration workoutConfigurationWithCodingObject:dict];}),
+            PROPERTY(recorderConfigurations, ORKRecorderConfiguration, NSArray, YES, nil, nil),
+            })),
+   ENTRY(ORKHeartRateCaptureStep,
+         ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
+             return [[ORKHeartRateCaptureStep alloc] initWithIdentifier:GETPROP(dict, identifier)];
+         },
+         (@{
+            PROPERTY(minimumDuration, NSNumber, NSObject, YES, nil, nil),
+            PROPERTY(beforeWorkout, NSNumber, NSObject, YES, nil, nil),
+            })),
    ENTRY(ORKReviewStep,
          ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
              ORKReviewStep *reviewStep = [ORKReviewStep standaloneReviewStepWithIdentifier:GETPROP(dict, identifier)
@@ -514,12 +539,20 @@ encondingTable =
                      ^id(id unit) { return [(HKUnit *)unit unitString]; },
                      ^id(id string) { return [HKUnit unitFromString:string]; }),
             })),
+   ENTRY(ORKHeartRateCameraRecorderConfiguration,
+         ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
+             ORKHeartRateCameraRecorderConfiguration *recorderConfiguration = [[ORKHeartRateCameraRecorderConfiguration alloc] initWithIdentifier:GETPROP(dict, identifier)];
+             return recorderConfiguration;
+         },
+         (@{
+            })),
    ENTRY(ORKActiveStep,
          ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
              return [[ORKActiveStep alloc] initWithIdentifier:GETPROP(dict, identifier)];
          },
          (@{
             PROPERTY(stepDuration, NSNumber, NSObject, YES, nil, nil),
+            PROPERTY(shouldConsolidateRecorders, NSNumber, NSObject, YES, nil, nil),
             PROPERTY(shouldShowDefaultTimer, NSNumber, NSObject, YES, nil, nil),
             PROPERTY(shouldSpeakCountDown, NSNumber, NSObject, YES, nil, nil),
             PROPERTY(shouldSpeakRemainingTimeAtHalfway, NSNumber, NSObject, YES, nil, nil),
@@ -533,6 +566,9 @@ encondingTable =
             PROPERTY(spokenInstruction, NSString, NSObject, YES, nil, nil),
             PROPERTY(finishedSpokenInstruction, NSString, NSObject, YES, nil, nil),
             PROPERTY(recorderConfigurations, ORKRecorderConfiguration, NSArray, YES, nil, nil),
+            PROPERTY(watchInstruction, NSString, NSObject, YES, nil, nil),
+            PROPERTY(beginCommand, NSString, NSObject, YES, nil, nil),
+            PROPERTY(endCommand, NSString, NSObject, YES, nil, nil),
             })),
    ENTRY(ORKAudioStep,
          ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
@@ -678,6 +714,20 @@ encondingTable =
             PROPERTY(timeoutSound, NSNumber, NSObject, YES, nil, nil),
             PROPERTY(failureSound, NSNumber, NSObject, YES, nil, nil),
             })),
+   ENTRY(ORKGoNoGoStep,
+         ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
+             return [[ORKGoNoGoStep alloc] initWithIdentifier:GETPROP(dict, identifier)];
+         },
+         (@{
+            PROPERTY(maximumStimulusInterval, NSNumber, NSObject, YES, nil, nil),
+            PROPERTY(minimumStimulusInterval, NSNumber, NSObject, YES, nil, nil),
+            PROPERTY(timeout, NSNumber, NSObject, YES, nil, nil),
+            PROPERTY(numberOfAttempts, NSNumber, NSObject, YES, nil, nil),
+            PROPERTY(thresholdAcceleration, NSNumber, NSObject, YES, nil, nil),
+            PROPERTY(successSound, NSNumber, NSObject, YES, nil, nil),
+            PROPERTY(timeoutSound, NSNumber, NSObject, YES, nil, nil),
+            PROPERTY(failureSound, NSNumber, NSObject, YES, nil, nil),
+            })),
    ENTRY(ORKTappingIntervalStep,
          ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
              return [[ORKTappingIntervalStep alloc] initWithIdentifier:GETPROP(dict, identifier)];
@@ -743,6 +793,7 @@ encondingTable =
             return [[ORKFitnessStep alloc] initWithIdentifier:GETPROP(dict, identifier)];
         },
         (@{
+           PROPERTY(standingStill, NSNumber, NSObject, YES, nil, nil),
            })),
   ENTRY(ORKConsentSection,
         ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
@@ -903,6 +954,13 @@ encondingTable =
         (@{
           PROPERTY(imageChoices, ORKImageChoice, NSArray, NO, nil, nil),
           })),
+   ENTRY(ORKMoodScaleAnswerFormat,
+         ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
+             return [[ORKMoodScaleAnswerFormat alloc] initWithImageChoices:GETPROP(dict, imageChoices)];
+         },
+         (@{
+            PROPERTY(imageChoices, ORKImageChoice, NSArray, NO, nil, nil),
+            })),
   ENTRY(ORKTextChoiceAnswerFormat,
         ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
             return [[ORKTextChoiceAnswerFormat alloc] initWithStyle:((NSNumber *)GETPROP(dict, style)).integerValue textChoices:GETPROP(dict, textChoices)];
@@ -1078,6 +1136,8 @@ encondingTable =
             return [[ORKLocationRecorderConfiguration alloc] initWithIdentifier:GETPROP(dict,identifier)];
         },
         (@{
+           PROPERTY(relativeDistanceOnly, NSNumber, NSObject, YES, nil, nil),
+           PROPERTY(standingStill, NSNumber, NSObject, YES, nil, nil),
           })),
    ENTRY(ORKPedometerRecorderConfiguration,
          ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
@@ -1091,6 +1151,50 @@ encondingTable =
          },
         (@{
           })),
+   ENTRY(ORKWorkoutMessage,
+         nil,
+         (@{
+            PROPERTY(identifier, NSString, NSObject, NO, nil, nil),
+            PROPERTY(timestamp, NSDate, NSObject, NO,
+                     ^id(id date) { return ORKEStringFromDateISO8601(date); },
+                     ^id(id string) { return ORKEDateFromStringISO8601(string); }),
+            PROPERTY(workoutState, NSString, NSObject, YES, nil, nil)
+            })),
+   ENTRY(ORKInstructionWorkoutMessage,
+         nil,
+         (@{
+            PROPERTY(instruction, NSString, NSObject, YES, nil, nil),
+            PROPERTY(stepDuration, NSNumber, NSObject, YES, nil, nil),
+            PROPERTY(command, NSString, NSObject, YES, nil, nil)
+            })),
+   ENTRY(ORKErrorWorkoutMessage,
+         nil,
+         (@{
+            PROPERTY(error, NSError, NSObject, YES,
+                     ^id(id error) { return [error ork_jsonCodingObject]; },
+                     ^id(id dict) { return [NSError errorWithCodingObject:dict]; }),
+            })),
+   ENTRY(ORKEventWorkoutMessage,
+         nil,
+         (@{
+            PROPERTY(event, HKWorkoutEvent, NSObject, YES,
+                     ^id(id event) { return [event ork_jsonCodingObject]; },
+                     ^id(id dict) { return [HKWorkoutEvent workoutEventWithCodingObject:dict]; }),
+            })),
+   ENTRY(ORKSamplesWorkoutMessage,
+         nil,
+         (@{
+            PROPERTY(quantityTypeIdentifier, NSString, NSObject, YES, nil, nil),
+            PROPERTY(samples, HKQuantitySample, NSArray, YES,
+                     ^id(id samples) {
+                         NSMutableArray *array = [NSMutableArray new];
+                         for (id obj in samples) {
+                             [array addObject:[obj ork_jsonCodingObject]];
+                         }
+                         return [array copy];
+                     },
+                     ^id(id array) { return [HKQuantitySample quantitySamplesWithArray:array]; }),
+            })),
   ENTRY(ORKResult,
         nil,
         (@{
@@ -1202,6 +1306,21 @@ encondingTable =
             PROPERTY(timestamp, NSNumber, NSObject, NO, nil, nil),
             PROPERTY(fileResult, ORKResult, NSObject, NO, nil, nil)
             })),
+   ENTRY(ORKGoNoGoResult,
+         nil,
+         (@{
+            PROPERTY(timestamp, NSNumber, NSObject, YES, nil, nil),
+            PROPERTY(timeToThreshold, NSNumber, NSObject, YES, nil, nil),
+            PROPERTY(go, NSNumber, NSObject, YES, nil, nil),
+            PROPERTY(incorrect, NSNumber, NSObject, YES, nil, nil),
+            PROPERTY(samples, ORKGoNoGoSample, NSArray, YES, nil, nil),
+            })),
+   ENTRY(ORKGoNoGoSample,
+         nil,
+         (@{
+            PROPERTY(timestamp, NSNumber, NSObject, YES, nil, nil),
+            PROPERTY(vectorMagnitude, NSNumber, NSObject, YES, nil, nil),
+            })),
    ENTRY(ORKTimedWalkResult,
          nil,
          (@{
@@ -1280,18 +1399,17 @@ encondingTable =
          (@{
             PROPERTY(questionType, NSNumber, NSObject, NO, nil, nil)
             })),
-   ENTRY(ORKDataResult,
-         nil,
-         (@{
-            PROPERTY(contentType, NSString, NSObject, YES, nil, nil),
-            PROPERTY(filename, NSString, NSObject, YES, nil, nil),
-            })),
    ENTRY(ORKScaleQuestionResult,
          nil,
          (@{
             PROPERTY(scaleAnswer, NSNumber, NSObject, NO, nil, nil)
             })),
    ENTRY(ORKChoiceQuestionResult,
+         nil,
+         (@{
+            PROPERTY(choiceAnswers, NSObject, NSObject, NO, nil, nil)
+            })),
+   ENTRY(ORKMoodScaleQuestionResult,
          nil,
          (@{
             PROPERTY(choiceAnswers, NSObject, NSObject, NO, nil, nil)
@@ -1371,6 +1489,29 @@ encondingTable =
          nil,
          (@{
             PROPERTY(locationAnswer, ORKLocation, NSObject, NO, nil, nil)
+            })),
+   ENTRY(ORKWorkoutResult,
+         nil,
+         (@{
+            PROPERTY(error, NSError, NSObject, YES,
+                     ^id(id error) { return [error ork_jsonCodingObject]; },
+                     ^id(id dict) { return [NSError errorWithCodingObject:dict]; }),
+            PROPERTY(device, ORKDevice, NSObject, YES, nil, nil),
+            })),
+   ENTRY(ORKDevice,
+         ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
+             return [[ORKDevice alloc] initWithName:GETPROP(dict, name)
+                                       manufacturer:GETPROP(dict, manufacturer)
+                                              model:GETPROP(dict, model)
+                                    hardwareVersion:GETPROP(dict, hardwareVersion)
+                                    softwareVersion:GETPROP(dict, softwareVersion)];
+         },
+         (@{
+            PROPERTY(name, NSString, NSObject, NO, nil, nil),
+            PROPERTY(manufacturer, NSString, NSObject, NO, nil, nil),
+            PROPERTY(model, NSString, NSObject, NO, nil, nil),
+            PROPERTY(hardwareVersion, NSString, NSObject, NO, nil, nil),
+            PROPERTY(softwareVersion, NSString, NSObject, NO, nil, nil),
             })),
    ENTRY(ORKConsentSignatureResult,
          nil,
@@ -1539,7 +1680,7 @@ static id jsonObjectForObject(id object) {
                     } else {
                         if (converter != nil) {
                             valueForKey = converter(valueForKey);
-                            NSCAssert((valueForKey == nil) || isValid(valueForKey), @"Expected valid JSON object");
+                            NSCAssert((valueForKey == nil) || isValid(valueForKey), @"Expected valid JSON object: %@", object);
                         } else {
                             // Recurse for each property
                             valueForKey = jsonObjectForObject(valueForKey);

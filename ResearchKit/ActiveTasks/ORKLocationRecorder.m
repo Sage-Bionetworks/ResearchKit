@@ -34,16 +34,23 @@
 #import "ORKDataLogger.h"
 
 #import "ORKRecorder_Internal.h"
+#import "ORKHelpers_Internal.h"
 
 #import "CLLocation+ORKJSONDictionary.h"
 
 #import <CoreLocation/CoreLocation.h>
 
 
+NSString * const ORKTotalGPSDistanceKey = @"distance_gps";
+const CLLocationAccuracy ORKLocationRequiredAccuracy = 20;
+
 @interface ORKLocationRecorder () <CLLocationManagerDelegate> {
-    ORKDataLogger *_logger;
     NSError *_recordingError;
     BOOL _started;
+    NSMutableArray<CLLocation *> *_locationData;
+    CLLocationDistance _totalDistance;
+    NSMutableArray<CLLocation *> *_recentLocations;
+    dispatch_queue_t _processingQueue;
 }
 
 @property (nonatomic, strong, nullable) CLLocationManager *locationManager;
@@ -59,12 +66,10 @@
     self = [super initWithIdentifier:identifier step:step outputDirectory:outputDirectory];
     if (self) {
         self.continuesInBackground = YES;
+        NSString *processingQueueId = [@"org.ResearchKit.location.processing." stringByAppendingString:[[NSUUID UUID] UUIDString]];
+        _processingQueue = dispatch_queue_create([processingQueueId cStringUsingEncoding:NSUTF8StringEncoding], DISPATCH_QUEUE_SERIAL);
     }
     return self;
-}
-
-- (void)dealloc {
-    [_logger finishCurrentLog];
 }
 
 - (NSString *)recorderType {
@@ -77,15 +82,6 @@
 
 - (void)start {
     [super start];
-    
-    if (!_logger) {
-        NSError *error = nil;
-        _logger = [self makeJSONDataLoggerWithError:&error];
-        if (!_logger) {
-            [self finishRecordingWithError:error];
-            return;
-        }
-    }
     
     self.locationManager = [self createLocationManager];
     if ([CLLocationManager authorizationStatus] <= kCLAuthorizationStatusDenied) {
@@ -102,6 +98,8 @@
         return;
     }
     
+    _locationData = [NSMutableArray new];
+    _recentLocations = [NSMutableArray new];
     self.uptime = [NSProcessInfo processInfo].systemUptime;
     [self.locationManager startUpdatingLocation];
 }
@@ -114,16 +112,6 @@
 
 - (void)stop {
     [self doStopRecording];
-    [_logger finishCurrentLog];
-    
-    NSError *error = _recordingError;
-    _recordingError = nil;
-    __block NSURL *fileUrl = nil;
-    [_logger enumerateLogs:^(NSURL *logFileUrl, BOOL *stop) {
-        fileUrl = logFileUrl;
-    } error:&error];
-    
-    [self reportFileResultWithFile:fileUrl error:error];
     
     [super stop];
 }
@@ -131,16 +119,69 @@
 - (void)locationManager:(CLLocationManager *)manager
      didUpdateLocations:(NSArray *)locations {
     BOOL success = YES;
+    BOOL relativeDistanceOnly = [self relativeDistanceOnly];
     NSParameterAssert(locations.count >= 0);
     NSError *error = nil;
     if (locations) {
-        NSMutableArray *dictionaries = [NSMutableArray arrayWithCapacity:locations.count];
-        [locations enumerateObjectsUsingBlock:^(CLLocation *obj, NSUInteger idx, BOOL *stop) {
-            NSDictionary *d = [obj ork_JSONDictionary];
-            [dictionaries addObject:d];
-        }];
         
-        success = [_logger appendObjects:dictionaries error:&error];
+        // Add the location data points to the log
+        __block NSMutableArray *dictionaries = [NSMutableArray arrayWithCapacity:locations.count];
+        dispatch_sync(_processingQueue, ^{
+            [locations enumerateObjectsUsingBlock:^(CLLocation *obj, NSUInteger idx, BOOL *stop) {
+                
+                // Calculate time interval since start time
+                NSTimeInterval timeInterval = [obj.timestamp timeIntervalSinceDate:self.startDate];
+                
+                // If there is a reference uptime or the data is consolidated then this uses a schema that
+                // uses an NSTimeInterval to define the timestamp rather than a date. This remains compatible
+                // with the V1 schema, while allowing the data to be compared to other recorders using the
+                // same value for the timestamp.
+                id timestamp = nil;
+                BOOL consolidated = (self.sharedLogger != nil);
+                if (consolidated || (self.referenceUptime > 0)) {
+                    NSTimeInterval uptimeDelta = (self.referenceUptime > 0) ? (self.uptime - self.referenceUptime) : 0;
+                    timestamp = [NSDecimalNumber numberWithDouble:(uptimeDelta + timeInterval)];
+                }
+                
+                // Only include total distance traveled if the user is not supposed to be standing still
+                // and the horizontal accuracy indicates that the user is outdoors
+                if (!self.isStandingStill && (obj.horizontalAccuracy > 0) && (obj.horizontalAccuracy <= ORKLocationRequiredAccuracy)) {
+                    if (timeInterval > 0) {
+                        // If the time is after the start time, then add the distance traveled to the total distance.
+                        // This is a rough measurement and does not (at this time) include any spline drawing to measure the
+                        // actual curve of the distance traveled.
+                        _totalDistance += [_locationData.lastObject distanceFromLocation:obj];
+                    }
+                    if (timeInterval > -60.0) {
+                        // Save the accurate data objects to an array for calculating the distance traveled.
+                        [_locationData addObject:obj];
+                    }
+                }
+                
+                // Save the data points
+                NSMutableDictionary *dict = [[obj ork_JSONDictionaryWithRelativeDistanceOnly:relativeDistanceOnly
+                                                                                previous:_mostRecentLocation
+                                                                               timestamp:timestamp] mutableCopy];
+                dict[ORKRecorderIdentifierKey] = self.identifier;
+                if (!self.isStandingStill) {
+                    dict[ORKTotalGPSDistanceKey] = [NSDecimalNumber numberWithDouble:_totalDistance];
+                }
+                [dictionaries addObject:[dict copy]];
+                
+                // If this is a valid location then store as the previous location
+                if (obj.horizontalAccuracy >= 0) {
+                    _mostRecentLocation = [obj copy];
+                    if (timeInterval > 0) {
+                        [_recentLocations addObject:[obj copy]];
+                        if (_recentLocations.count > 5) {
+                            [_recentLocations removeObjectAtIndex:0];
+                        }
+                    }
+                }
+            }];
+        });
+        
+        success = (dictionaries.count == 0) || [self.logger appendObjects:dictionaries error:&error];
     }
     if (!success) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -159,14 +200,57 @@
     return [CLLocationManager locationServicesEnabled] && (self.locationManager != nil) && ([CLLocationManager authorizationStatus] > kCLAuthorizationStatusDenied);
 }
 
-- (void)reset {
-    [super reset];
-    
-    _logger = nil;
-}
-
 - (NSString *)mimeType {
     return @"application/json";
+}
+
+
+#pragma mark - total distance tracking
+
+- (BOOL)isStandingStill {
+    return ((ORKLocationRecorderConfiguration *)self.configuration).isStandingStill;
+}
+
+- (BOOL)relativeDistanceOnly {
+    return ((ORKLocationRecorderConfiguration *)self.configuration).relativeDistanceOnly;
+}
+
+- (NSTimeInterval)timestamp {
+    __block NSTimeInterval timestamp = 0;
+    dispatch_sync(_processingQueue, ^{
+        NSTimeInterval timeInterval = [_locationData.lastObject.timestamp timeIntervalSinceDate:self.startDate];
+        NSTimeInterval uptimeDelta = (self.referenceUptime > 0) ? (self.uptime - self.referenceUptime) : 0;
+        timestamp = (uptimeDelta + timeInterval);
+    });
+    return timestamp;
+}
+
+- (CLLocationDistance)distanceTraveled {
+    return _totalDistance;
+}
+
+- (BOOL)isOutdoors {
+    __block BOOL isOutdoors = NO;
+    dispatch_sync(_processingQueue, ^{
+        if (_recentLocations.count > 0) {
+            NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:NSStringFromSelector(@selector(horizontalAccuracy)) ascending:YES];
+            NSArray<CLLocation *> *sorted = [_recentLocations sortedArrayUsingDescriptors:@[sortDescriptor]];
+            isOutdoors = (sorted[sorted.count / 2].horizontalAccuracy <= ORKLocationRequiredAccuracy);
+        }
+    });
+    return isOutdoors;
+}
+
+- (void)resetTotalDistanceWithInitialLocation:(nullable CLLocation *)initialLocation {
+    dispatch_sync(_processingQueue, ^{
+        _totalDistance = 0;
+        _mostRecentLocation = [initialLocation copy];
+        [_recentLocations removeAllObjects];
+        [_locationData removeAllObjects];
+        if (_mostRecentLocation) {
+            [_locationData addObject:_mostRecentLocation];
+        }
+    });
 }
 
 @end
@@ -184,17 +268,32 @@
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
+    ORK_DECODE_BOOL(aDecoder, relativeDistanceOnly);
+    ORK_DECODE_BOOL(aDecoder, standingStill);
     return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    [super encodeWithCoder:aCoder];
+    ORK_ENCODE_BOOL(aCoder, relativeDistanceOnly);
+    ORK_ENCODE_BOOL(aCoder, standingStill);
 }
 
 + (BOOL)supportsSecureCoding {
     return YES;
 }
 
+- (NSUInteger)hash {
+    return super.hash ^ self.relativeDistanceOnly ^ self.standingStill;
+}
+
 - (BOOL)isEqual:(id)object {
     BOOL isParentSame = [super isEqual:object];
     
-    return isParentSame;
+    __typeof(self) castObject = object;
+    return isParentSame &&
+        (self.relativeDistanceOnly == castObject.relativeDistanceOnly) &&
+        (self.standingStill == castObject.standingStill);
 }
 
 - (ORKPermissionMask)requestedPermissionMask {

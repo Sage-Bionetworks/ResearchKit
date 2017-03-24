@@ -28,6 +28,7 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import <ResearchKit/ResearchKit-Swift.h>
 
 #import "ORKActiveStep.h"
 #import "ORKActiveStep_Internal.h"
@@ -70,6 +71,26 @@
     return  (hasSpokenInstruction || hasFinishedSpokenInstruction);
 }
 
+- (nullable ORKWorkoutMessage *)watchStartMessage {
+    if (self.watchInstruction || self.beginCommand) {
+        ORKInstructionWorkoutMessage *message = [[ORKInstructionWorkoutMessage alloc] initWithIdentifier:self.identifier];
+        message.instruction =  self.watchInstruction;
+        message.command = self.beginCommand;
+        message.stepDuration = self.stepDuration;
+        return message;
+    }
+    return nil;
+}
+
+- (nullable ORKWorkoutMessage *)watchFinishMessage {
+    if (self.endCommand) {
+        ORKInstructionWorkoutMessage *message = [[ORKInstructionWorkoutMessage alloc] initWithIdentifier:self.identifier];
+        message.command = self.endCommand;
+        return message;
+    }
+    return nil;
+}
+
 - (BOOL)isRestorable {
     return NO;
 }
@@ -89,6 +110,7 @@
 - (instancetype)copyWithZone:(NSZone *)zone {
     ORKActiveStep *step = [super copyWithZone:zone];
     step.stepDuration = self.stepDuration;
+    step.shouldConsolidateRecorders = self.shouldConsolidateRecorders;
     step.shouldStartTimerAutomatically = self.shouldStartTimerAutomatically;
     step.shouldSpeakCountDown = self.shouldSpeakCountDown;
     step.shouldSpeakRemainingTimeAtHalfway = self.shouldSpeakRemainingTimeAtHalfway;
@@ -103,6 +125,10 @@
     step.finishedSpokenInstruction = self.finishedSpokenInstruction;
     step.recorderConfigurations = [self.recorderConfigurations copy];
     step.image = self.image;
+    step.watchInstruction = self.watchInstruction;
+    step.beginCommand = self.beginCommand;
+    step.endCommand = self.endCommand;
+    
     return step;
 }
 
@@ -110,6 +136,7 @@
     self = [super initWithCoder:aDecoder];
     if (self ) {
         ORK_DECODE_DOUBLE(aDecoder, stepDuration);
+        ORK_DECODE_BOOL(aDecoder, shouldConsolidateRecorders);
         ORK_DECODE_BOOL(aDecoder, shouldStartTimerAutomatically);
         ORK_DECODE_BOOL(aDecoder, shouldSpeakCountDown);
         ORK_DECODE_BOOL(aDecoder, shouldSpeakRemainingTimeAtHalfway);
@@ -124,6 +151,9 @@
         ORK_DECODE_OBJ_CLASS(aDecoder, finishedSpokenInstruction, NSString);
         ORK_DECODE_IMAGE(aDecoder, image);
         ORK_DECODE_OBJ_ARRAY(aDecoder, recorderConfigurations, ORKRecorderConfiguration);
+        ORK_DECODE_OBJ(aDecoder, watchInstruction);
+        ORK_DECODE_OBJ(aDecoder, beginCommand);
+        ORK_DECODE_OBJ(aDecoder, endCommand);
     }
     return self;
 }
@@ -131,6 +161,7 @@
 - (void)encodeWithCoder:(NSCoder *)aCoder {
     [super encodeWithCoder:aCoder];
     ORK_ENCODE_DOUBLE(aCoder, stepDuration);
+    ORK_ENCODE_BOOL(aCoder, shouldConsolidateRecorders);
     ORK_ENCODE_BOOL(aCoder, shouldStartTimerAutomatically);
     ORK_ENCODE_BOOL(aCoder, shouldSpeakCountDown);
     ORK_ENCODE_BOOL(aCoder, shouldSpeakRemainingTimeAtHalfway);
@@ -145,6 +176,9 @@
     ORK_ENCODE_OBJ(aCoder, spokenInstruction);
     ORK_ENCODE_OBJ(aCoder, finishedSpokenInstruction);
     ORK_ENCODE_OBJ(aCoder, recorderConfigurations);
+    ORK_ENCODE_OBJ(aCoder, watchInstruction);
+    ORK_ENCODE_OBJ(aCoder, beginCommand);
+    ORK_ENCODE_OBJ(aCoder, endCommand);
 }
 
 - (BOOL)isEqual:(id)object {
@@ -152,11 +186,15 @@
     
     __typeof(self) castObject = object;
     return (isParentSame &&
+            ORKEqualObjects(self.watchInstruction, castObject.watchInstruction) &&
+            ORKEqualObjects(self.beginCommand, castObject.beginCommand) &&
+            ORKEqualObjects(self.endCommand, castObject.endCommand) &&
             ORKEqualObjects(self.spokenInstruction, castObject.spokenInstruction) &&
             ORKEqualObjects(self.finishedSpokenInstruction, castObject.finishedSpokenInstruction) &&
             ORKEqualObjects(self.recorderConfigurations, castObject.recorderConfigurations) &&
             ORKEqualObjects(self.image, castObject.image) &&
             (self.stepDuration == castObject.stepDuration) &&
+            (self.shouldConsolidateRecorders == castObject.shouldConsolidateRecorders) &&
             (self.shouldShowDefaultTimer == castObject.shouldShowDefaultTimer) &&
             (self.shouldStartTimerAutomatically == castObject.shouldStartTimerAutomatically) &&
             (self.shouldSpeakCountDown == castObject.shouldSpeakCountDown) &&

@@ -32,7 +32,7 @@
 @import UIKit;
 @import HealthKit;
 #import <ResearchKit/ORKStep.h>
-
+#import <ResearchKit/ORKWorkoutMessage.h>
 
 @class ORKRecorderConfiguration;
 
@@ -213,6 +213,41 @@ The default value of this property is `NO`.
  See also: `ORKRecorderConfiguration` and `ORKRecorder`.
  */
 @property (nonatomic, copy, nullable) NSArray<ORKRecorderConfiguration *> *recorderConfigurations;
+
+/**
+ Default = `NO`. If `YES`, then the recorders that support consolidation will record their results to a 
+ single data file that includes all the results.
+ */
+@property (nonatomic, assign) BOOL shouldConsolidateRecorders;
+
+/**
+ Command to send to the watch on start of the step.
+ */
+@property (nonatomic, copy, nullable) ORKWorkoutCommand beginCommand;
+
+/**
+ Command to send to the watch on the end of the step.
+ */
+@property (nonatomic, copy, nullable) ORKWorkoutCommand endCommand;
+
+/**
+ An instruction to send to the watch when this step is started (if available).
+ */
+@property (nonatomic, copy, nullable) NSString *watchInstruction;
+
+/**
+ A message to send to the watch on the start of the step.
+ 
+ @return  The dictionary for the message to send to the watch on start of the step (if applicable)
+ */
+- (nullable ORKInstructionWorkoutMessage *)watchStartMessage;
+
+/**
+ A message to send to the watch on the finish of the step.
+ 
+ @return  The dictionary for the message to send to the watch on finish of the step (if applicable)
+ */
+- (nullable ORKInstructionWorkoutMessage *)watchFinishMessage;
 
 @end
 

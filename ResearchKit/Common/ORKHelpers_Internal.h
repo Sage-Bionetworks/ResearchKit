@@ -29,12 +29,16 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 @import UIKit;
+
+#if TARGET_OS_IOS
+// Define any helpers specific to iOS
+#import "ORKHelpers+UIKIt.h"
+#import "ORKErrors.h"
+#endif
+
 #import "ORKHelpers_Private.h"
 #import "ORKTypes.h"
-#import "ORKErrors.h"
-
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -165,13 +169,8 @@ NSURL *ORKCreateRandomBaseURL();
 // Marked extern so it is accessible to unit tests
 ORK_EXTERN NSString *ORKFileProtectionFromMode(ORKFileProtectionMode mode);
 
-CGFloat ORKExpectedLabelHeight(UILabel *label);
-void ORKAdjustHeightForLabel(UILabel *label);
-
 // build a image with color
 UIImage *ORKImageWithColor(UIColor *color);
-
-void ORKEnableAutoLayoutForViews(NSArray *views);
 
 NSDateComponentsFormatter *ORKTimeIntervalLabelFormatter();
 NSDateComponentsFormatter *ORKDurationStringFormatter();
@@ -183,11 +182,6 @@ NSDateComponents *ORKTimeOfDayComponentsFromDate(NSDate *date);
 NSDate *ORKTimeOfDayDateFromComponents(NSDateComponents *dateComponents);
 
 BOOL ORKCurrentLocalePresentsFamilyNameFirst();
-
-UIFont *ORKTimeFontForSize(CGFloat size);
-UIFontDescriptor *ORKFontDescriptorForLightStylisticAlternative(UIFontDescriptor *descriptor);
-
-CGFloat ORKFloorToViewScale(CGFloat value, UIView *view);
 
 ORK_INLINE bool
 ORKEqualObjects(id o1, id o2) {
@@ -231,10 +225,6 @@ PerformCall; \
 _Pragma("clang diagnostic pop") \
 } while (0)
 
-UIFont *ORKThinFontWithSize(CGFloat size);
-UIFont *ORKLightFontWithSize(CGFloat size);
-UIFont *ORKMediumFontWithSize(CGFloat size);
-
 NSURL *ORKURLFromBookmarkData(NSData *data);
 NSData *ORKBookmarkDataFromURL(NSURL *url);
 
@@ -258,14 +248,6 @@ ORKCGFloatNearlyEqualToFloat(CGFloat f1, CGFloat f2) {
 #define ORKThrowInvalidArgumentExceptionIfNil(argument)  if (!argument) { @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@#argument" cannot be nil." userInfo:nil]; }
 
 void ORKValidateArrayForObjectsOfClass(NSArray *array, Class expectedObjectClass, NSString *exceptionReason);
-
-void ORKRemoveConstraintsForRemovedViews(NSMutableArray *constraints, NSArray *removedViews);
-
-extern const double ORKDoubleInvalidValue;
-
-extern const CGFloat ORKCGFloatInvalidValue;
-
-void ORKAdjustPageViewControllerNavigationDirectionForRTL(UIPageViewControllerNavigationDirection *direction);
 
 NSString *ORKPaddingWithNumberOfSpaces(NSUInteger numberOfPaddingSpaces);
 

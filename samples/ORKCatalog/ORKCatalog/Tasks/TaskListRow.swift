@@ -85,8 +85,11 @@ enum TaskListRow: Int, CustomStringConvertible {
     case login
     case passcode
     case audio
+    case cardio
     case fitness
+    case gonogoTest
     case holePegTest
+    case moodSurvey
     case psat
     case reactionTime
     case shortWalk
@@ -154,7 +157,9 @@ enum TaskListRow: Int, CustomStringConvertible {
             TaskListRowSection(title: "Active Tasks", rows:
                 [
                     .audio,
+                    .cardio,
                     .fitness,
+                    .gonogoTest,
                     .holePegTest,
                     .psat,
                     .reactionTime,
@@ -170,6 +175,10 @@ enum TaskListRow: Int, CustomStringConvertible {
                     .kneeRangeOfMotion,
                     .shoulderRangeOfMotion,
                     .trailMaking
+                ]),
+            TaskListRowSection(title: "Surveys", rows:
+                [
+                    .moodSurvey,
                 ]),
             TaskListRowSection(title: "Miscellaneous", rows:
                 [
@@ -259,11 +268,20 @@ enum TaskListRow: Int, CustomStringConvertible {
         case .audio:
             return NSLocalizedString("Audio", comment: "")
             
+        case .cardio:
+            return NSLocalizedString("Cardio Challenge", comment: "")
+            
         case .fitness:
             return NSLocalizedString("Fitness Check", comment: "")
+            
+        case .gonogoTest:
+            return NSLocalizedString("Go No Go Test", comment: "")
         
         case .holePegTest:
             return NSLocalizedString("Hole Peg Test", comment: "")
+            
+        case .moodSurvey:
+            return NSLocalizedString("Mood Survey", comment: "")
             
         case .psat:
             return NSLocalizedString("PSAT", comment: "")
@@ -453,7 +471,9 @@ enum TaskListRow: Int, CustomStringConvertible {
 
         // Active tasks.
         case audioTask
+        case cardioTask
         case fitnessTask
+		case gonogoTest
         case holePegTestTask
         case psatTask
         case reactionTime
@@ -469,6 +489,9 @@ enum TaskListRow: Int, CustomStringConvertible {
         case kneeRangeOfMotion
         case shoulderRangeOfMotion
         case trailMaking
+        
+        // Surveys
+        case moodSurvey
         
         // Video instruction tasks.
         case videoInstructionTask
@@ -556,12 +579,21 @@ enum TaskListRow: Int, CustomStringConvertible {
             
         case .audio:
             return audioTask
+            
+        case .cardio:
+            return cardioTask
 
         case .fitness:
             return fitnessTask
             
+        case .gonogoTest:
+            return gonogoTask
+            
         case .holePegTest:
             return holePegTestTask
+            
+        case .moodSurvey:
+            return moodSurvey
             
         case .psat:
             return PSATTask
@@ -607,7 +639,7 @@ enum TaskListRow: Int, CustomStringConvertible {
         
         case .videoInstruction:
             return videoInstruction
-        }
+       }
     }
 
     // MARK: Task Creation Convenience
@@ -1278,6 +1310,15 @@ enum TaskListRow: Int, CustomStringConvertible {
     private var audioTask: ORKTask {
         return ORKOrderedTask.audioTask(withIdentifier: String(describing:Identifier.audioTask), intendedUseDescription: exampleDescription, speechInstruction: exampleSpeechInstruction, shortSpeechInstruction: exampleSpeechInstruction, duration: 20, recordingSettings: nil,  checkAudioLevel: true, options: [])
     }
+    
+    /// This task presents a 6-minute walk with heart rate measurement using the Apple Watch (if available) and phone camera
+    private var cardioTask: ORKTask {
+        if #available(iOS 10.0, *) {
+            return ORKOrderedTask.cardioChallenge(withIdentifier: String(describing:Identifier.cardioTask), intendedUseDescription: exampleDescription, walkDuration: 60, restDuration: 30, relativeDistanceOnly:false, options: [])
+        } else {
+            return fitnessTask
+        }
+    }
 
     /**
         This task presents the Fitness pre-defined active task. For this example,
@@ -1288,9 +1329,22 @@ enum TaskListRow: Int, CustomStringConvertible {
         return ORKOrderedTask.fitnessCheck(withIdentifier: String(describing:Identifier.fitnessTask), intendedUseDescription: exampleDescription, walkDuration: 20, restDuration: 20, options: [])
     }
     
+    /// This task presents a go no go task
+    private var gonogoTask: ORKTask {
+        /// An example of a custom sound.
+        let successSoundURL = Bundle.main.url(forResource:"tap", withExtension: "aif")!
+        let successSound = SystemSound(soundURL: successSoundURL)!
+        return ORKOrderedTask.gonogoTask(withIdentifier: String(describing:Identifier.reactionTime), intendedUseDescription: exampleDescription, maximumStimulusInterval: 10, minimumStimulusInterval: 4, thresholdAcceleration: 0.5, numberOfAttempts: 9, timeout: 3, successSound: successSound.soundID, timeoutSound: 0, failureSound: UInt32(kSystemSoundID_Vibrate), options: [])
+    }
+    
     /// This task presents the Hole Peg Test pre-defined active task.
     private var holePegTestTask: ORKTask {
         return ORKNavigableOrderedTask.holePegTest(withIdentifier: String(describing:Identifier.holePegTestTask), intendedUseDescription: exampleDescription, dominantHand: .right, numberOfPegs: 9, threshold: 0.2, rotated: false, timeLimit: 300, options: [])
+    }
+    
+    /// This task presents a Mood Survey
+    private var moodSurvey: ORKTask {
+        return ORKOrderedTask.moodSurvey(withIdentifier: String(describing:Identifier.moodSurvey), intendedUseDescription: exampleDescription, frequency: .daily, customQuestionText: NSLocalizedString("How much do you like oranges?", comment: ""), options: [])
     }
     
     /// This task presents the PSAT pre-defined active task.

@@ -37,7 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
 typedef NS_OPTIONS(NSInteger, ORKSampleJSONOptions) {
     ORKSampleIncludeMetadata = 0x1,
     ORKSampleIncludeSource = 0x2,
-    ORKSampleIncludeUUID = 0x4
+    ORKSampleIncludeUUID = 0x4,
+    ORKSampleIncludeDevice = 0x8,
 };
 
 /**

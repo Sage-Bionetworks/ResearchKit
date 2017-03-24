@@ -89,7 +89,7 @@
     
     self.motionManager = [self createMotionManager];
     
-    if (!_logger) {
+    if (!_logger && !self.sharedLogger) {
         NSError *error = nil;
         _logger = [self makeJSONDataLoggerWithError:&error];
         if (!_logger) {
@@ -115,7 +115,17 @@
     [self.motionManager startAccelerometerUpdatesToQueue:[[NSOperationQueue alloc] init] withHandler:^(CMAccelerometerData *data, NSError *error) {
          BOOL success = NO;
          if (data) {
-             success = [_logger append:[data ork_JSONDictionary] error:&error];
+             ORKDataLogger *logger = self.sharedLogger ? : _logger;
+             NSTimeInterval timestamp = data.timestamp;
+             if (self.referenceUptime > 0) {
+                 timestamp = (data.timestamp - self.referenceUptime);
+             }
+             BOOL consolidated = (self.sharedLogger != nil);
+             NSMutableDictionary *dict = [[data ork_JSONDictionaryWithTimestamp:timestamp consolidated:consolidated] mutableCopy];
+             if (consolidated) {
+                 dict[ORKRecorderIdentifierKey] = self.identifier;
+             }
+             success = [logger append:[dict copy] error:&error];
          }
          if (!success) {
              dispatch_async(dispatch_get_main_queue(), ^{

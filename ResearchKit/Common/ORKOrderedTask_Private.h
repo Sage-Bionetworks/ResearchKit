@@ -53,6 +53,7 @@ FOUNDATION_EXPORT NSString *const ORKSpatialSpanMemoryStepIdentifier;
 FOUNDATION_EXPORT NSString *const ORKToneAudiometryPracticeStepIdentifier;
 FOUNDATION_EXPORT NSString *const ORKToneAudiometryStepIdentifier;
 FOUNDATION_EXPORT NSString *const ORKReactionTimeStepIdentifier;
+FOUNDATION_EXPORT NSString *const ORKGoNoGoStepIdentifier;
 FOUNDATION_EXPORT NSString *const ORKHolePegTestDominantPlaceStepIdentifier;
 FOUNDATION_EXPORT NSString *const ORKHolePegTestDominantRemoveStepIdentifier;
 FOUNDATION_EXPORT NSString *const ORKHolePegTestNonDominantPlaceStepIdentifier;
@@ -66,9 +67,10 @@ FOUNDATION_EXPORT NSString *const ORKHeartRateRecorderIdentifier;
 
 FOUNDATION_EXPORT void ORKStepArrayAddStep(NSMutableArray *array, ORKStep *step);
 
-@interface ORKOrderedTask ()
+@interface ORKOrderedTask (ORKMakeTaskUtilities)
 
 + (ORKCompletionStep *)makeCompletionStep;
++ (NSDateComponentsFormatter *)textTimeFormatter;
 
 @end
 

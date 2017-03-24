@@ -36,6 +36,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class ORKStep;
+@class ORKDataLogger;
+
+ORK_EXTERN NSString *const ORKRecorderIdentifierKey ORK_AVAILABLE_DECL;
+ORK_EXTERN NSString *const ORKRecorderTimestampKey ORK_AVAILABLE_DECL;
 
 /**
  The `ORKTouchRecorderConfiguration` is a recorder configuration class for
@@ -145,6 +149,18 @@ ORK_CLASS_AVAILABLE
  This method is typically overridden in new recorder configuration subclasses.
  */
 - (ORKPermissionMask)requestedPermissionMask;
+
+@end
+
+
+/**
+ The `ORKDataLogRecorder` is a subclass of the data recorder that implements starting and stopping a
+ log with the start/stop of the recorder.
+ */
+ORK_CLASS_AVAILABLE
+@interface ORKDataLogRecorder : ORKRecorder
+
+@property (nonatomic, strong) ORKDataLogger *logger;
 
 @end
 

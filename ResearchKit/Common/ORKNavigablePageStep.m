@@ -30,6 +30,7 @@
 
 #import "ORKNavigablePageStep.h"
 #import "ORKPageStep_Private.h"
+#import "ORKHelpers_Internal.h"
 
 @implementation ORKNavigablePageStep
 
@@ -40,7 +41,7 @@
 }
 
 - (instancetype)initWithIdentifier:(NSString *)identifier steps:(NSArray<ORKStep *> *)steps {
-    return [self initWithIdentifier:identifier pageTask:[[ORKOrderedTask alloc] initWithIdentifier:identifier steps:steps]];
+    ORKThrowMethodUnavailableException();
 }
 
 - (instancetype)initWithIdentifier:(NSString *)identifier

@@ -31,7 +31,7 @@
 
 #import "ORKTaskViewController.h"
 
-#import "ORKActiveStepViewController.h"
+#import "ORKActiveStepViewController_Internal.h"
 #import "ORKInstructionStepViewController_Internal.h"
 #import "ORKFormStepViewController.h"
 #import "ORKQuestionStepViewController.h"
@@ -42,9 +42,11 @@
 #import "ORKVisualConsentStepViewController.h"
 
 #import "ORKActiveStep.h"
+#import "ORKCollectionResult_Private.h"
 #import "ORKFormStep.h"
 #import "ORKInstructionStep.h"
 #import "ORKOrderedTask.h"
+#import "ORKPermissionsValidator.h"
 #import "ORKQuestionStep.h"
 #import "ORKResult_Private.h"
 #import "ORKReviewStep_Internal.h"
@@ -454,7 +456,7 @@ static NSString *const _ChildNavigationControllerRestorationKey = @"childNavigat
     return permissions;
 }
 
-- (void)requestHealthAuthorizationWithCompletion:(void (^)(void))completion {
+- (void)requestAuthorizationWithCompletion:(void (^)(void))completion {
     if (_hasRequestedHealthData) {
         if (completion) completion();
         return;
@@ -471,6 +473,13 @@ static NSString *const _ChildNavigationControllerRestorationKey = @"childNavigat
     }
     
     ORKPermissionMask permissions = [self desiredPermissions];
+    
+    // Validate permissions
+    NSError *error;
+    if (![ORKPermissionsValidator validatePermissions:permissions writeTypes:writeTypes readTypes:readTypes error:&error]) {
+        ORK_Log_Error(@"%@: %@", [error localizedFailureReason], [error localizedDescription]);
+        NSAssert(NO, [error description]);
+    }
     
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     
@@ -645,9 +654,9 @@ static NSString *const _ChildNavigationControllerRestorationKey = @"childNavigat
         ORKStep *step = [self nextStep];
         if ([self shouldPresentStep:step]) {
             
-            if (![step isKindOfClass:[ORKInstructionStep class]]) {
+            if (![step isInstructionStep]) {
                 [self startAudioPromptSessionIfNeeded];
-                [self requestHealthAuthorizationWithCompletion:nil];
+                [self requestAuthorizationWithCompletion:nil];
             }
             
             ORKStepViewController *firstViewController = [self viewControllerForStep:step];
@@ -862,7 +871,7 @@ static NSString *const _ChildNavigationControllerRestorationKey = @"childNavigat
     }
     
     ORKStep *nextStep = [self.task stepAfterStep:step withResult:[self result]];
-    BOOL isNextStepInstructionStep = [nextStep isKindOfClass:[ORKInstructionStep class]];
+    BOOL isNextStepInstructionStep = [nextStep isInstructionStep];
     
     if (_lastBeginningInstructionStepIdentifier == nil &&
         nextStep && NO == isNextStepInstructionStep) {
@@ -875,7 +884,7 @@ static NSString *const _ChildNavigationControllerRestorationKey = @"childNavigat
         return NO;
     }
     return (_lastBeginningInstructionStepIdentifier != nil &&
-            [step isKindOfClass:[ORKInstructionStep class]]&&
+            [step isInstructionStep] &&
             [step.identifier isEqualToString:_lastBeginningInstructionStepIdentifier]);
 }
 
@@ -907,7 +916,7 @@ static NSString *const _ChildNavigationControllerRestorationKey = @"childNavigat
         
         if ( [self grantedAtLeastOnePermission] == NO) {
             // Do the health request and THEN proceed.
-            [self requestHealthAuthorizationWithCompletion:^{
+            [self requestAuthorizationWithCompletion:^{
                 
                 // If we are able to collect any data, proceed.
                 // An alternative rule would be to never proceed if any permission fails.
@@ -1206,7 +1215,7 @@ static NSString *const _ChildNavigationControllerRestorationKey = @"childNavigat
 
 - (IBAction)cancelAction:(UIBarButtonItem *)sender {
     // Should we also include visualConsentStep here? Others?
-    BOOL isCurrentInstructionStep = [self.currentStepViewController.step isKindOfClass:[ORKInstructionStep class]];
+    BOOL isCurrentInstructionStep = [self.currentStepViewController.step isInstructionStep];
     
     // [self result] would not include any results beyond current step.
     // Use _managedResults to get the completed result set.

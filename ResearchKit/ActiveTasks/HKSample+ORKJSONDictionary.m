@@ -31,6 +31,7 @@
 
 #import "HKSample+ORKJSONDictionary.h"
 
+#import "ORKCodingObjects.h"
 #import "ORKHelpers_Internal.h"
 
 
@@ -41,6 +42,7 @@ static NSString *const HKSampleEndDateKey = @"endDate";
 static NSString *const HKSampleValue = @"value";
 static NSString *const HKMetadataKey = @"metadata";
 static NSString *const HKSourceKey = @"source";
+static NSString *const HKDeviceKey = @"device";
 static NSString *const HKUnitKey = @"unit";
 static NSString *const HKCorrelatedObjectsKey = @"objects";
 // static NSString *const HKSourceIdentifierKey = @"sourceBundleIdentifier";
@@ -95,7 +97,13 @@ static NSString *const HKCorrelatedObjectsKey = @"objects";
             mutableDictionary[HKSourceKey] = source.name;
         }
     }
-        
+    
+    if (options & ORKSampleIncludeDevice) {
+        if (self.device) {
+            mutableDictionary[HKDeviceKey] = [self.device ork_jsonCodingObject];
+        }
+    }
+    
     return mutableDictionary;
 }
 
