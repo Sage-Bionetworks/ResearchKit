@@ -42,28 +42,28 @@
 
 @implementation ORKFitnessStep
 
-+ (NSArray *)recorderConfigurationsWithOptions:(ORKPredefinedRecorderOption)options
++ (NSArray *)recorderConfigurationsWithOptions:(ORKPredefinedTaskOption)options
                           relativeDistanceOnly:(BOOL)relativeDistanceOnly
                                  standingStill:(BOOL)standingStill {
     NSMutableArray *recorderConfigurations = [NSMutableArray arrayWithCapacity:5];
-    if (!(ORKPredefinedRecorderOptionExcludePedometer & options)) {
+    if (!(ORKPredefinedTaskOptionExcludePedometer & options)) {
         [recorderConfigurations addObject:[[ORKPedometerRecorderConfiguration alloc] initWithIdentifier:ORKPedometerRecorderIdentifier]];
     }
-    if (!(ORKPredefinedRecorderOptionExcludeAccelerometer & options)) {
+    if (!(ORKPredefinedTaskOptionExcludeAccelerometer & options)) {
         [recorderConfigurations addObject:[[ORKAccelerometerRecorderConfiguration alloc] initWithIdentifier:ORKAccelerometerRecorderIdentifier
                                                                                                   frequency:100]];
     }
-    if (!(ORKPredefinedRecorderOptionExcludeDeviceMotion & options)) {
+    if (!(ORKPredefinedTaskOptionExcludeDeviceMotion & options)) {
         [recorderConfigurations addObject:[[ORKDeviceMotionRecorderConfiguration alloc] initWithIdentifier:ORKDeviceMotionRecorderIdentifier
                                                                                                  frequency:100]];
     }
-    if (!(ORKPredefinedRecorderOptionExcludeLocation & options)) {
+    if (!(ORKPredefinedTaskOptionExcludeLocation & options)) {
         ORKLocationRecorderConfiguration *locationConfig = [[ORKLocationRecorderConfiguration alloc] initWithIdentifier:ORKLocationRecorderIdentifier];
         locationConfig.relativeDistanceOnly = relativeDistanceOnly;
         locationConfig.standingStill = standingStill;
         [recorderConfigurations addObject:locationConfig];
     }
-    if (!(ORKPredefinedRecorderOptionExcludeHeartRate & options)) {
+    if (!(ORKPredefinedTaskOptionExcludeHeartRate & options)) {
         HKUnit *bpmUnit = [HKUnit bpmUnit];
         HKQuantityType *heartRateType = [HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierHeartRate];
         [recorderConfigurations addObject:[[ORKHealthQuantityTypeRecorderConfiguration alloc] initWithIdentifier:ORKHeartRateRecorderIdentifier

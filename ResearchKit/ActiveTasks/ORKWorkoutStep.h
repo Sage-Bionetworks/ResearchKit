@@ -159,7 +159,7 @@ HK_CLASS_AVAILABLE_IOS_WATCHOS(10_0, 3_0)
                        motionSteps:(NSArray<ORKStep *> *)motionSteps
                           restStep:(nullable ORKHeartRateCaptureStep *)restStep
               relativeDistanceOnly:(BOOL)relativeDistanceOnly
-                           options:(ORKPredefinedRecorderOption)options NS_DESIGNATED_INITIALIZER;
+                           options:(ORKPredefinedTaskOption)options NS_DESIGNATED_INITIALIZER;
 
 /**
  Returns a workout step initialized from data in the given unarchiver.
