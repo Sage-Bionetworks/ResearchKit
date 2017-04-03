@@ -33,7 +33,7 @@
 
 #if TARGET_OS_IOS
 // Define any helpers specific to iOS
-#import "ORKHelpers+UIKIt.h"
+#import "ORKHelpers+UIKit.h"
 #import "ORKErrors.h"
 #endif
 
