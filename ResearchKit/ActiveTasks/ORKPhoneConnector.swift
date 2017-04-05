@@ -147,7 +147,7 @@ public final class ORKPhoneConnector: NSObject, WCSessionDelegate {
             if activationState == .activated {
                 self.sendPending()
             } else {
-                print("Watch connector \(session): activationDidCompleteWith: \(activationState) error: \(error)")
+                print("Watch connector \(session): activationDidCompleteWith: \(activationState) error: \(String(describing: error))")
                 self.respondWithFailed(error: error)
             }
         }
