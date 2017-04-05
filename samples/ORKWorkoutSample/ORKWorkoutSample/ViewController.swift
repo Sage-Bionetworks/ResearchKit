@@ -84,7 +84,7 @@ class ViewController: UIViewController, ORKTaskViewControllerDelegate {
     func taskViewController(_ taskViewController: ORKTaskViewController, didFinishWith reason: ORKTaskViewControllerFinishReason, error: Error?) {
         
         let result = taskViewController.result
-        print("Finished with \(result) and error: \(error)")
+        print("Finished with \(result) and error: \(String(describing: error))")
         
         taskViewController.dismiss(animated: true) { 
             let resultVC = ResultsTableViewController(style: .grouped)
