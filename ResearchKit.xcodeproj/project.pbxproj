@@ -4165,7 +4165,7 @@
 				INFOPLIST_FILE = "ResearchKit (watchOS)/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = ResearchKit/ResearchKit;
+				MODULEMAP_FILE = ResearchKit/ResearchKit.modulemap;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				OTHER_SWIFT_FLAGS = "-D DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = org.researchkit.ResearchKit.watchOS;
@@ -4202,7 +4202,7 @@
 				INFOPLIST_FILE = "ResearchKit (watchOS)/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = ResearchKit/ResearchKit;
+				MODULEMAP_FILE = ResearchKit/ResearchKit.modulemap;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = org.researchkit.ResearchKit.watchOS;
