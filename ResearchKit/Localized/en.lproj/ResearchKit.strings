@@ -315,7 +315,7 @@
 "WALK_INTRO_2_TITLE" = "Walk and Balance instructions";
 "WALK_INTRO_2_TEXT_BACK_AND_FORTH_INSTRUCTION" = "First, walk back and forth for %1$@ at your normal pace.\n\nYou will then be asked to turn around in a full circle and then stand still, with your feet about shoulder-width apart. Stand still for %2$@.";
 "WALK_INTRO_3_TITLE" = "Please walk with your phone";
-"WALK_INTRO_3_TEXT_BACK_AND_FORTH_INSTRUCTION" = "When you are ready, tap the walk button and put the phone in a pocket or hold in your hand while you walk. The phone will count down from 5 to begin your session.";
+"WALK_INTRO_3_TEXT_BACK_AND_FORTH_INSTRUCTION" = "When you are ready, tap the walk button and put the phone in a pocket while you walk. The phone will count down from 5 to begin your session.";
 "WALK_COUNTDOWN_1_TITLE" = "Start walking in:";
 "WALK_BACK_AND_FORTH_INSTRUCTION_FORMAT" = "Walk back and forth for %@. Walk as you would normally.";
 "WALK_BACK_AND_FORTH_STOP_SPOKEN" = "Stop walking and stand still.";
