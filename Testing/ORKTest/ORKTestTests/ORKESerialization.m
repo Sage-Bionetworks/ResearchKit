@@ -110,6 +110,11 @@ static NSDictionary *dictionaryFromNSRange(NSRange r) {
     return @{ @"location": @(r.location) , @"length": @(r.length) };
 }
 
+// TODO: syoung 07/29/2019 This is broken on master (cannot build ORKTest) because the features
+// were added with iOS 13 and will not build with a current released version of Xcode 10.3 b/c
+// that does not include beta versions of the OS. Just ignore it and don't attempt a submission to
+// ResearchKit until after September. Sorry.
+
 static NSDictionary *dictionaryFromSFAcousticFeature(SFAcousticFeature *acousticFeature) {
     if (acousticFeature == nil) { return @{}; }
     return @{ @"acousticFeatureValuePerFrame" : acousticFeature.acousticFeatureValuePerFrame,
