@@ -97,7 +97,12 @@ static const NSTimeInterval OutcomeAnimationDuration = 0.3;
     [_gonogoContentView setStimulusHidden:YES];
     
     self.activeStepView.activeCustomView = _gonogoContentView;
-    self.activeStepView.stepViewFillsAvailableSpace = YES;
+    
+    // TODO: syoung 07/29/2019 The view `ORKActiveView` that this inherits from was changed by
+    // commit 7b6dae0 from `ORKVerticalContainerView` to `ORKStepContainerView` which does not have
+    // this property. You will need to test for and address fixing any adverse side effects of this
+    // change before attempting to submit this task to the main ResearchKit fork.
+    //self.activeStepView.stepViewFillsAvailableSpace = YES;
 }
 
 - (void)viewDidAppear:(BOOL)animated {

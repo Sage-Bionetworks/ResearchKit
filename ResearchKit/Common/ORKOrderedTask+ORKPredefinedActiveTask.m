@@ -300,19 +300,21 @@ NSString *const ORKGoNoGoStepIdentifier = @"gonogo";
             ORKStepArrayAddStep(steps, step);
         }
     }
+    {
     
-    ORKGoNoGoStep *step = [[ORKGoNoGoStep alloc] initWithIdentifier:ORKGoNoGoStepIdentifier];
-    step.maximumStimulusInterval = maximumStimulusInterval;
-    step.minimumStimulusInterval = minimumStimulusInterval;
-    step.thresholdAcceleration = thresholdAcceleration;
-    step.numberOfAttempts = numberOfAttempts;
-    step.timeout = timeout;
-    step.successSound = successSoundID;
-    step.timeoutSound = timeoutSoundID;
-    step.failureSound = failureSoundID;
-    step.recorderConfigurations = @[ [[ORKDeviceMotionRecorderConfiguration  alloc] initWithIdentifier:ORKDeviceMotionRecorderIdentifier frequency: 100]];
-    
-    ORKStepArrayAddStep(steps, step);
+        ORKGoNoGoStep *step = [[ORKGoNoGoStep alloc] initWithIdentifier:ORKGoNoGoStepIdentifier];
+        step.maximumStimulusInterval = maximumStimulusInterval;
+        step.minimumStimulusInterval = minimumStimulusInterval;
+        step.thresholdAcceleration = thresholdAcceleration;
+        step.numberOfAttempts = numberOfAttempts;
+        step.timeout = timeout;
+        step.successSound = successSoundID;
+        step.timeoutSound = timeoutSoundID;
+        step.failureSound = failureSoundID;
+        step.recorderConfigurations = @[ [[ORKDeviceMotionRecorderConfiguration  alloc] initWithIdentifier:ORKDeviceMotionRecorderIdentifier frequency: 100]];
+        
+        ORKStepArrayAddStep(steps, step);
+    }
     
     if (!(options & ORKPredefinedTaskOptionExcludeConclusion)) {
         ORKInstructionStep *step = [self makeCompletionStep];
