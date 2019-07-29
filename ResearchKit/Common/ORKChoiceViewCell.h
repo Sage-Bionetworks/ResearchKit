@@ -34,19 +34,32 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class ORKSelectionTitleLabel;
-@class ORKSelectionSubTitleLabel;
+@class ORKAnswerTextView;
 
 @interface ORKChoiceViewCell : UITableViewCell
 
-@property (nonatomic, strong, readonly) ORKSelectionTitleLabel *shortLabel;
-@property (nonatomic, strong, readonly) ORKSelectionSubTitleLabel *longLabel;
-
-+ (CGFloat)suggestedCellHeightForShortText:(nullable NSString *)shortText LongText:(nullable NSString *)longText inTableView:(nullable UITableView *)tableView;
-
 @property (nonatomic, assign, getter=isImmediateNavigation) BOOL immediateNavigation;
 
-@property (nonatomic, assign, getter=isSelectedItem) BOOL selectedItem;
+@property (nonatomic, assign, getter=isCellSelected) BOOL cellSelected;
+
+@property (nonatomic) bool useCardView;
+
+@property (nonatomic) bool isLastItem;
+
+@property (nonatomic) BOOL isFirstItemInSectionWithoutTitle;
+
+- (void)setPrimaryText:(NSString *)primaryText;
+- (void)setPrimaryAttributedText: (NSAttributedString *)primaryAttributedText;
+- (void)setDetailText:(NSString *)detailText;
+- (void)setDetailAttributedText:(NSAttributedString *)detailAttributedText;
+
+@end
+
+@interface ORKChoiceOtherViewCell : ORKChoiceViewCell <UITextViewDelegate>
+
+@property (nonatomic, strong, readonly) ORKAnswerTextView *textView;
+
+@property (nonatomic, assign, setter=hideTextView:) BOOL textViewHidden;
 
 @end
 

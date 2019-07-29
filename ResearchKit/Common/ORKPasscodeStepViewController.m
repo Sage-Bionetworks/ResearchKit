@@ -33,7 +33,7 @@
 #import "ORKPasscodeStepViewController_Internal.h"
 
 #import "ORKPasscodeStepView.h"
-#import "ORKStepHeaderView_Internal.h"
+#import "ORKStepView_Private.h"
 #import "ORKTextFieldView.h"
 
 #import "ORKPasscodeViewController.h"
@@ -42,10 +42,12 @@
 #import "ORKCollectionResult_Private.h"
 #import "ORKPasscodeResult.h"
 #import "ORKPasscodeStep.h"
+#import "ORKNavigationContainerView_Internal.h"
 #import "ORKResult.h"
 
 #import "ORKKeychainWrapper.h"
 #import "ORKHelpers_Internal.h"
+#import "ORKTaskViewController_Internal.h"
 
 #import <AudioToolbox/AudioToolbox.h>
 #import <LocalAuthentication/LocalAuthentication.h>
@@ -70,6 +72,7 @@ static CGFloat const kForgotPasscodeHeight              = 100.0f;
     LAContext *_touchContext;
     ORKPasscodeType _authenticationPasscodeType;
     BOOL _useTouchId;
+    ORKNavigationContainerView *_navigationFooterView;
 }
 
 - (ORKPasscodeStep *)passcodeStep {
@@ -94,11 +97,18 @@ static CGFloat const kForgotPasscodeHeight              = 100.0f;
         _accessibilityPasscodeField.keyboardType = UIKeyboardTypeNumberPad;
         [self.view addSubview:_accessibilityPasscodeField];
         
-        _passcodeStepView = [[ORKPasscodeStepView alloc] initWithFrame:self.view.bounds];
-        _passcodeStepView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
-        _passcodeStepView.headerView.instructionLabel.text = [self passcodeStep].text;
+        _passcodeStepView = [ORKPasscodeStepView new];
+        _passcodeStepView.stepText = [self passcodeStep].text;
         _passcodeStepView.textField.delegate = self;
+        
+        [_passcodeStepView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showHideKeyboard)]];
+        
         [self.view addSubview:_passcodeStepView];
+        _navigationFooterView = _passcodeStepView.navigationFooterView;
+        _navigationFooterView.neverHasContinueButton = YES;
+        _navigationFooterView.skipEnabled = NO;
+        _navigationFooterView.cancelButtonItem = self.cancelButtonItem;
+        [_navigationFooterView updateContinueAndSkipEnabled];
         
         _passcode = [NSMutableString new];
         _confirmPasscode = [NSMutableString new];
@@ -172,7 +182,53 @@ static CGFloat const kForgotPasscodeHeight              = 100.0f;
                                                  selector:@selector(makePasscodeViewBecomeFirstResponder)
                                                      name:UIApplicationWillEnterForegroundNotification
                                                    object:nil];
+        
+        [self setupConstraints];
     }
+}
+
+- (void)showHideKeyboard {
+    if ([_accessibilityPasscodeField isFirstResponder]) {
+        [self makePasscodeViewResignFirstResponder];
+    }
+    else {
+        [self makePasscodeViewBecomeFirstResponder];
+    }
+}
+
+- (void)setupConstraints {
+    _passcodeStepView.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    [NSLayoutConstraint activateConstraints:@[
+                                              [NSLayoutConstraint constraintWithItem:_passcodeStepView
+                                                                           attribute:NSLayoutAttributeTop
+                                                                           relatedBy:NSLayoutRelationEqual
+                                                                              toItem:self.view
+                                                                           attribute:NSLayoutAttributeTop
+                                                                          multiplier:1.0
+                                                                            constant:0.0],
+                                              [NSLayoutConstraint constraintWithItem:_passcodeStepView
+                                                                           attribute:NSLayoutAttributeLeft
+                                                                           relatedBy:NSLayoutRelationEqual
+                                                                              toItem:self.view
+                                                                           attribute:NSLayoutAttributeLeft
+                                                                          multiplier:1.0
+                                                                            constant:0.0],
+                                              [NSLayoutConstraint constraintWithItem:_passcodeStepView
+                                                                           attribute:NSLayoutAttributeRight
+                                                                           relatedBy:NSLayoutRelationEqual
+                                                                              toItem:self.view
+                                                                           attribute:NSLayoutAttributeRight
+                                                                          multiplier:1.0
+                                                                            constant:0.0],
+                                              [NSLayoutConstraint constraintWithItem:_passcodeStepView
+                                                                           attribute:NSLayoutAttributeBottom
+                                                                           relatedBy:NSLayoutRelationEqual
+                                                                              toItem:self.view
+                                                                           attribute:NSLayoutAttributeBottom
+                                                                          multiplier:1.0
+                                                                            constant:0.0]
+                                              ]];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -203,7 +259,7 @@ static CGFloat const kForgotPasscodeHeight              = 100.0f;
     
     switch (_passcodeState) {
         case ORKPasscodeStateEntry:
-            _passcodeStepView.headerView.captionLabel.text = ORKLocalizedString(@"PASSCODE_PROMPT_MESSAGE", nil);
+            _passcodeStepView.stepText = ORKLocalizedString(@"PASSCODE_PROMPT_MESSAGE", nil);
             _numberOfFilledBullets = 0;
             _accessibilityPasscodeField.text = @"";
             _passcode = [NSMutableString new];
@@ -211,21 +267,21 @@ static CGFloat const kForgotPasscodeHeight              = 100.0f;
             break;
             
         case ORKPasscodeStateConfirm:
-            _passcodeStepView.headerView.captionLabel.text = ORKLocalizedString(@"PASSCODE_CONFIRM_MESSAGE", nil);
+            _passcodeStepView.stepText = ORKLocalizedString(@"PASSCODE_CONFIRM_MESSAGE", nil);
             _numberOfFilledBullets = 0;
             _accessibilityPasscodeField.text = @"";
             _confirmPasscode = [NSMutableString new];
             break;
             
         case ORKPasscodeStateSaved:
-            _passcodeStepView.headerView.captionLabel.text = ORKLocalizedString(@"PASSCODE_SAVED_MESSAGE", nil);
-            _passcodeStepView.headerView.instructionLabel.text = @"";
+            _passcodeStepView.stepText = ORKLocalizedString(@"PASSCODE_SAVED_MESSAGE", nil);
+            _passcodeStepView.stepDetailText = @"";
             _passcodeStepView.textField.hidden = YES;
             [self makePasscodeViewResignFirstResponder];
             break;
             
         case ORKPasscodeStateOldEntry:
-            _passcodeStepView.headerView.captionLabel.text = ORKLocalizedString(@"PASSCODE_OLD_ENTRY_MESSAGE", nil);
+            _passcodeStepView.stepText = ORKLocalizedString(@"PASSCODE_OLD_ENTRY_MESSAGE", nil);
             _numberOfFilledBullets = 0;
             _accessibilityPasscodeField.text = @"";
             _passcode = [NSMutableString new];
@@ -233,7 +289,7 @@ static CGFloat const kForgotPasscodeHeight              = 100.0f;
             break;
             
         case ORKPasscodeStateNewEntry:
-            _passcodeStepView.headerView.captionLabel.text = ORKLocalizedString(@"PASSCODE_NEW_ENTRY_MESSAGE", nil);
+            _passcodeStepView.stepText = ORKLocalizedString(@"PASSCODE_NEW_ENTRY_MESSAGE", nil);
             _numberOfFilledBullets = 0;
             _accessibilityPasscodeField.text = @"";
             _passcode = [NSMutableString new];
@@ -241,7 +297,7 @@ static CGFloat const kForgotPasscodeHeight              = 100.0f;
             break;
             
         case ORKPasscodeStateConfirmNewEntry:
-            _passcodeStepView.headerView.captionLabel.text = ORKLocalizedString(@"PASSCODE_CONFIRM_NEW_ENTRY_MESSAGE", nil);
+            _passcodeStepView.stepText = ORKLocalizedString(@"PASSCODE_CONFIRM_NEW_ENTRY_MESSAGE", nil);
             _numberOfFilledBullets = 0;
             _accessibilityPasscodeField.text = @"";
             _confirmPasscode = [NSMutableString new];
@@ -262,7 +318,7 @@ static CGFloat const kForgotPasscodeHeight              = 100.0f;
     self.internalDoneButtonItem = nil;
 }
                                                               
-- (void)showValidityAlertWithMessage:(NSString *)text {
+- (BOOL)showValidityAlertWithMessage:(NSString *)text {
     
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:ORKLocalizedString(@"PASSCODE_INVALID_ALERT_TITLE", nil)
                                                                    message:text
@@ -271,6 +327,8 @@ static CGFloat const kForgotPasscodeHeight              = 100.0f;
                                               style:UIAlertActionStyleDefault
                                             handler:nil]];
     [self presentViewController:alert animated:YES completion:nil];
+    
+    return YES;
 }
 
 - (ORKStepResult *)result {
@@ -377,22 +435,10 @@ static CGFloat const kForgotPasscodeHeight              = 100.0f;
                     [alert addAction:[UIAlertAction actionWithTitle:ORKLocalizedString(@"BUTTON_OK", nil)
                                                               style:UIAlertActionStyleDefault
                                                             handler:^(UIAlertAction * action) {
-                                                                ORKStrongTypeOf(self) strongSelf = weakSelf;
-                                                                [strongSelf makePasscodeViewBecomeFirstResponder];
+                                                                ORKStrongTypeOf(self) innerStrongSelf = weakSelf;
+                                                                [innerStrongSelf makePasscodeViewBecomeFirstResponder];
                                                             }]];
                     [strongSelf presentViewController:alert animated:YES completion:nil];
-                } else if (error.code == LAErrorUserCancel) {
-
-                    // call becomeFirstResponder here to show the keyboard. dispatch to main queue with
-                    // delay because without it, the transition from the touch ID context back to the app
-                    // inexplicably causes the keyboard to be invisble. It's not hidden, as user can still
-                    // tap keys, but cannot see them
-                    
-                    double delayInSeconds = 0.3;
-                    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-                    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-                        [strongSelf makePasscodeViewBecomeFirstResponder];
-                    });
                 }
                 
                 [strongSelf finishTouchId];
@@ -638,7 +684,9 @@ static CGFloat const kForgotPasscodeHeight              = 100.0f;
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     
     ORKPasscodeTextField *passcodeTextField = _passcodeStepView.textField;
-    [passcodeTextField insertText:string];
+    if (passcodeTextField.text.length < passcodeTextField.numberOfDigits) {
+        [passcodeTextField insertText:string];
+    }
 
     // Disable input while changing states.
     if (_isChangingState) {

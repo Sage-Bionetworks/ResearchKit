@@ -50,8 +50,9 @@ class ChartListViewController: UITableViewController {
     var chartTableViewCells: [UITableViewCell]!
     
     override func viewDidLoad() {
+        super.viewDidLoad()
         // ORKPieChartView
-        pieChartTableViewCell = tableView.dequeueReusableCell(withIdentifier: pieChartIdentifier) as! PieChartTableViewCell
+        pieChartTableViewCell = (tableView.dequeueReusableCell(withIdentifier: pieChartIdentifier) as! PieChartTableViewCell)
         let pieChartView = pieChartTableViewCell.pieChartView
         pieChartView?.dataSource = pieChartDataSource
         // Optional custom configuration
@@ -62,28 +63,28 @@ class ChartListViewController: UITableViewController {
         pieChartView?.radiusScaleFactor = 0.6
         
         // ORKLineGraphChartView
-        lineGraphChartTableViewCell = tableView.dequeueReusableCell(withIdentifier: lineGraphChartIdentifier) as! LineGraphChartTableViewCell
+        lineGraphChartTableViewCell = (tableView.dequeueReusableCell(withIdentifier: lineGraphChartIdentifier) as! LineGraphChartTableViewCell)
         let lineGraphChartView = lineGraphChartTableViewCell.graphView as! ORKLineGraphChartView
         lineGraphChartView.dataSource = lineGraphChartDataSource
-        lineGraphChartView.tintColor = UIColor(red: 244/255, green: 190/255, blue: 74/255, alpha: 1)
+        lineGraphChartView.tintColor = UIColor(red: 244 / 255, green: 190 / 255, blue: 74 / 255, alpha: 1)
         // Optional custom configuration
         lineGraphChartView.showsHorizontalReferenceLines = true
         lineGraphChartView.showsVerticalReferenceLines = true
         
         // ORKDiscreteGraphChartView
-        discreteGraphChartTableViewCell = tableView.dequeueReusableCell(withIdentifier: discreteGraphChartIdentifier) as! DiscreteGraphChartTableViewCell
+        discreteGraphChartTableViewCell = (tableView.dequeueReusableCell(withIdentifier: discreteGraphChartIdentifier) as! DiscreteGraphChartTableViewCell)
         let discreteGraphChartView = discreteGraphChartTableViewCell.graphView as! ORKDiscreteGraphChartView
         discreteGraphChartView.dataSource = discreteGraphChartDataSource
-        discreteGraphChartView.tintColor = UIColor(red: 244/255, green: 190/255, blue: 74/255, alpha: 1)
+        discreteGraphChartView.tintColor = UIColor(red: 244 / 255, green: 190 / 255, blue: 74 / 255, alpha: 1)
         // Optional custom configuration
         discreteGraphChartView.showsHorizontalReferenceLines = true
         discreteGraphChartView.showsVerticalReferenceLines = true
 
         // ORKBarGraphChartView
-        barGraphChartTableViewCell = tableView.dequeueReusableCell(withIdentifier: barGraphChartIdentifier) as! BarGraphChartTableViewCell
+        barGraphChartTableViewCell = (tableView.dequeueReusableCell(withIdentifier: barGraphChartIdentifier) as! BarGraphChartTableViewCell)
         let barGraphChartView = barGraphChartTableViewCell.graphView as! ORKBarGraphChartView
         barGraphChartView.dataSource = barGraphChartDataSource
-        barGraphChartView.tintColor = UIColor(red: 244/255, green: 190/255, blue: 74/255, alpha: 1)
+        barGraphChartView.tintColor = UIColor(red: 244 / 255, green: 190 / 255, blue: 74 / 255, alpha: 1)
         // Optional custom configuration
         barGraphChartView.showsHorizontalReferenceLines = true
         barGraphChartView.showsVerticalReferenceLines = true
@@ -98,7 +99,7 @@ class ChartListViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = chartTableViewCells[(indexPath as NSIndexPath).row];
+        let cell = chartTableViewCells[(indexPath as NSIndexPath).row]
         return cell
     }
     
@@ -108,6 +109,6 @@ class ChartListViewController: UITableViewController {
         lineGraphChartTableViewCell.graphView.animate(withDuration: 0.5)
         discreteGraphChartTableViewCell.graphView.animate(withDuration: 0.5)
         barGraphChartTableViewCell.graphView.animate(withDuration: 0.5)
-    }    
+    }
 
 }

@@ -30,11 +30,11 @@
 
 
 #import "ORKInstructionStepViewController.h"
+#import "ORKLearnMoreStepViewController.h"
 
-#import "ORKInstructionStepView.h"
-#import "ORKNavigationContainerView.h"
-#import "ORKStepHeaderView_Internal.h"
-
+#import "ORKNavigationContainerView_Internal.h"
+#import "ORKInstructionStepContainerView.h"
+#import "ORKStepView_Private.h"
 #import "ORKInstructionStepViewController_Internal.h"
 #import "ORKStepViewController_Internal.h"
 #import "ORKTaskViewController_Internal.h"
@@ -45,7 +45,14 @@
 #import "ORKSkin.h"
 
 
-@implementation ORKInstructionStepViewController
+@interface ORKInstructionStepViewController()<ORKStepViewLearnMoreItemDelegate>
+
+@end
+
+@implementation ORKInstructionStepViewController {
+    ORKNavigationContainerView *_navigationFooterView;
+    NSArray<NSLayoutConstraint *> *_constraints;
+}
 
 - (ORKInstructionStep *)instructionStep {
     return (ORKInstructionStep *)self.step;
@@ -58,23 +65,67 @@
     self.stepView = nil;
     
     if (self.step && [self isViewLoaded]) {
-        self.stepView = [[ORKInstructionStepView alloc] initWithFrame:self.view.bounds];
-        self.stepView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+        self.stepView = [[ORKInstructionStepContainerView alloc] initWithInstructionStep:[self instructionStep]];
+        _stepView.delegate = self;
         [self.view addSubview:self.stepView];
-        
-        self.stepView.continueSkipContainer.continueButtonItem = self.continueButtonItem;
-        self.stepView.headerView.learnMoreButtonItem = self.learnMoreButtonItem;
-        self.stepView.continueSkipContainer.continueEnabled = YES;
-        self.stepView.continueSkipContainer.hidden = self.isBeingReviewed;
-        
-        self.stepView.instructionStep = [self instructionStep];
+        [self setNavigationFooterView];
+        [self setupConstraints];
     }
+}
+
+- (void)setNavigationFooterView {
+    if (_stepView) {
+        _navigationFooterView = _stepView.navigationFooterView;
+        _navigationFooterView.continueButtonItem = self.continueButtonItem;
+        _navigationFooterView.continueEnabled = YES;
+        _navigationFooterView.cancelButtonItem = self.cancelButtonItem;
+        _navigationFooterView.hidden = self.isBeingReviewed;
+        _navigationFooterView.footnoteLabel.text = [self instructionStep].footnote;
+        [_navigationFooterView updateContinueAndSkipEnabled];
+    }
+}
+
+- (void)setupConstraints {
+    if (_constraints) {
+        [NSLayoutConstraint deactivateConstraints:_constraints];
+    }
+    self.stepView.translatesAutoresizingMaskIntoConstraints = NO;
+    _constraints = nil;
+    _constraints = @[
+                     [NSLayoutConstraint constraintWithItem:self.stepView
+                                                  attribute:NSLayoutAttributeTop
+                                                  relatedBy:NSLayoutRelationEqual
+                                                     toItem:self.view
+                                                  attribute:NSLayoutAttributeTop
+                                                 multiplier:1.0
+                                                   constant:0.0],
+                     [NSLayoutConstraint constraintWithItem:self.stepView
+                                                  attribute:NSLayoutAttributeLeft
+                                                  relatedBy:NSLayoutRelationEqual
+                                                     toItem:self.view
+                                                  attribute:NSLayoutAttributeLeft
+                                                 multiplier:1.0
+                                                   constant:0.0],
+                     [NSLayoutConstraint constraintWithItem:self.stepView
+                                                  attribute:NSLayoutAttributeRight
+                                                  relatedBy:NSLayoutRelationEqual
+                                                     toItem:self.view
+                                                  attribute:NSLayoutAttributeRight
+                                                 multiplier:1.0
+                                                   constant:0.0],
+                     [NSLayoutConstraint constraintWithItem:self.stepView
+                                                  attribute:NSLayoutAttributeBottom
+                                                  relatedBy:NSLayoutRelationEqual
+                                                     toItem:self.view
+                                                  attribute:NSLayoutAttributeBottom
+                                                 multiplier:1.0
+                                                   constant:0.0]
+                     ];
+    [NSLayoutConstraint activateConstraints:_constraints];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
-    [self.taskViewController setRegisteredScrollView:_stepView];
 }
 
 - (void)viewDidLoad {
@@ -83,18 +134,24 @@
     [self stepDidChange];
 }
 
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    [_stepView setNeedsUpdateConstraints];
+}
+
+
 - (void)useAppropriateButtonTitleAsLastBeginningInstructionStep {
-    self.internalContinueButtonItem.title = ORKLocalizedString(@"BUTTON_GET_STARTED",nil);
+    self.internalContinueButtonItem.title = ORKLocalizedString(@"BUTTON_GET_STARTED", nil);
 }
 
 - (void)setContinueButtonItem:(UIBarButtonItem *)continueButtonItem {
     [super setContinueButtonItem:continueButtonItem];
-    self.stepView.continueSkipContainer.continueButtonItem = continueButtonItem;
+    _navigationFooterView.continueButtonItem = continueButtonItem;
 }
 
-- (void)setLearnMoreButtonItem:(UIBarButtonItem *)learnMoreButtonItem {
-    [super setLearnMoreButtonItem:learnMoreButtonItem];
-    self.stepView.headerView.learnMoreButtonItem = learnMoreButtonItem;
+- (void)setCancelButtonItem:(UIBarButtonItem *)cancelButtonItem {
+    [super setCancelButtonItem:cancelButtonItem];
+    _navigationFooterView.cancelButtonItem = cancelButtonItem;
 }
 
 - (void)encodeRestorableStateWithCoder:(NSCoder *)coder {
@@ -103,6 +160,12 @@
 
 - (void)decodeRestorableStateWithCoder:(NSCoder *)coder {
     [super decodeRestorableStateWithCoder:coder];
+}
+
+#pragma mark - ORKStepContainerLearnMoreItemDelegate
+
+- (void)stepViewLearnMoreButtonPressed:(ORKLearnMoreInstructionStep *)learnMoreStep {
+    [self presentViewController:[[ORKLearnMoreStepViewController alloc] initWithStep:learnMoreStep] animated:YES completion:nil];
 }
 
 @end

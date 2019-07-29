@@ -133,10 +133,11 @@ ORK_DESIGNATE_CODING_AND_SERIALIZATION_INITIALIZERS(ORKWeightAnswerFormat)
 - (NSInteger)numberOfSteps;
 - (nullable NSNumber *)normalizedValueForNumber:(nullable NSNumber *)number;
 - (BOOL)isVertical;
+- (BOOL)shouldHideSelectedValueLabel;
 - (NSString *)maximumValueDescription;
 - (NSString *)minimumValueDescription;
-- (UIImage *)maximumImage;
-- (UIImage *)minimumImage;
+- (nullable UIImage *)maximumImage;
+- (nullable UIImage *)minimumImage;
 - (nullable NSArray<UIColor *> *)gradientColors;
 - (nullable NSArray<NSNumber *> *)gradientLocations;
 
@@ -146,7 +147,7 @@ ORK_DESIGNATE_CODING_AND_SERIALIZATION_INITIALIZERS(ORKWeightAnswerFormat)
 @protocol ORKTextScaleAnswerFormatProvider <ORKScaleAnswerFormatProvider>
 
 - (NSArray<ORKTextChoice *> *)textChoices;
-- (ORKTextChoice *)textChoiceAtIndex:(NSUInteger)index;
+- (nullable ORKTextChoice *)textChoiceAtIndex:(NSUInteger)index;
 - (NSUInteger)textChoiceIndexForValue:(id<NSCopying, NSCoding, NSObject>)value;
 
 @end
@@ -245,11 +246,16 @@ ORK_DESIGNATE_CODING_AND_SERIALIZATION_INITIALIZERS(ORKWeightAnswerFormat)
 
 - (void)fetchDefaultValueForAnswerFormat:(nullable ORKAnswerFormat *)answerFormat handler:(void(^)(id defaultValue, NSError *error))handler;
 
-- (HKUnit *)defaultHealthKitUnitForAnswerFormat:(ORKAnswerFormat *)answerFormat;
+- (nullable HKUnit *)defaultHealthKitUnitForAnswerFormat:(ORKAnswerFormat *)answerFormat;
 - (void)updateHealthKitUnitForAnswerFormat:(ORKAnswerFormat *)answerFormat force:(BOOL)force;
 
 @end
 
+@interface ORKTextChoiceOther()
+
+@property (nonatomic, nullable) NSString *textViewText;
+
+@end
 
 NS_ASSUME_NONNULL_END
 

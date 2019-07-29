@@ -52,6 +52,8 @@
     if (self) {
         _consentDocument = consentDocument;
         _signature = signature;
+        _requiresScrollToBottom = NO;
+        self.showsProgress = NO;
     }
     return self;
 }
@@ -61,6 +63,7 @@
     step->_consentDocument = self.consentDocument;
     step->_signature = self.signature;
     step->_reasonForConsent = self.reasonForConsent;
+    step->_requiresScrollToBottom = self.requiresScrollToBottom;
     return step;
 }
 
@@ -70,6 +73,7 @@
         ORK_DECODE_OBJ_CLASS(aDecoder, consentDocument, ORKConsentDocument);
         ORK_DECODE_OBJ_CLASS(aDecoder, signature, ORKConsentSignature);
         ORK_DECODE_OBJ_CLASS(aDecoder, reasonForConsent, NSString);
+        ORK_DECODE_BOOL(aDecoder, requiresScrollToBottom);
     }
     return self;
 }
@@ -79,6 +83,7 @@
     ORK_ENCODE_OBJ(aCoder, consentDocument);
     ORK_ENCODE_OBJ(aCoder, signature);
     ORK_ENCODE_OBJ(aCoder, reasonForConsent);
+    ORK_ENCODE_BOOL(aCoder, requiresScrollToBottom);
 }
 
 + (BOOL)supportsSecureCoding {
@@ -92,15 +97,12 @@
     return (isParentSame &&
             ORKEqualObjects(self.consentDocument, castObject.consentDocument) &&
             ORKEqualObjects(self.signature, castObject.signature) &&
-            ORKEqualObjects(self.reasonForConsent, castObject.reasonForConsent));
+            ORKEqualObjects(self.reasonForConsent, castObject.reasonForConsent)) &&
+            (self.requiresScrollToBottom == castObject.requiresScrollToBottom);
 }
 
 - (NSUInteger)hash {
-    return super.hash ^ self.consentDocument.hash ^ self.signature.hash ^ self.reasonForConsent.hash;
-}
-
-- (BOOL)showsProgress {
-    return NO;
+    return super.hash ^ self.consentDocument.hash ^ self.signature.hash ^ self.reasonForConsent.hash ^ (_requiresScrollToBottom ? 0xf : 0x0);
 }
 
 @end

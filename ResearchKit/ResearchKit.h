@@ -42,6 +42,7 @@
 #import <ResearchKit/ORKNavigablePageStep.h>
 #import <ResearchKit/ORKPageStep.h>
 #import <ResearchKit/ORKPasscodeStep.h>
+#import <ResearchKit/ORKPDFViewerStep.h>
 #import <ResearchKit/ORKQuestionStep.h>
 #import <ResearchKit/ORKRegistrationStep.h>
 #import <ResearchKit/ORKReviewStep.h>
@@ -54,6 +55,8 @@
 #import <ResearchKit/ORKWaitStep.h>
 #import <ResearchKit/ORKVideoInstructionStep.h>
 #import <ResearchKit/ORKWebViewStep.h>
+#import <ResearchKit/ORKEnvironmentSPLMeterStep.h>
+#import <ResearchKit/ORKLearnMoreInstructionStep.h>
 
 #import <ResearchKit/ORKTask.h>
 #import <ResearchKit/ORKOrderedTask.h>
@@ -73,6 +76,7 @@
 #import <ResearchKit/ORKSignatureResult.h>
 #import <ResearchKit/ORKVideoInstructionStepResult.h>
 #import <ResearchKit/ORKWebViewStepResult.h>
+#import <ResearchKit/ORKEnvironmentSPLMeterResult.h>
 #import <ResearchKit/ORKResultPredicate.h>
 
 #import <ResearchKit/ORKTextButton.h>
@@ -87,6 +91,7 @@
 #import <ResearchKit/ORKLoginStepViewController.h>
 #import <ResearchKit/ORKPageStepViewController.h>
 #import <ResearchKit/ORKPasscodeViewController.h>
+#import <ResearchKit/ORKPDFViewerStepViewController.h>
 #import <ResearchKit/ORKQuestionStepViewController.h>
 #import <ResearchKit/ORKTableStepViewController.h>
 #import <ResearchKit/ORKTaskViewController.h>
@@ -109,7 +114,21 @@
 #import <ResearchKit/ORKLineGraphChartView.h>
 #import <ResearchKit/ORKPieChartView.h>
 
+#import <ResearchKit/ORKBodyItem.h>
+#import <ResearchKit/ORKLearnMoreItem.h>
+
 #import <ResearchKit/ORKDataCollectionManager.h>
 #import <ResearchKit/ORKCollector.h>
+
+#import <ResearchKit/ORKTouchAbilityTouch.h>
+#import <ResearchKit/ORKTouchAbilityTrack.h>
+#import <ResearchKit/ORKTouchAbilityGestureRecoginzerEvent.h>
+#import <ResearchKit/ORKTouchAbilityTrial.h>
+#import <ResearchKit/ORKTouchAbilityTapTrial.h>
+#import <ResearchKit/ORKTouchAbilityLongPressTrial.h>
+#import <ResearchKit/ORKTouchAbilitySwipeTrial.h>
+#import <ResearchKit/ORKTouchAbilityScrollTrial.h>
+#import <ResearchKit/ORKTouchAbilityPinchTrial.h>
+#import <ResearchKit/ORKTouchAbilityRotationTrial.h>
 
 #import <ResearchKit/ORKDeprecated.h>

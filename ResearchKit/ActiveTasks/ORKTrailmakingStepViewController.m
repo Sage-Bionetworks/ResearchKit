@@ -51,7 +51,6 @@
 
 #define BOUND(lo, hi, v) (((v) < (lo)) ? (lo) : (((v) > (hi)) ? (hi) : (v)))
 
-
 @implementation ORKTrailmakingStepViewController {
     ORKTrailmakingContentView *_trailmakingContentView;
     NSArray *_testPoints;
@@ -98,6 +97,8 @@
     }
     
     _timerLabel = [[UILabel alloc] init];
+    _timerLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+    _timerLabel.adjustsFontForContentSizeCategory = YES;
     _timerLabel.textAlignment = NSTextAlignmentCenter;
     
     [self.view addSubview:_timerLabel];
@@ -105,12 +106,17 @@
 
 - (void)timerUpdated:(NSTimer*)timer {
     NSTimeInterval elapsed = [[NSDate date] timeIntervalSinceDate: self.presentedDate];
-    NSString *text = [NSString localizedStringWithFormat:ORKLocalizedString(@"TRAILMAKING_TIMER", nil), elapsed];
     
-    if (_errors == 1) {
-        text = [NSString localizedStringWithFormat:ORKLocalizedString(@"TRAILMAKING_ERROR", nil), text, _errors];
-    } else if (_errors > 1) {
-        text = [NSString localizedStringWithFormat:ORKLocalizedString(@"TRAILMAKING_ERROR_PLURAL", nil), text, _errors];
+    NSDateComponentsFormatter *durationFormatter = [NSDateComponentsFormatter new];
+    [durationFormatter setUnitsStyle:NSDateComponentsFormatterUnitsStyleAbbreviated];
+    [durationFormatter setAllowedUnits:NSCalendarUnitSecond];
+    [durationFormatter setFormattingContext:NSFormattingContextDynamic];
+    [durationFormatter setMaximumUnitCount:1];
+    NSString *text = [durationFormatter stringFromTimeInterval:elapsed];
+    
+    if(_errors > 0){
+        NSString *localizedErrors = [NSString localizedStringWithFormat:ORKLocalizedString(@"TRAILMAKING_ERROR_FORMAT", nil), _errors];
+        text = [NSString stringWithFormat:@"%@ %@", text, localizedErrors];
     }
     
     _timerLabel.text = text;
@@ -134,6 +140,7 @@
     
     CGRect labelRect = _trailmakingContentView.testArea;
     labelRect.size.height = 20;
+    labelRect.origin = self.activeStepView.frame.origin;
     [_timerLabel setFrame:labelRect];
     
     CGRect r = _trailmakingContentView.testArea;
@@ -164,6 +171,10 @@
     [super viewDidAppear:animated];
     [self start];
     _updateTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(timerUpdated:) userInfo:nil repeats:YES];
+    if (UIAccessibilityIsVoiceOverRunning()) {
+        // Put focus on the direct touch area immediately so that the first touch gets registered
+        UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, _trailmakingContentView);
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

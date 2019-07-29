@@ -32,10 +32,11 @@
 #import "ORKCompletionStepViewController.h"
 
 #import "ORKCustomStepView_Internal.h"
+#import "ORKInstructionStepContainerView.h"
 #import "ORKInstructionStepView.h"
 #import "ORKNavigationContainerView.h"
 #import "ORKStepHeaderView_Internal.h"
-#import "ORKVerticalContainerView_Internal.h"
+#import "ORKStepContainerView_Private.h"
 
 #import "ORKInstructionStepViewController_Internal.h"
 #import "ORKStepViewController_Internal.h"
@@ -43,7 +44,7 @@
 #import "ORKHelpers_Internal.h"
 
 
-@interface ORKCompletionStepView : ORKActiveStepCustomView
+@interface ORKCompletionCheckmarkView : UIView
 
 @property (nonatomic) CGFloat animationPoint;
 
@@ -52,7 +53,7 @@
 @end
 
 
-@implementation ORKCompletionStepView {
+@implementation ORKCompletionCheckmarkView {
     CAShapeLayer *_shapeLayer;
 }
 
@@ -135,8 +136,60 @@ static const CGFloat TickViewSize = 122;
     return [super accessibilityTraits] | UIAccessibilityTraitImage;
 }
 
+- (NSString *)accessibilityLabel {
+    return ORKLocalizedString(@"AX_COMPLETION_ILLUSTRATION", nil);
+}
+
 @end
 
+
+@interface ORKCompletionStepView : UIView
+
+@property (nonatomic) ORKCompletionCheckmarkView * completionCheckmarkView;
+
+@end
+
+
+@implementation ORKCompletionStepView
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [self setupCheckmarkView];
+        [self setupConstraints];
+    }
+    return self;
+}
+
+- (void)setupCheckmarkView {
+    if (!_completionCheckmarkView) {
+        _completionCheckmarkView = [ORKCompletionCheckmarkView new];
+    }
+    [self addSubview:_completionCheckmarkView];
+}
+
+- (void)setupConstraints {
+    _completionCheckmarkView.translatesAutoresizingMaskIntoConstraints = NO;
+    [NSLayoutConstraint activateConstraints:@[
+                                              [NSLayoutConstraint constraintWithItem:_completionCheckmarkView
+                                                                           attribute:NSLayoutAttributeCenterX
+                                                                           relatedBy:NSLayoutRelationEqual
+                                                                              toItem:self
+                                                                           attribute:NSLayoutAttributeCenterX
+                                                                          multiplier:1.0
+                                                                            constant:0.0],
+                                              [NSLayoutConstraint constraintWithItem:_completionCheckmarkView
+                                                                           attribute:NSLayoutAttributeCenterY
+                                                                           relatedBy:NSLayoutRelationEqual
+                                                                              toItem:self
+                                                                           attribute:NSLayoutAttributeCenterY
+                                                                          multiplier:1.0
+                                                                            constant:0.0]
+                                              ]];
+}
+
+@end
 
 @implementation ORKCompletionStepViewController {
     ORKCompletionStepView *_completionStepView;
@@ -149,58 +202,26 @@ static const CGFloat TickViewSize = 122;
     if (self.checkmarkColor) {
         _completionStepView.tintColor = self.checkmarkColor;
     }
-    
-    self.stepView.stepView = _completionStepView;
-    
-    self.stepView.continueSkipContainer.continueButtonItem = nil;
+    self.stepView.customContentFillsAvailableSpace = YES;
+    self.stepView.customContentView = _completionStepView;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    _completionStepView.animationPoint = animated ? 0 : 1;
+    _completionStepView.completionCheckmarkView.animationPoint = animated ? 0 : 1;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     if (animated) {
-        [_completionStepView setAnimationPoint:1 animated:YES];
+        [_completionStepView.completionCheckmarkView setAnimationPoint:1 animated:YES];
     }
-    
-    UILabel *captionLabel = self.stepView.headerView.captionLabel;
-    UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, captionLabel);
-    _completionStepView.accessibilityLabel = [NSString localizedStringWithFormat:ORKLocalizedString(@"AX_IMAGE_ILLUSTRATION", nil), captionLabel.accessibilityLabel];
 }
 
 - (void)setCheckmarkColor:(UIColor *)checkmarkColor {
     _checkmarkColor = [checkmarkColor copy];
     _completionStepView.tintColor = checkmarkColor;
-}
-
-- (void)setShouldShowContinueButton:(BOOL)shouldShowContinueButton {
-    _shouldShowContinueButton = shouldShowContinueButton;
-    
-    // Update button states
-    [self setContinueButtonItem:self.continueButtonItem];
-    [self updateNavRightBarButtonItem];
-}
-
-// Override top right bar button item
-- (void)updateNavRightBarButtonItem {
-    if (self.shouldShowContinueButton) {
-        self.navigationItem.rightBarButtonItem = nil;
-    }
-    else {
-        self.navigationItem.rightBarButtonItem = self.continueButtonItem;
-    }
-}
-
-- (void)setContinueButtonItem:(UIBarButtonItem *)continueButtonItem {
-    [super setContinueButtonItem:continueButtonItem];
-    if (!self.shouldShowContinueButton) {
-        self.stepView.continueSkipContainer.continueButtonItem = nil;
-    }
-    [self updateNavRightBarButtonItem];
 }
 
 @end

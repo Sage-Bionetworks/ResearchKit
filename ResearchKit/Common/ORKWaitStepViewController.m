@@ -42,10 +42,11 @@
 
 #import "ORKStepHeaderView_Internal.h"
 #import "ORKWaitStepView.h"
-
+#import "ORKStepView.h"
 #import "ORKStepViewController_Internal.h"
-
+#import "ORKNavigationContainerView_Internal.h"
 #import "ORKWaitStep.h"
+#import "ORKTaskViewController_Internal.h"
 
 #import "ORKHelpers_Internal.h"
 
@@ -54,6 +55,8 @@
     ORKWaitStepView *_waitStepView;
     ORKProgressIndicatorType _indicatorType;
     NSString *_updatedText;
+    ORKNavigationContainerView *_navigationFooterView;
+    NSArray<NSLayoutConstraint *> *_constraints;
 }
 
 - (ORKWaitStep *)waitStep {
@@ -75,10 +78,65 @@
         _waitStepView.frame = self.view.bounds;
         _waitStepView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
         [self.view addSubview:_waitStepView];
-        
-        _waitStepView.headerView.captionLabel.text = [self waitStep].title;
-        _waitStepView.headerView.instructionLabel.text = _updatedText;
+        [self setupNavigationFooterView];
+        [self setupConstraints];
+        _waitStepView.stepTopContentImage = self.step.image;
+        _waitStepView.titleIconImage = self.step.iconImage;
+        _waitStepView.stepTitle = self.step.title;
+        _waitStepView.stepText = _updatedText;
+        _waitStepView.stepDetailText = self.step.detailText;
+        _waitStepView.bodyItems = self.step.bodyItems;
+        _waitStepView.stepTopContentImageContentMode = self.step.imageContentMode;
     }
+}
+
+- (void)setupNavigationFooterView {
+    if (!_navigationFooterView) {
+        _navigationFooterView = _waitStepView.navigationFooterView;
+    }
+    _navigationFooterView.cancelButtonItem = self.cancelButtonItem;
+    _navigationFooterView.neverHasContinueButton = YES;
+}
+
+- (void)setupConstraints {
+    if (_constraints) {
+        [NSLayoutConstraint deactivateConstraints:_constraints];
+    }
+    _constraints = nil;
+    _waitStepView.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    
+    _constraints = @[
+                     [NSLayoutConstraint constraintWithItem:_waitStepView
+                                                  attribute:NSLayoutAttributeTop
+                                                  relatedBy:NSLayoutRelationEqual
+                                                     toItem:self.view
+                                                  attribute:NSLayoutAttributeTop
+                                                 multiplier:1.0
+                                                   constant:0.0],
+                     [NSLayoutConstraint constraintWithItem:_waitStepView
+                                                  attribute:NSLayoutAttributeLeft
+                                                  relatedBy:NSLayoutRelationEqual
+                                                     toItem:self.view
+                                                  attribute:NSLayoutAttributeLeft
+                                                 multiplier:1.0
+                                                   constant:0.0],
+                     [NSLayoutConstraint constraintWithItem:_waitStepView
+                                                  attribute:NSLayoutAttributeRight
+                                                  relatedBy:NSLayoutRelationEqual
+                                                     toItem:self.view
+                                                  attribute:NSLayoutAttributeRight
+                                                 multiplier:1.0
+                                                   constant:0.0],
+                     [NSLayoutConstraint constraintWithItem:_waitStepView
+                                                  attribute:NSLayoutAttributeBottom
+                                                  relatedBy:NSLayoutRelationEqual
+                                                     toItem:self.view
+                                                  attribute:NSLayoutAttributeBottom
+                                                 multiplier:1.0
+                                                   constant:0.0]
+                     ];
+    [NSLayoutConstraint activateConstraints:_constraints];
 }
 
 - (void)viewDidLoad {

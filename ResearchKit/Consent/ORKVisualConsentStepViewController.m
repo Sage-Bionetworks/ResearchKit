@@ -77,6 +77,8 @@
 
 @property (nonatomic, strong) ORKContinueButton *continueActionButton;
 
+@property (nonatomic, strong) ORKBorderedButton *cancelActionButton;
+
 - (ORKConsentSceneViewController *)viewControllerForIndex:(NSUInteger)index;
 - (NSUInteger)currentIndex;
 - (NSUInteger)indexOfViewController:(UIViewController *)viewController;
@@ -142,7 +144,9 @@
 @end
 
 
-@implementation ORKVisualConsentStepViewController
+@implementation ORKVisualConsentStepViewController {
+    UIColor *_backgroundColor;
+}
 
 - (void)dealloc {
     [[ORKTintedImageCache sharedCache] removeAllObjects];
@@ -150,6 +154,7 @@
 
 - (void)stepDidChange {
     [super stepDidChange];
+    _backgroundColor = [UIColor whiteColor];
     {
         NSMutableArray *visualSections = [NSMutableArray new];
         
@@ -177,11 +182,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    CGRect viewBounds = self.view.bounds;
-    
-    self.view.backgroundColor = ORKColor(ORKBackgroundColorKey);
-   
+       
     // Prepare pageViewController
     _pageViewController = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll
                                                           navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal
@@ -194,19 +195,15 @@
     if ([_pageViewController respondsToSelector:@selector(edgesForExtendedLayout)]) {
         _pageViewController.edgesForExtendedLayout = UIRectEdgeNone;
     }
-    
-    _pageViewController.view.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
-    _pageViewController.view.frame = viewBounds;
     [self.view addSubview:_pageViewController.view];
+    
     [self addChildViewController:_pageViewController];
     [_pageViewController didMoveToParentViewController:self];
     
-    self.animationView = [[ORKAnimationPlaceholderView alloc] initWithFrame:
-                          (CGRect){{0, 0}, {viewBounds.size.width, ORKGetMetricForWindow(ORKScreenMetricIllustrationHeight, self.view.window)}}];
-    _animationView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleBottomMargin;
-    _animationView.backgroundColor = [UIColor clearColor];
+    if (self.taskViewController.navigationBar) {
+        [self.taskViewController.navigationBar setBarTintColor:self.view.backgroundColor];
+    }
     _animationView.userInteractionEnabled = NO;
-    [self.view addSubview:_animationView];
     
     [self updatePageIndex];
 }
@@ -436,14 +433,14 @@
 
     if (!animateBeforeTransition && !transitionBeforeAnimate) {
         [_animator animateTransitionWithDirection:direction
-                                      loadHandler:^(ORKVisualConsentTransitionAnimator *animator, UIPageViewControllerNavigationDirection direction) {
+                                      loadHandler:^(ORKVisualConsentTransitionAnimator *loadAnimator, UIPageViewControllerNavigationDirection loadDirection) {
                                           
                                           fromViewController.imageHidden = YES;
                                           toViewController.imageHidden = YES;
                                           
                                           ORKStrongTypeOf(self) strongSelf = weakSelf;
                                           [strongSelf doShowViewController:toViewController
-                                                                 direction:direction
+                                                                 direction:loadDirection
                                                                   animated:YES
                                                                 completion:^(BOOL finished) {
                                                                     
@@ -451,27 +448,27 @@
                                                                     dispatch_semaphore_signal(semaphore);
                                                                 }];
                                       }
-                                completionHandler:^(ORKVisualConsentTransitionAnimator *animator, UIPageViewControllerNavigationDirection direction) {
+                                completionHandler:^(ORKVisualConsentTransitionAnimator *completedAnimator, UIPageViewControllerNavigationDirection completedDirection) {
         
                                     animatorFinished = YES;
-                                    finishAndNilAnimator(animator);
+                                    finishAndNilAnimator(completedAnimator);
                                     dispatch_semaphore_signal(semaphore);
                                 }];
         
     } else if (animateBeforeTransition && !transitionBeforeAnimate) {
         [_animator animateTransitionWithDirection:direction
-                                      loadHandler:^(ORKVisualConsentTransitionAnimator *animator, UIPageViewControllerNavigationDirection direction) {
+                                      loadHandler:^(ORKVisualConsentTransitionAnimator *loadAnimator, UIPageViewControllerNavigationDirection loadDirection) {
                                           
                                           fromViewController.imageHidden = YES;
                                       }
-                                completionHandler:^(ORKVisualConsentTransitionAnimator *animator, UIPageViewControllerNavigationDirection direction) {
+                                completionHandler:^(ORKVisualConsentTransitionAnimator *completedAnimator, UIPageViewControllerNavigationDirection completedDirection) {
                                     
                                     animatorFinished = YES;
-                                    finishAndNilAnimator(animator);
+                                    finishAndNilAnimator(completedAnimator);
                                     
                                     ORKStrongTypeOf(self) strongSelf = weakSelf;
                                     [strongSelf doShowViewController:toViewController
-                                                           direction:direction
+                                                           direction:completedDirection
                                                             animated:YES
                                                           completion:^(BOOL finished) {
                                                               
@@ -493,10 +490,10 @@
                             
                             [_animator animateTransitionWithDirection:direction
                                                           loadHandler:nil
-                                                    completionHandler:^(ORKVisualConsentTransitionAnimator *animator, UIPageViewControllerNavigationDirection direction) {
+                                                    completionHandler:^(ORKVisualConsentTransitionAnimator *completedAnimator, UIPageViewControllerNavigationDirection completedDirection) {
                                                         
                                                         animatorFinished = YES;
-                                                        finishAndNilAnimator(animator);
+                                                        finishAndNilAnimator(completedAnimator);
                                                         dispatch_semaphore_signal(semaphore);
                                                     }];
                             
@@ -533,13 +530,6 @@
                      forward:forward
                     animated:animated
                   completion:^(BOOL finished) {
-                      if (preloadNextViewController) {
-                          ORKConsentSection *nextConsentSection = [self consentSectionForIndex:[self currentIndex] + 1];
-                          ORKTintedImageView *currentSceneImageView = viewController.sceneView.imageView;
-                          [[ORKTintedImageCache sharedCache] cacheImage:nextConsentSection.image
-                                                              tintColor:currentSceneImageView.tintColor
-                                                                  scale:currentSceneImageView.window.screen.scale];
-                      }
                   }];
 }
 
@@ -555,7 +545,6 @@
     }
     // Stop old hairline scroll view observer and start new one
     _scrollViewObserver = [[ORKScrollViewObserver alloc] initWithTargetView:viewController.scrollView delegate:self];
-    [self.taskViewController setRegisteredScrollView:viewController.scrollView];
 
     ORKConsentSceneViewController *fromViewController = nil;
     NSUInteger currentIndex = [self currentIndex];
@@ -659,6 +648,7 @@
         _viewControllers[@(index)] = consentViewController;
     }
     
+    consentViewController.cancelButtonItem = self.cancelButtonItem;
     return consentViewController;
 }
 
