@@ -319,12 +319,12 @@ static UIBezierPath *ORKErrorBezierPath() {
     _flowerView.transform = CGAffineTransformMakeScale(_flowerScaleFactor, _flowerScaleFactor);
     
     [UIView animateWithDuration:(animated ? duration : 0) delay:0 usingSpringWithDamping:useSpring ? 0.5 : 1 initialSpringVelocity:0 options:(UIViewAnimationOptions)UIViewAnimationOptionBeginFromCurrentState animations:^{
-        _errorView.alpha = newCircleAlpha;
-        _checkView.alpha = newCircleAlpha;
-        _errorView.transform = newCircleTransform;
-        _checkView.transform = newCircleTransform;
+        self->_errorView.alpha = newCircleAlpha;
+        self->_checkView.alpha = newCircleAlpha;
+        self->_errorView.transform = newCircleTransform;
+        self->_checkView.transform = newCircleTransform;
         self.alpha = newAlpha;
-        _flowerView.transform = newTransform;
+        self->_flowerView.transform = newTransform;
     } completion:NULL];
 }
 

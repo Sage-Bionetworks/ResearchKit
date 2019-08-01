@@ -491,7 +491,7 @@
                             
                             transitionFinished = finished;
                             
-                            [_animator animateTransitionWithDirection:direction
+                            [self->_animator animateTransitionWithDirection:direction
                                                           loadHandler:nil
                                                     completionHandler:^(ORKVisualConsentTransitionAnimator *animator, UIPageViewControllerNavigationDirection direction) {
                                                         

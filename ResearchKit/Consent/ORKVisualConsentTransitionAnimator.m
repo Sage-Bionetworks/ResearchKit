@@ -170,10 +170,10 @@
     ORKVisualConsentAnimationContext *animationContext = (__bridge ORKVisualConsentAnimationContext *)context;
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (([keyPath isEqualToString:@"status"] && object == _moviePlayer) ||
-            ([keyPath isEqualToString:@"duration"] && object == _playerItem)) {
-            if (_moviePlayer.error) {
-                ORK_Log_Warning(@"%@", _moviePlayer.error);
+        if (([keyPath isEqualToString:@"status"] && object == self->_moviePlayer) ||
+            ([keyPath isEqualToString:@"duration"] && object == self->_playerItem)) {
+            if (self->_moviePlayer.error) {
+                ORK_Log_Warning(@"%@", self->_moviePlayer.error);
             }
             
             [self attemptAnimationWithContext:animationContext];

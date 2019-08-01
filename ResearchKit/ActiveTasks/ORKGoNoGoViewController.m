@@ -262,21 +262,21 @@ static const NSTimeInterval OutcomeAnimationDuration = 0.3;
 - (void)attemptDidFinish {
     void (^completion)(void) = ^{
         int successCount = 0;
-        for (ORKGoNoGoResult* res in _results) {
+        for (ORKGoNoGoResult* res in self->_results) {
             if (res.incorrect == NO) {
                 successCount++;
             }
         }
         
         if (successCount == [self gonogoTimeStep].numberOfAttempts) {
-            _testEnded = YES;
+            self->_testEnded = YES;
             [self configureTitle];
             [self performSelector:@selector(finish) withObject:nil afterDelay:2.5];
         } else {
             // If the user cancels the test, there may be animations active,
             // and the animation complete block will start the next test
             // after we've already tried to cancel. Don't let that happen
-            if (_testActive) {
+            if (self->_testActive) {
                 [self resetAfterDelay:2];
             }
         }

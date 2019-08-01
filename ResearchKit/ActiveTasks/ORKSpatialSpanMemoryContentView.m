@@ -94,8 +94,8 @@
             }
         }
         
-        _tileViews = newViews;
-        for (ORKSpatialSpanTargetView *view in _tileViews) {
+        self->_tileViews = newViews;
+        for (ORKSpatialSpanTargetView *view in self->_tileViews) {
             [view setState:ORKSpatialSpanTargetStateQuiescent];
         }
         

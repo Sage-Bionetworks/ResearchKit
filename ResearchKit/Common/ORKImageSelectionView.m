@@ -338,8 +338,8 @@ static const CGFloat SpacerWidth = 10.0;
             @throw [NSException exceptionWithName:NSGenericException reason:@"selectedIndexes should only containt objects of the NSNumber kind" userInfo:nil];
         }
         NSNumber *number = object;
-        if (number.unsignedIntegerValue < _buttonViews.count) {
-            ORKChoiceButtonView *buttonView = _buttonViews[number.unsignedIntegerValue];
+        if (number.unsignedIntegerValue < self->_buttonViews.count) {
+            ORKChoiceButtonView *buttonView = self->_buttonViews[number.unsignedIntegerValue];
             [buttonView button].selected = YES;
             [self setLabelText:buttonView.labelText];
         }

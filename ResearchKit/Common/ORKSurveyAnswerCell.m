@@ -185,12 +185,12 @@
                           delay:0.0
                         options:UIViewAnimationOptionCurveEaseInOut
                      animations:^ {
-                         if (UIEdgeInsetsEqualToEdgeInsets(tableView.contentInset, _cachedContentInsets) == NO) {
-                             tableView.contentInset = _cachedContentInsets;
+                         if (UIEdgeInsetsEqualToEdgeInsets(tableView.contentInset, self->_cachedContentInsets) == NO) {
+                             tableView.contentInset = self->_cachedContentInsets;
                          }
                          
-                         if (UIEdgeInsetsEqualToEdgeInsets(tableView.scrollIndicatorInsets, _cachedScrollIndicatorInsets) == NO) {
-                             tableView.scrollIndicatorInsets = _cachedScrollIndicatorInsets;
+                         if (UIEdgeInsetsEqualToEdgeInsets(tableView.scrollIndicatorInsets, self->_cachedScrollIndicatorInsets) == NO) {
+                             tableView.scrollIndicatorInsets = self->_cachedScrollIndicatorInsets;
                          }
                      }
                      completion:^(BOOL finished) {

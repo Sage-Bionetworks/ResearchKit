@@ -94,7 +94,7 @@
 
 - (void)queue_sessionRunning {
     dispatch_async(dispatch_get_main_queue(), ^{
-        _previewView.templateImageHidden = NO;
+        self->_previewView.templateImageHidden = NO;
     });
 }
 
@@ -283,7 +283,7 @@
     // Capture the image via the delegate
     [self.delegate capturePressed:^(BOOL captureSuccess) {
         // Stop ignoring presses
-        _capturePressesIgnored = NO;
+        self->_capturePressesIgnored = NO;
     }];
 }
 
@@ -298,7 +298,7 @@
     // Tell the delegate to start capturing again
     [self.delegate retakePressed:^{
         // Stop ignoring presses
-        _retakePressesIgnored = NO;
+        self->_retakePressesIgnored = NO;
     }];
 }
 

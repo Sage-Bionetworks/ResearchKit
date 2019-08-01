@@ -408,7 +408,7 @@ static NSString *const _SignatureStepIdentifier = @"signatureStep";
         ORKStepResult *result = [stepViewController result];
         [result.results enumerateObjectsUsingBlock:^(ORKResult * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             if ([obj isKindOfClass:[ORKSignatureResult class]]) {
-                _signatureImage = ((ORKSignatureResult *)obj).signatureImage;
+                self->_signatureImage = ((ORKSignatureResult *)obj).signatureImage;
                 *stop = YES;
     }
         }];

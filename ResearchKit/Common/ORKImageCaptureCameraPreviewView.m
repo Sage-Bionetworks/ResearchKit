@@ -151,9 +151,9 @@
     }
     [UIView animateWithDuration:0.15
                      animations:^{
-                         _templateImageView.alpha = hidden ? 0 : 1;
+                         self->_templateImageView.alpha = hidden ? 0 : 1;
                      } completion:^(BOOL finished) {
-                         _templateImageView.hidden = hidden;
+                         self->_templateImageView.hidden = hidden;
                      }];
 }
 

@@ -132,7 +132,7 @@
     // If we don't already have a captured image, then start running the capture session.
     if (!_fileURL) {
         dispatch_async(_sessionQueue, ^{
-            [_captureSession startRunning];
+            [self->_captureSession startRunning];
         });
     }
 }
@@ -141,7 +141,7 @@
     // If the capture session is running, stop it
     if (_captureSession.isRunning) {
         dispatch_async(_sessionQueue, ^{
-            [_captureSession stopRunning];
+            [self->_captureSession stopRunning];
         });
     }
     
@@ -261,9 +261,9 @@
 
 #pragma mark - ORKVideoCaptureViewDelegate
 
-- (void)retakePressed:(void (^)())handler {
+- (void)retakePressed:(void (^)(void))handler {
     dispatch_async(_sessionQueue, ^{
-        [_captureSession startRunning];
+        [self->_captureSession startRunning];
         dispatch_async(dispatch_get_main_queue(), ^{
             self.fileURL = nil;
             if (handler) {
@@ -273,18 +273,18 @@
     });
 }
 
-- (void)capturePressed:(void (^)())handler {
+- (void)capturePressed:(void (^)(void))handler {
     // Capture the video via the output
     dispatch_async(_sessionQueue, ^{
-        _fileURL = [self.outputDirectory URLByAppendingPathComponent:[NSString stringWithFormat:@"%@.mp4",self.step.identifier]];
+        self->_fileURL = [self.outputDirectory URLByAppendingPathComponent:[NSString stringWithFormat:@"%@.mp4",self.step.identifier]];
         
         NSFileManager *fileManager = [NSFileManager defaultManager];
-        if ([fileManager fileExistsAtPath:_fileURL.path]) {
-            [fileManager removeItemAtURL:_fileURL error:nil];
+        if ([fileManager fileExistsAtPath:self->_fileURL.path]) {
+            [fileManager removeItemAtURL:self->_fileURL error:nil];
         }
 
 
-        [_movieFileOutput startRecordingToOutputFileURL:_fileURL
+        [self->_movieFileOutput startRecordingToOutputFileURL:self->_fileURL
                                       recordingDelegate:self];
         
         // Use the main queue, as UI components may need to be updated
@@ -296,9 +296,9 @@
     });
 }
 
-- (void)stopCapturePressed:(void (^)())handler {
+- (void)stopCapturePressed:(void (^)(void))handler {
     dispatch_async(_sessionQueue, ^{
-        [_movieFileOutput stopRecording];
+        [self->_movieFileOutput stopRecording];
         
         // Use the main queue, as UI components may need to be updated
         dispatch_async(dispatch_get_main_queue(), ^{

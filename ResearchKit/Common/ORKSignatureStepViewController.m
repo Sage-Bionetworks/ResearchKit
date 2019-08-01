@@ -113,7 +113,7 @@
     if (clearButtonEnabled) {
         NSTimeInterval duration = (UIAccessibilityIsVoiceOverRunning() ? 0 : 0.2);
         [UIView animateWithDuration:duration delay:0 options:(UIViewAnimationOptions)UIViewAnimationOptionBeginFromCurrentState animations:^{
-            _clearButton.alpha = 1;
+            self->_clearButton.alpha = 1;
         } completion:^(BOOL finished) {
             UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
         }];
@@ -222,7 +222,7 @@
         if ([result isKindOfClass:[ORKStepResult class]]) {
             [[(ORKStepResult *)result results] enumerateObjectsUsingBlock:^(ORKResult * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
                 if ([obj isKindOfClass:[ORKSignatureResult class]]) {
-                    _originalPath = [(ORKSignatureResult*)obj signaturePath];
+                    self->_originalPath = [(ORKSignatureResult*)obj signaturePath];
                     *stop = YES;
                 }
             }];

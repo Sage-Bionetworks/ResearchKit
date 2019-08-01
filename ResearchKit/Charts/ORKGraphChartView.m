@@ -723,7 +723,7 @@ ORK_INLINE CALayer *graphPointLayerWithColor(UIColor *color, BOOL drawPointIndic
 }
 
 - (void)updateScrubberViewForXPosition:(CGFloat)xPosition plotIndex:(NSInteger)plotIndex {
-    void (^updateScrubberLinePosition)() = ^{
+    void (^updateScrubberLinePosition)(void) = ^{
         self.scrubberLine.center = CGPointMake(xPosition + ORKGraphChartViewLeftPadding, self.scrubberLine.center.y);
     };
     BOOL scrubberlineAnimated = (self.scrubberLine.alpha > 0);
@@ -781,9 +781,9 @@ ORK_INLINE CALayer *graphPointLayerWithColor(UIColor *color, BOOL drawPointIndic
 - (void)setScrubberViewsHidden:(BOOL)hidden animated:(BOOL)animated {
     void (^updateAlpha)(BOOL) = ^(BOOL hidden) {
         CGFloat alpha = hidden ? 0.0 : 1.0;
-        _scrubberThumbView.alpha = alpha;
-        _scrubberLine.alpha = alpha;
-        _scrubberLabel.alpha = alpha;
+        self->_scrubberThumbView.alpha = alpha;
+        self->_scrubberLine.alpha = alpha;
+        self->_scrubberLabel.alpha = alpha;
     };
     
     if (animated) {

@@ -92,9 +92,9 @@
     if (indexNumbers) {
         [indexNumbers enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop __unused) {
             NSUInteger pickerIdx = [self convertToPickerViewComponent:idx];
-            [_pickerView selectRow:[obj integerValue] inComponent:pickerIdx animated:NO];
-            if (_shouldShowSeparator && idx > 0) {
-                [_pickerView selectRow:0 inComponent:pickerIdx - 1 animated:NO];
+            [self->_pickerView selectRow:[obj integerValue] inComponent:pickerIdx animated:NO];
+            if (self->_shouldShowSeparator && idx > 0) {
+                [self->_pickerView selectRow:0 inComponent:pickerIdx - 1 animated:NO];
             }
         }];
     }
@@ -189,7 +189,7 @@
     __block NSMutableArray *answers = [NSMutableArray new];
     [self.helpers enumerateObjectsUsingBlock:^(ORKChoiceAnswerFormatHelper * _Nonnull helper, NSUInteger idx, BOOL * _Nonnull stop) {
         NSUInteger pickerIdx = [self convertToPickerViewComponent:idx];
-        NSInteger row = [_pickerView selectedRowInComponent:pickerIdx];
+        NSInteger row = [self->_pickerView selectedRowInComponent:pickerIdx];
         id answer = [helper answerForSelectedIndex:row];
         if ([answer isKindOfClass:[NSArray class]]) {
             id obj = [(NSArray*)answer firstObject];

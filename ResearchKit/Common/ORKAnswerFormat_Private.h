@@ -35,7 +35,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-ORK_EXTERN id ORKNullAnswerValue() ORK_AVAILABLE_DECL;
+ORK_EXTERN id ORKNullAnswerValue(void) ORK_AVAILABLE_DECL;
 
 
 @interface ORKAnswerFormat ()

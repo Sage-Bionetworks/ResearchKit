@@ -42,7 +42,7 @@ public extension Array where Element: Equatable {
      
      @return        Next object that matches this one or `nil` if not found.
      */
-    public func nextMatch(_ object: Array.Iterator.Element?) -> Array.Iterator.Element? {
+    func nextMatch(_ object: Array.Iterator.Element?) -> Array.Iterator.Element? {
         guard let match = object else { return self.first }
         return self.next({ (match == $0) })
     }
@@ -58,7 +58,7 @@ public extension Array {
      
      @return            An `Array` with the element appended to the end.
      */
-    public func appending(_ newElement: Element) -> [Element] {
+    func appending(_ newElement: Element) -> [Element] {
         var mutable = self
         mutable.append(newElement)
         return mutable
@@ -71,7 +71,7 @@ public extension Array {
      
      @return            An `Array` with the elements appended to the end.
      */
-    public func appending(contentsOf contents: [Element]) -> [Element] {
+    func appending(contentsOf contents: [Element]) -> [Element] {
         var mutable = self
         mutable.append(contentsOf: contents)
         return mutable

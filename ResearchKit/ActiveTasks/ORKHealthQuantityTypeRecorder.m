@@ -99,7 +99,7 @@ static const NSInteger _HealthAnchoredQueryLimit = 100;
     NSMutableArray *dictionaries = [NSMutableArray arrayWithCapacity:resultCount];
     [results enumerateObjectsUsingBlock:^(HKQuantitySample *sample, NSUInteger idx, BOOL *stop) {
         if (!self.isConsolidated) {
-            [dictionaries addObject:[sample ork_JSONDictionaryWithOptions:ORKSampleIncludeSource|ORKSampleIncludeMetadata unit:_unit]];
+            [dictionaries addObject:[sample ork_JSONDictionaryWithOptions:ORKSampleIncludeSource|ORKSampleIncludeMetadata unit:self->_unit]];
         } else {
             // If consolidating the results, then only record the bpm, timestamp and recorder identifier
             NSTimeInterval offset = (self.referenceUptime > 0) ? (self.uptime - self.referenceUptime) : 0;
@@ -124,7 +124,7 @@ static const NSInteger _HealthAnchoredQueryLimit = 100;
         
         if (newAnchor != nil) {
         
-            _anchor = newAnchor;
+            self->_anchor = newAnchor;
             
             if (resultCount == _HealthAnchoredQueryLimit) {
                 // Do another fetch immediately rather than wait for an observation

@@ -222,7 +222,7 @@ public extension HKWorkoutActivityType {
      @param identifier    The identifier to convert
      @return              An `HKWorkoutActivityType`. Default = `.other`
      */
-    public init(identifier: String) {
+    init(identifier: String) {
         guard let idx = ORKWorkoutActivityTypeIdentifiers.firstIndex(of: identifier),
             let type = HKWorkoutActivityType(rawValue: UInt(idx) + 1)
             else {
@@ -235,7 +235,7 @@ public extension HKWorkoutActivityType {
     /**
      String identifier for this enum value.
      */
-    public var identifier: String {
+    var identifier: String {
         let idx = self.rawValue
         guard idx >= 1 && idx <= UInt(ORKWorkoutActivityTypeIdentifiers.count) else {
             return "other"
@@ -252,7 +252,7 @@ public extension HKWorkoutEventType {
      @param identifier    The identifier to convert
      @return              An `HKWorkoutEventType` or `nil` if undefined
      */
-    public init?(identifier: String) {
+    init?(identifier: String) {
         guard let idx = ORKWorkoutEventTypeIdentifiers.firstIndex(of: identifier),
             let type = HKWorkoutEventType(rawValue: idx + 1) else {
                 return nil
@@ -263,7 +263,7 @@ public extension HKWorkoutEventType {
     /**
      String identifier for this enum value.
     */
-    public var identifier: String {
+    var identifier: String {
         let idx = self.rawValue
         guard idx >= 1 && idx <= ORKWorkoutEventTypeIdentifiers.count else {
             return "other"
@@ -282,7 +282,7 @@ public extension HKWorkoutSessionLocationType {
      @param identifier    The identifier to convert
      @return              An `HKWorkoutSessionLocationType`. Default = `.unknown`
      */
-    public init(identifier: String) {
+    init(identifier: String) {
         guard let idx = ORKWorkoutSessionLocationTypeIdentifiers.firstIndex(of: identifier),
             let type = HKWorkoutSessionLocationType(rawValue: Int(idx) + 1)
             else {
@@ -295,7 +295,7 @@ public extension HKWorkoutSessionLocationType {
     /**
      String identifier for this enum value.
      */
-    public var identifier: String {
+    var identifier: String {
         let idx = self.rawValue
         guard idx >= 1 && idx <= ORKWorkoutSessionLocationTypeIdentifiers.count else {
             return ORKWorkoutSessionLocationTypeIdentifiers[0]

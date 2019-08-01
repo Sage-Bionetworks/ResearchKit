@@ -264,19 +264,19 @@ static const CGFloat AssumedStatusBarHeight = 20;
         CGFloat visibleHeight = bounds.size.height - intersectionSize.height;
         
         // Keep track of the keyboard overlap, so we can adjust the constraint properly.
-        _keyboardOverlap = intersectionSize.height;
+        self->_keyboardOverlap = intersectionSize.height;
         
         [self updateContinueButtonConstraints];
         
         // Trigger layout inside the animation block to get the constraint change to animate.
         [self layoutIfNeeded];
         
-        if (_keyboardIsUp) {
+        if (self->_keyboardIsUp) {
             // The content ends at the bottom of the continueSkipContainer.
             // We want to calculate new insets so it's possible to scroll it fully visible, but no more.
             // Made a little more complicated because the contentSize will still extend below the bottom of this container,
             // because we haven't changed our bounds.
-            CGFloat contentMaxY = CGRectGetMaxY([self convertRect:_continueSkipContainer.bounds fromView:_continueSkipContainer]);
+            CGFloat contentMaxY = CGRectGetMaxY([self convertRect:self->_continueSkipContainer.bounds fromView:self->_continueSkipContainer]);
             
             // First compute the contentOffset.y that would make the continue and skip buttons visible
             CGFloat yOffset = MAX(contentMaxY - visibleHeight, 0);
@@ -284,7 +284,7 @@ static const CGFloat AssumedStatusBarHeight = 20;
             
             // If that yOffset would not make the stepView visible, override to align with the top of the stepView.
             CGRect potentialVisibleRect = (CGRect){{0,yOffset},{bounds.size.width,visibleHeight}};
-            CGRect targetBounds = [self convertRect:_stepView.bounds fromView:_stepView];
+            CGRect targetBounds = [self convertRect:self->_stepView.bounds fromView:self->_stepView];
             if (!CGRectContainsRect(potentialVisibleRect, targetBounds)) {
                 yOffset = targetBounds.origin.y;
             }

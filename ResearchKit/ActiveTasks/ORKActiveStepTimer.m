@@ -116,7 +116,7 @@ static NSTimeInterval timeIntervalFromMachTime(uint64_t delta) {
 
 - (void)setDuration:(NSTimeInterval)duration {
     dispatch_sync(_queue, ^{
-        _duration = duration;
+        self->_duration = duration;
     });
 }
 
@@ -136,11 +136,11 @@ static NSTimeInterval timeIntervalFromMachTime(uint64_t delta) {
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        _handler(self, finished);
-        dispatch_sync(_queue, ^{
+        self->_handler(self, finished);
+        dispatch_sync(self->_queue, ^{
             
             // If the timer is still NULL here, we can safely release the background task.
-            if (_timer == NULL) {
+            if (self->_timer == NULL) {
                 [self queue_releaseBackgroundTask];
             }
         });
@@ -172,8 +172,8 @@ static NSTimeInterval timeIntervalFromMachTime(uint64_t delta) {
     }
     _backgroundTaskIdentifier = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
         // This is guaranteed to be called synchronously on the main queue, switch to our queue to invalidate the identifier
-        dispatch_sync(_queue, ^{
-            _backgroundTaskIdentifier = UIBackgroundTaskInvalid;
+        dispatch_sync(self->_queue, ^{
+            self->_backgroundTaskIdentifier = UIBackgroundTaskInvalid;
         });
     }];
 }

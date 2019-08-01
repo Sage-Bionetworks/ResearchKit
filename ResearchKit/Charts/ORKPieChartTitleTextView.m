@@ -155,9 +155,9 @@
     _noDataLabel.alpha = 0.0;
     [UIView animateWithDuration:animationDuration
                      animations:^{
-                         _titleLabel.alpha = 1.0;
-                         _textLabel.alpha = 1.0;
-                         _noDataLabel.alpha = 1.0;
+                         self->_titleLabel.alpha = 1.0;
+                         self->_textLabel.alpha = 1.0;
+                         self->_noDataLabel.alpha = 1.0;
                      }];
 }
 

@@ -117,7 +117,7 @@ static const CGFloat ProgressCircleSpacing = 4;
 - (void)setIndex:(NSInteger)index {
     _index = index;
     [_circles enumerateObjectsUsingBlock:^(ORKProgressCircleView *circle, NSUInteger idx, BOOL *stop) {
-        circle.completed = (idx < _index);
+        circle.completed = (idx < self->_index);
     }];
 }
 

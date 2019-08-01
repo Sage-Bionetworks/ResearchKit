@@ -150,31 +150,31 @@ const CLLocationAccuracy ORKLocationRequiredAccuracy = 20;
                         // If the time is after the start time, then add the distance traveled to the total distance.
                         // This is a rough measurement and does not (at this time) include any spline drawing to measure the
                         // actual curve of the distance traveled.
-                        _totalDistance += [_locationData.lastObject distanceFromLocation:obj];
+                        self->_totalDistance += [self->_locationData.lastObject distanceFromLocation:obj];
                     }
                     if (timeInterval > -60.0) {
                         // Save the accurate data objects to an array for calculating the distance traveled.
-                        [_locationData addObject:obj];
+                        [self->_locationData addObject:obj];
                     }
                 }
                 
                 // Save the data points
                 NSMutableDictionary *dict = [[obj ork_JSONDictionaryWithRelativeDistanceOnly:relativeDistanceOnly
-                                                                                previous:_mostRecentLocation
+                                                                                previous:self->_mostRecentLocation
                                                                                timestamp:timestamp] mutableCopy];
                 dict[ORKRecorderIdentifierKey] = self.identifier;
                 if (!self.isStandingStill) {
-                    dict[ORKTotalGPSDistanceKey] = [NSDecimalNumber numberWithDouble:_totalDistance];
+                    dict[ORKTotalGPSDistanceKey] = [NSDecimalNumber numberWithDouble:self->_totalDistance];
                 }
                 [dictionaries addObject:[dict copy]];
                 
                 // If this is a valid location then store as the previous location
                 if (obj.horizontalAccuracy >= 0) {
-                    _mostRecentLocation = [obj copy];
+                    self->_mostRecentLocation = [obj copy];
                     if (timeInterval > 0) {
-                        [_recentLocations addObject:[obj copy]];
-                        if (_recentLocations.count > 5) {
-                            [_recentLocations removeObjectAtIndex:0];
+                        [self->_recentLocations addObject:[obj copy]];
+                        if (self->_recentLocations.count > 5) {
+                            [self->_recentLocations removeObjectAtIndex:0];
                         }
                     }
                 }
@@ -185,7 +185,7 @@ const CLLocationAccuracy ORKLocationRequiredAccuracy = 20;
     }
     if (!success) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            _recordingError = error;
+            self->_recordingError = error;
             [self stop];
         });
     }
@@ -222,7 +222,7 @@ const CLLocationAccuracy ORKLocationRequiredAccuracy = 20;
 - (NSTimeInterval)timestamp {
     __block NSTimeInterval timestamp = 0;
     dispatch_sync(_processingQueue, ^{
-        NSTimeInterval timeInterval = [_locationData.lastObject.timestamp timeIntervalSinceDate:self.startDate];
+        NSTimeInterval timeInterval = [self->_locationData.lastObject.timestamp timeIntervalSinceDate:self.startDate];
         NSTimeInterval uptimeDelta = (self.referenceUptime > 0) ? (self.uptime - self.referenceUptime) : 0;
         timestamp = (uptimeDelta + timeInterval);
     });
@@ -236,9 +236,9 @@ const CLLocationAccuracy ORKLocationRequiredAccuracy = 20;
 - (BOOL)isOutdoors {
     __block BOOL isOutdoors = NO;
     dispatch_sync(_processingQueue, ^{
-        if (_recentLocations.count > 0) {
+        if (self->_recentLocations.count > 0) {
             NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:NSStringFromSelector(@selector(horizontalAccuracy)) ascending:YES];
-            NSArray<CLLocation *> *sorted = [_recentLocations sortedArrayUsingDescriptors:@[sortDescriptor]];
+            NSArray<CLLocation *> *sorted = [self->_recentLocations sortedArrayUsingDescriptors:@[sortDescriptor]];
             isOutdoors = (sorted[sorted.count / 2].horizontalAccuracy <= ORKLocationRequiredAccuracy);
         }
     });
@@ -247,12 +247,12 @@ const CLLocationAccuracy ORKLocationRequiredAccuracy = 20;
 
 - (void)resetTotalDistanceWithInitialLocation:(nullable CLLocation *)initialLocation {
     dispatch_sync(_processingQueue, ^{
-        _totalDistance = 0;
-        _mostRecentLocation = [initialLocation copy];
-        [_recentLocations removeAllObjects];
-        [_locationData removeAllObjects];
-        if (_mostRecentLocation) {
-            [_locationData addObject:_mostRecentLocation];
+        self->_totalDistance = 0;
+        self->_mostRecentLocation = [initialLocation copy];
+        [self->_recentLocations removeAllObjects];
+        [self->_locationData removeAllObjects];
+        if (self->_mostRecentLocation) {
+            [self->_locationData addObject:self->_mostRecentLocation];
         }
     });
 }
