@@ -128,7 +128,7 @@ public final class ORKWorkoutUtilities: NSObject {
     /**
      List of the distance types to be measured and their associated preferred unit.
      */
-    open static let supportedDistanceTypeIdentifiers : [HKQuantityTypeIdentifier] = {
+    public static let supportedDistanceTypeIdentifiers : [HKQuantityTypeIdentifier] = {
         var types: [HKQuantityTypeIdentifier] = [.distanceWalkingRunning,
                                                  .distanceCycling]
         if #available(iOS 10.0, *), #available(watchOS 3.0, *){
@@ -148,7 +148,7 @@ public final class ORKWorkoutUtilities: NSObject {
     @available(iOS 10.0, *)
     @available(watchOS 3.0, *)
     @objc(queryIdentifiersForWorkoutConfiguration:)
-    open class func queryIdentifiers(for workoutConfiguration: HKWorkoutConfiguration) -> [HKQuantityTypeIdentifier] {
+    public class func queryIdentifiers(for workoutConfiguration: HKWorkoutConfiguration) -> [HKQuantityTypeIdentifier] {
         
         var queryIds: [HKQuantityTypeIdentifier] = [HKQuantityTypeIdentifier.activeEnergyBurned,
                                                     HKQuantityTypeIdentifier.heartRate]
@@ -178,7 +178,7 @@ public final class ORKWorkoutUtilities: NSObject {
      
      @return    Calculated duration
      */
-    open class func computeDurationOfWorkout(withEvents workoutEvents: [HKWorkoutEvent]?, startDate: Date?, endDate: Date?) -> TimeInterval {
+    public class func computeDurationOfWorkout(withEvents workoutEvents: [HKWorkoutEvent]?, startDate: Date?, endDate: Date?) -> TimeInterval {
         var duration = 0.0
         
         if var lastDate = startDate {
@@ -223,7 +223,7 @@ public extension HKWorkoutActivityType {
      @return              An `HKWorkoutActivityType`. Default = `.other`
      */
     public init(identifier: String) {
-        guard let idx = ORKWorkoutActivityTypeIdentifiers.index(of: identifier),
+        guard let idx = ORKWorkoutActivityTypeIdentifiers.firstIndex(of: identifier),
             let type = HKWorkoutActivityType(rawValue: UInt(idx) + 1)
             else {
                 self = .other
@@ -253,7 +253,7 @@ public extension HKWorkoutEventType {
      @return              An `HKWorkoutEventType` or `nil` if undefined
      */
     public init?(identifier: String) {
-        guard let idx = ORKWorkoutEventTypeIdentifiers.index(of: identifier),
+        guard let idx = ORKWorkoutEventTypeIdentifiers.firstIndex(of: identifier),
             let type = HKWorkoutEventType(rawValue: idx + 1) else {
                 return nil
         }
@@ -283,7 +283,7 @@ public extension HKWorkoutSessionLocationType {
      @return              An `HKWorkoutSessionLocationType`. Default = `.unknown`
      */
     public init(identifier: String) {
-        guard let idx = ORKWorkoutSessionLocationTypeIdentifiers.index(of: identifier),
+        guard let idx = ORKWorkoutSessionLocationTypeIdentifiers.firstIndex(of: identifier),
             let type = HKWorkoutSessionLocationType(rawValue: Int(idx) + 1)
             else {
                 self = .unknown
