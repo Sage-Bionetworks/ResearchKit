@@ -361,6 +361,8 @@ typedef NS_CLOSED_ENUM(NSInteger, ORKUpdateConstraintSequence) {
 
 - (void)setupTitleLabelConstraints {
     _titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    _titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
+    _titleLabel.numberOfLines = 0;
     [self setTitleLabelTopConstraint];
     [_updatedConstraints addObjectsFromArray:@[
                                                _titleLabelTopConstraint,
