@@ -326,10 +326,12 @@ static CGFloat const kForgotPasscodeHeight              = 100.0f;
 }
 
 - (void)makePasscodeViewBecomeFirstResponder {
-    _shouldResignFirstResponder = NO;
-    if (![_accessibilityPasscodeField isFirstResponder]) {
-        [_accessibilityPasscodeField becomeFirstResponder];
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self->_shouldResignFirstResponder = NO;
+        if (![self->_accessibilityPasscodeField isFirstResponder]) {
+            [self->_accessibilityPasscodeField becomeFirstResponder];
+        }
+    });
 }
 
 - (void)makePasscodeViewResignFirstResponder {
