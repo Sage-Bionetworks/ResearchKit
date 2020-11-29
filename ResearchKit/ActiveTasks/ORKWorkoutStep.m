@@ -174,50 +174,12 @@ ORKWorkoutResultIdentifier const ORKWorkoutResultIdentifierDistanceTraveled = @"
     return [ORKWorkoutStepViewController class];
 }
 
-- (ORKStep *)stepAfterStepWithIdentifier:(NSString *)identifier withResult:(ORKTaskResult *)result {
-    //ORKStepResult *stepResult = [result stepResultForStepIdentifier:identifier];
-    if ([identifier isEqualToString:ORKWorkoutOutdoorInstructionStepIdentifier]) {
-        return [self.pageTask stepWithIdentifier:ORKWorkoutBeforeCountdownStepIdentifier];
-    } else {
-        ORKStep *nextStep = [super stepAfterStepWithIdentifier:identifier withResult:result];
-        if ([self shouldAlertUserToMoveOutdoors] &&
-            [nextStep.identifier isEqualToString:ORKWorkoutBeforeCountdownStepIdentifier] &&
-            (self.locationState == ORKLocationStateInside)) {
-            // If this is an outdoor workout and the accuracy indicates that the user is indoors
-            // then instruct them to move outdoors.
-            self.locationState = ORKLocationStateTriggered;
-            return [self createOutdoorsInstructionStep];
-        }
-        return nextStep;
-    }
-}
-
 - (BOOL)shouldStopRecordersOnFinishedWithStep:(ORKStep *)step {
     return [step.identifier isEqualToString:ORKWorkoutAfterStepIdentifier];
 }
 
 - (BOOL)shouldAlertUserToMoveOutdoors {
     return (self.workoutConfiguration.locationType == HKWorkoutSessionLocationTypeOutdoor);
-}
-
-- (ORKQuestionStep *)createOutdoorsInstructionStep {
-    
-    ORKTextChoice *choice1 = [ORKTextChoice choiceWithText:ORKLocalizedString(@"CARDIO_OUTDOOR_ALREADY_OUTSIDE", nil)
-                                                     value:@"CARDIO_OUTDOOR_ALREADY_OUTSIDE"];
-    ORKTextChoice *choice2 = [ORKTextChoice choiceWithText:ORKLocalizedString(@"CARDIO_OUTDOOR_STAY_INDOORS", nil)
-                                                     value:@"CARDIO_OUTDOOR_STAY_INDOORS"];
-    ORKTextChoice *choice3 = [ORKTextChoice choiceWithText:ORKLocalizedString(@"CARDIO_OUTDOOR_CONTINUE", nil)
-                                                     value:@"CARDIO_OUTDOOR_CONTINUE"];
-    ORKAnswerFormat *format = [ORKAnswerFormat choiceAnswerFormatWithStyle:ORKChoiceAnswerStyleSingleChoice
-                                                               textChoices:@[choice1, choice2, choice3]];
-    
-    ORKQuestionStep *step = [ORKQuestionStep questionStepWithIdentifier:ORKWorkoutOutdoorInstructionStepIdentifier
-                                                                  title:ORKLocalizedString(@"CARDIO_OUTDOOR_INSTRUCTION_TITLE", nil)
-                                                                   text:ORKLocalizedString(@"CARDIO_OUTDOOR_INSTRUCTION_TEXT", nil)
-                                                                 answer:format];
-    step.useSurveyMode = YES;
-    step.optional = NO;
-    return step;
 }
 
 #pragma mark - Encoding, Copying and Equality

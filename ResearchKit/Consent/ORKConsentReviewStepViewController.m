@@ -231,7 +231,7 @@ static NSString *const _FamilyNameIdentifier = @"family";
     NSString *html = [document mobileHTMLWithTitle:ORKLocalizedString(@"CONSENT_REVIEW_TITLE", nil)
                                              detail:ORKLocalizedString(@"CONSENT_REVIEW_INSTRUCTION", nil)];
 
-    ORKConsentReviewController *reviewViewController = [[ORKConsentReviewController alloc] initWithHTML:html delegate:self];
+    ORKConsentReviewController *reviewViewController = [[ORKConsentReviewController alloc] initWithHTML:html delegate:self requiresScrollToBottom:[[self consentReviewStep] requiresScrollToBottom]];
     reviewViewController.localizedReasonForConsent = [[self consentReviewStep] reasonForConsent];
     return reviewViewController;
 }
@@ -263,6 +263,7 @@ static NSString *const _SignatureStepIdentifier = @"signatureStep";
         case ORKConsentReviewPhaseName: {
             // A form step VC with a form step with a first name and a last name
             ORKFormStepViewController *formViewController = [self makeNameFormViewController];
+            formViewController.cancelButtonItem = self.cancelButtonItem;
             viewController = formViewController;
             break;
         }
@@ -275,6 +276,7 @@ static NSString *const _SignatureStepIdentifier = @"signatureStep";
         case ORKConsentReviewPhaseSignature: {
             // Signature VC
             ORKSignatureStepViewController *signatureViewController = [self makeSignatureViewController];
+            signatureViewController.cancelButtonItem = self.cancelButtonItem;
             viewController = signatureViewController;
             break;
         }
@@ -408,7 +410,7 @@ static NSString *const _SignatureStepIdentifier = @"signatureStep";
         ORKStepResult *result = [stepViewController result];
         [result.results enumerateObjectsUsingBlock:^(ORKResult * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             if ([obj isKindOfClass:[ORKSignatureResult class]]) {
-                self->_signatureImage = ((ORKSignatureResult *)obj).signatureImage;
+                _signatureImage = ((ORKSignatureResult *)obj).signatureImage;
                 *stop = YES;
     }
         }];
